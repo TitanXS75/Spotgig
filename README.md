@@ -1,73 +1,64 @@
-# Welcome to your Lovable project
+# Aaspass — Hyperlocal Marketplace
 
-## Project info
+**Aaspass** (meaning *nearby* in Hindi) is a mobile-first web app that connects buyers with home-based sellers in their neighbourhood. Think of it as a local discovery feed — buyers can find handmade food, crafts, tailoring, tutoring, and other home-based products or services within walking distance, and contact sellers directly on WhatsApp or Instagram.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## What It Does
 
-There are several ways of editing your application.
+- 📍 **Location-aware feed** — shows listings sorted by distance from the user's current location (falls back to city centre if permission is denied).
+- 🔍 **Search & filter** — search by keyword, filter by category (Food, Fashion, Services, etc.) or type (Product / Service), and set a max distance radius.
+- 🃏 **Listing cards** — each card shows the seller's area, distance, contact channels, and tags at a glance.
+- 📄 **Listing detail page** — full description, seller info, view count, and one-tap WhatsApp / Instagram contact buttons.
+- 🗂️ **Categories page** — browse all available categories with emoji icons.
+- 🗺️ **Map view** — placeholder for a future map-based discovery experience.
+- 👤 **Profile page** — buyer / seller profile overview.
+- 🛍️ **Seller onboarding** — a 3-step flow for home sellers to create a listing (details → contact & location → review & pay). Pricing starts at ₹100/month.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+| Layer | Technology |
+|---|---|
+| Framework | React 18 + Vite 5 |
+| Language | TypeScript |
+| Styling | Tailwind CSS v3 + shadcn-ui |
+| Animation | Framer Motion |
+| Routing | React Router DOM v6 |
+| State | Zustand |
+| Data Fetching | TanStack Query (React Query) |
+| Forms | React Hook Form + Zod |
+| Charts | Recharts |
+| Testing | Vitest + Testing Library |
+| Linting | ESLint + TypeScript-ESLint |
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Project Structure
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+src/
+├── components/       # Reusable UI pieces (TopBar, BottomNav, ListingCard, SearchBar, …)
+├── pages/            # Route-level pages (Index, ListingDetail, CategoriesPage, SellerOnboarding, …)
+├── store/            # Zustand global state (app-store)
+├── lib/              # Utilities & mock data (mock-data, distance helpers)
+├── hooks/            # Custom React hooks
+└── assets/           # Static assets
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Key Features & Design Decisions
 
-**Use GitHub Codespaces**
+- **Privacy-first** — seller exact addresses are never shown; only the area name and approximate distance are displayed.
+- **Dual contact channels** — sellers can list a WhatsApp number and/or Instagram handle; buyers tap once to connect.
+- **Emoji-based listing identity** — sellers pick an emoji as their listing avatar, keeping onboarding lightweight with no image upload required.
+- **Distance calculated client-side** — the Haversine formula is used in `src/lib/distance.ts` for fast, dependency-free distance sorting.
+- **Smooth animations** — Framer Motion drives card entrance, layout transitions, and the step-based onboarding flow.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## Target Audience
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Home-based sellers (cooks, tailors, tutors, craftspeople) in Indian cities who don't have a formal shopfront, and buyers who prefer supporting local micro-entrepreneurs close to home.

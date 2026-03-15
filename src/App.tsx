@@ -9,7 +9,7 @@ import Index from "./pages/Index";
 import ListingDetail from "./pages/ListingDetail";
 import CategoriesPage from "./pages/CategoriesPage";
 import ProfilePage from "./pages/ProfilePage";
-import MapPlaceholder from "./pages/MapPlaceholder";
+import MapPage from "./pages/MapPage";
 import SellerOnboarding from "./pages/SellerOnboarding";
 import NotFound from "./pages/NotFound";
 
@@ -22,13 +22,13 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <TopBar />
-        <main className="min-h-screen pt-0 pb-0">
+        <main className="min-h-screen">
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/listing/:id" element={<ListingDetail />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/map" element={<MapPlaceholder />} />
+            <Route path="/map" element={<MapPage />} />
             <Route path="/seller/onboarding" element={<SellerOnboarding />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -76,10 +76,10 @@ const Index = () => {
         className="pt-4 pb-5"
       >
         <h1 className="text-display text-foreground">
-          Find home-sellers in your neighborhood.
+          Apne aaspass ke sellers dhundho.
         </h1>
         <p className="text-sm text-muted-foreground mt-2">
-          Discover local products & services within walking distance.
+          Ghar baithe local products & services paao, paidal distance mein.
         </p>
         {!hasLocation && (
           <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">

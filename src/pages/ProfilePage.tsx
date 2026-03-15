@@ -39,7 +39,7 @@ const ProfilePage = () => {
       >
         <h3 className="font-semibold text-foreground">Become a seller</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          List your home business for ₹299. Reach customers within 5km.
+          Apni dukaan list karo sirf ₹100/month mein. ₹1,200/year mein poora saal live raho!
         </p>
         <motion.button
           whileTap={{ scale: 0.96 }}

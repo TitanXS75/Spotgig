@@ -1,5 +1,5 @@
-import { MapPin } from 'lucide-react';
 import { useAppStore } from '@/store/app-store';
+import aaspassLogo from '@/assets/aaspass-logo.png';
 
 const TopBar = () => {
   const { hasLocation } = useAppStore();
@@ -8,11 +8,9 @@ const TopBar = () => {
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl">
       <div className="max-w-md mx-auto flex items-center justify-between h-14 px-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
-            <MapPin className="w-4 h-4 text-primary-foreground" />
-          </div>
+          <img src={aaspassLogo} alt="Aaspass logo" className="w-8 h-8 rounded-xl object-contain" />
           <span className="text-lg font-semibold tracking-tight text-foreground">
-            Lokalink
+            Aaspass
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -22,9 +20,6 @@ const TopBar = () => {
               Live
             </span>
           )}
-          <button className="text-meta font-medium text-primary px-3 py-1.5 rounded-lg bg-primary/10">
-            Login
-          </button>
         </div>
       </div>
     </header>

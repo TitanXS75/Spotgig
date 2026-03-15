@@ -45,6 +45,7 @@ const ProfilePage = () => {
         </p>
         <motion.button
           whileTap={{ scale: 0.96 }}
+          onClick={() => navigate('/seller/onboarding')}
           className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-primary"
         >
           Get Started <ArrowRight className="w-4 h-4" />

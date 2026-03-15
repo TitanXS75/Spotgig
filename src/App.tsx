@@ -3,8 +3,14 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import TopBar from "@/components/TopBar";
+import BottomNav from "@/components/BottomNav";
+import Index from "./pages/Index";
+import ListingDetail from "./pages/ListingDetail";
+import CategoriesPage from "./pages/CategoriesPage";
+import ProfilePage from "./pages/ProfilePage";
+import MapPlaceholder from "./pages/MapPlaceholder";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -14,11 +20,18 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <TopBar />
+        <main className="min-h-screen pt-0 pb-0">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/listing/:id" element={<ListingDetail />} />
+            <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/map" element={<MapPlaceholder />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+        <BottomNav />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

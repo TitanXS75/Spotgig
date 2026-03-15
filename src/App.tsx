@@ -29,6 +29,7 @@ const App = () => (
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/map" element={<MapPlaceholder />} />
+            <Route path="/seller/onboarding" element={<SellerOnboarding />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

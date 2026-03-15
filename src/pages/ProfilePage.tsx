@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { User, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
   return (

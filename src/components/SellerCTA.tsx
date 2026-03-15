@@ -19,12 +19,14 @@ const SellerCTA = () => {
     </p>
     <motion.button
       whileTap={{ scale: 0.96 }}
+      onClick={() => navigate('/seller/onboarding')}
       className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg"
     >
       Register Now
       <ArrowRight className="w-4 h-4" />
     </motion.button>
   </motion.div>
-);
+  );
+};
 
 export default SellerCTA;

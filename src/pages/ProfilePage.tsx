@@ -11,7 +11,7 @@ const ProfilePage = () => {
         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
           <User className="w-7 h-7 text-muted-foreground" />
         </div>
-        <h2 className="font-semibold text-foreground">Sign in to Lokalink</h2>
+        <h2 className="font-semibold text-foreground">Sign in to Aaspass</h2>
         <p className="text-sm text-muted-foreground mt-1 max-w-[280px]">
           Create an account to contact sellers and list your own business.
         </p>

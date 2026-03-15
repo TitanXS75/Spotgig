@@ -17,37 +17,6 @@
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | React 18 + Vite 5 |
-| Language | TypeScript |
-| Styling | Tailwind CSS v3 + shadcn-ui |
-| Animation | Framer Motion |
-| Routing | React Router DOM v6 |
-| State | Zustand |
-| Data Fetching | TanStack Query (React Query) |
-| Forms | React Hook Form + Zod |
-| Charts | Recharts |
-| Testing | Vitest + Testing Library |
-| Linting | ESLint + TypeScript-ESLint |
-
----
-
-## Project Structure
-
-```
-src/
-├── components/       # Reusable UI pieces (TopBar, BottomNav, ListingCard, SearchBar, …)
-├── pages/            # Route-level pages (Index, ListingDetail, CategoriesPage, SellerOnboarding, …)
-├── store/            # Zustand global state (app-store)
-├── lib/              # Utilities & mock data (mock-data, distance helpers)
-├── hooks/            # Custom React hooks
-└── assets/           # Static assets
-```
-
----
 
 ## Key Features & Design Decisions
 

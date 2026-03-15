@@ -47,7 +47,7 @@ const SellerOnboarding = () => {
   const step2Valid = area && (whatsapp.length === 10 || instagram.length > 0);
 
   return (
-    <div className="max-w-md mx-auto px-4 pb-24">
+    <div className="max-w-xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-4 pb-2">
         <button onClick={() => step > 0 ? setStep(step - 1) : navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground mb-3">

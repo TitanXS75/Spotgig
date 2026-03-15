@@ -1,26 +1,56 @@
 import { useAppStore } from '@/store/app-store';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Home, MapPin, Grid3X3, User } from 'lucide-react';
 import aaspassLogo from '@/assets/aaspass-logo.png';
+import { motion } from 'framer-motion';
+
+const NAV_ITEMS = [
+  { path: '/', icon: Home, label: 'Home' },
+  { path: '/categories', icon: Grid3X3, label: 'Explore' },
+  { path: '/profile', icon: User, label: 'Profile' },
+];
 
 const TopBar = () => {
   const { hasLocation } = useAppStore();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl">
-      <div className="max-w-md mx-auto flex items-center justify-between h-14 px-4">
-        <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-14 px-4 md:px-6">
+        {/* Logo */}
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => navigate('/')}
+        >
           <img src={aaspassLogo} alt="Aaspass logo" className="w-8 h-8 rounded-xl object-contain" />
-          <span className="text-lg font-semibold tracking-tight text-foreground">
-            Aaspass
-          </span>
+          <span className="text-lg font-semibold tracking-tight text-foreground">Aaspass</span>
+
         </div>
-        <div className="flex items-center gap-2">
-          {hasLocation && (
-            <span className="text-meta text-muted-foreground flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-dot" />
-              Live
-            </span>
-          )}
-        </div>
+
+        {/* Desktop nav links */}
+        <nav className="hidden md:flex items-center gap-1">
+          {NAV_ITEMS.map(({ path, icon: Icon, label }) => {
+            const isActive = location.pathname === path;
+            return (
+              <motion.button
+                key={path}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => navigate(path)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'text-primary bg-primary/8'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                <Icon className="w-4 h-4" strokeWidth={isActive ? 2.5 : 2} />
+                {label}
+              </motion.button>
+            );
+          })}
+        </nav>
+
+
       </div>
     </header>
   );

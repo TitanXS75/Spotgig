@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const ProfilePage = () => {
   const navigate = useNavigate();
   return (
-    <div className="max-w-md mx-auto px-4 pb-24">
+    <div className="max-w-2xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-4">
         <h1 className="text-subhead text-foreground">Profile</h1>
       </motion.div>

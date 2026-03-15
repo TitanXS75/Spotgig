@@ -68,18 +68,18 @@ const Index = () => {
   }, [searchQuery, selectedCategory, typeFilter, distanceFilter, sortBy, userLat, userLng]);
 
   return (
-    <div className="max-w-md mx-auto px-4 pb-24">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
       {/* Hero */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="pt-4 pb-5"
+        className="pt-6 pb-5"
       >
-        <h1 className="text-display text-foreground">
+        <h1 className="text-display text-foreground md:text-5xl">
           Find home-sellers near you.
         </h1>
-        <p className="text-sm text-muted-foreground mt-2">
-          Discover local products & services within walking distance.
+        <p className="text-sm md:text-base text-muted-foreground mt-2">
+          Discover local products &amp; services within walking distance.
         </p>
         {!hasLocation && (
           <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
@@ -89,68 +89,68 @@ const Index = () => {
         )}
       </motion.div>
 
-      {/* Search & Filters */}
-      <div className="flex flex-col gap-3 mb-4">
-        <SearchBar />
-        <TypeToggle />
-        <CategoryPills />
-      </div>
+      <div>
+          {/* Search & Filters */}
+          <div className="flex flex-col gap-3 mb-4">
+            <SearchBar />
+            <TypeToggle />
+            <CategoryPills />
+          </div>
 
-      {/* Results meta */}
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-meta text-muted-foreground">
-          {filtered.length} seller{filtered.length !== 1 ? 's' : ''} found
-        </span>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as 'distance' | 'newest')}
-          className="text-meta text-muted-foreground bg-transparent focus:outline-none cursor-pointer"
-        >
-          <option value="distance">Nearest first</option>
-          <option value="newest">Newest first</option>
-        </select>
-      </div>
+          {/* Results meta */}
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-meta text-muted-foreground">
+              {filtered.length} seller{filtered.length !== 1 ? 's' : ''} found
+            </span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'distance' | 'newest')}
+              className="text-meta text-muted-foreground bg-transparent focus:outline-none cursor-pointer"
+            >
+              <option value="distance">Nearest first</option>
+              <option value="newest">Newest first</option>
+            </select>
+          </div>
 
-      {/* Grid */}
-      {loading ? (
-        <div className="grid grid-cols-2 gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <ListingCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center py-16 text-center"
-        >
-          <PackageOpen className="w-12 h-12 text-muted-foreground/40 mb-3" />
-          <p className="font-medium text-foreground">No sellers found nearby</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Try increasing your distance or clearing filters
-          </p>
-        </motion.div>
-      ) : (
-        <AnimatePresence mode="popLayout">
-          <motion.div layout className="grid grid-cols-2 gap-3">
-            {filtered.map((listing) => (
-              <motion.div
-                key={listing.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ListingCard listing={listing} />
+          {/* Grid */}
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <ListingCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center py-16 text-center"
+            >
+              <PackageOpen className="w-12 h-12 text-muted-foreground/40 mb-3" />
+              <p className="font-medium text-foreground">No sellers found nearby</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Try increasing your distance or clearing filters
+              </p>
+            </motion.div>
+          ) : (
+            <AnimatePresence mode="popLayout">
+              <motion.div layout className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                {filtered.map((listing) => (
+                  <motion.div
+                    key={listing.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ListingCard listing={listing} />
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
-      )}
+            </AnimatePresence>
+          )}
 
-      {/* Seller CTA */}
-      <SellerCTA />
+      </div>
     </div>
   );
 };

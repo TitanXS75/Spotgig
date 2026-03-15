@@ -36,7 +36,7 @@ const ListingDetail = () => {
 
   const whatsappUrl = listing.whatsapp
     ? `https://wa.me/${listing.whatsapp}?text=${encodeURIComponent(
-        `Hi! Maine aapko Aaspass pe dekha. Mujhe ${listing.name} mein interest hai.`
+        `Hi! I found you on Aaspass. I'm interested in ${listing.name}.`
       )}`
     : null;
 

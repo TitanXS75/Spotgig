@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { User, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   return (
     <div className="max-w-md mx-auto px-4 pb-24">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-4">
@@ -39,10 +41,11 @@ const ProfilePage = () => {
       >
         <h3 className="font-semibold text-foreground">Become a seller</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Apni dukaan list karo sirf ₹100/month mein. ₹1,200/year mein poora saal live raho!
+          List your business for just ₹100/month. Go yearly at ₹1,200 and stay live all year!
         </p>
         <motion.button
           whileTap={{ scale: 0.96 }}
+          onClick={() => navigate('/seller/onboarding')}
           className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-primary"
         >
           Get Started <ArrowRight className="w-4 h-4" />

@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const SellerCTA = () => (
+const SellerCTA = () => {
+  const navigate = useNavigate();
+  return (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -12,16 +15,18 @@ const SellerCTA = () => (
       Are you a local seller?
     </h3>
     <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-      Apni dukaan list karo sirf ₹100/month mein aur apne area ke customers tak pahuncho. ₹1,200/year mein poora saal live raho!
+      List your business for just ₹100/month and reach customers near you. Save with ₹1,200/year plan!
     </p>
     <motion.button
       whileTap={{ scale: 0.96 }}
+      onClick={() => navigate('/seller/onboarding')}
       className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg"
     >
       Register Now
       <ArrowRight className="w-4 h-4" />
     </motion.button>
   </motion.div>
-);
+  );
+};
 
 export default SellerCTA;

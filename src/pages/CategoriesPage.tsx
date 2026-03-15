@@ -1,15 +1,29 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Search } from 'lucide-react';
+import { useState } from 'react';
 import { CATEGORIES, MOCK_LISTINGS } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
 
 const CategoriesPage = () => {
   const navigate = useNavigate();
-  const { setSelectedCategory } = useAppStore();
+  const { setSelectedCategory, setSearchQuery } = useAppStore();
+  const [query, setQuery] = useState('');
 
   const handleCategoryTap = (name: string) => {
     setSelectedCategory(name);
     navigate('/');
+  };
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      setSearchQuery(query.trim());
+      navigate('/');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSearch();
   };
 
   return (
@@ -18,6 +32,29 @@ const CategoriesPage = () => {
         <h1 className="text-subhead text-foreground">Explore Categories</h1>
         <p className="text-sm text-muted-foreground mt-1">Find sellers by what they offer</p>
       </motion.div>
+
+      {/* Search bar */}
+      <div className="flex gap-2 mb-5">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search sellers, products..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-shadow"
+          />
+        </div>
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          onClick={handleSearch}
+          className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
+        >
+          Search
+        </motion.button>
+      </div>
+
       <div className="grid grid-cols-2 gap-3">
         {CATEGORIES.map(({ name, emoji }, i) => {
           const count = MOCK_LISTINGS.filter((l) => l.category === name && l.status === 'live').length;

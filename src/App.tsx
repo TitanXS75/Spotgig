@@ -10,6 +10,7 @@ import ListingDetail from "./pages/ListingDetail";
 import CategoriesPage from "./pages/CategoriesPage";
 import ProfilePage from "./pages/ProfilePage";
 import MapPlaceholder from "./pages/MapPlaceholder";
+import SellerOnboarding from "./pages/SellerOnboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

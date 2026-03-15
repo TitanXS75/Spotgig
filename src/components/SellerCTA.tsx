@@ -12,7 +12,7 @@ const SellerCTA = () => (
       Are you a local seller?
     </h3>
     <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-      Apni dukaan list karo sirf ₹100/month mein aur apne area ke customers tak pahuncho. ₹1,200/year mein poora saal live raho!
+      List your business for just ₹100/month and reach customers near you. Save with ₹1,200/year plan!
     </p>
     <motion.button
       whileTap={{ scale: 0.96 }}

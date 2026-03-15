@@ -39,7 +39,7 @@ const ProfilePage = () => {
       >
         <h3 className="font-semibold text-foreground">Become a seller</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Apni dukaan list karo sirf ₹100/month mein. ₹1,200/year mein poora saal live raho!
+          List your business for just ₹100/month. Go yearly at ₹1,200 and stay live all year!
         </p>
         <motion.button
           whileTap={{ scale: 0.96 }}

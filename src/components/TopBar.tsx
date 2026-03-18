@@ -1,7 +1,7 @@
 import { useAppStore } from '@/store/app-store';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, MapPin, Grid3X3, User } from 'lucide-react';
-import aaspassLogo from '@/assets/aaspass-logo.png';
+import aplgLogo from '/aplg.png';
 import { motion } from 'framer-motion';
 
 const NAV_ITEMS = [
@@ -23,7 +23,7 @@ const TopBar = () => {
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => navigate('/')}
         >
-          <img src={aaspassLogo} alt="Aaspass logo" className="w-8 h-8 rounded-xl object-contain" />
+          <img src={aplgLogo} alt="Aaspass logo" className="w-8 h-8 rounded-xl object-contain" />
           <span className="text-lg font-semibold tracking-tight text-foreground">Aaspass</span>
 
         </div>

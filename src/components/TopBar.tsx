@@ -1,12 +1,14 @@
 import { useAppStore } from '@/store/app-store';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, MapPin, Grid3X3, User } from 'lucide-react';
+import { Home, Map, Grid3X3, User } from 'lucide-react';
 import aplgLogo from '/aplg.png';
 import { motion } from 'framer-motion';
+import ThemeToggle from './ThemeToggle';
 
 const NAV_ITEMS = [
-  { path: '/', icon: Home, label: 'Home' },
+  { path: '/home', icon: Home, label: 'Home' },
   { path: '/categories', icon: Grid3X3, label: 'Explore' },
+  { path: '/map', icon: Map, label: 'Map' },
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
@@ -15,17 +17,19 @@ const TopBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Hide top bar on landing and auth pages
+  if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/forgot-password') return null;
+
   return (
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-14 px-4 md:px-6">
         {/* Logo */}
         <div
           className="flex items-center gap-2 cursor-pointer"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/home')}
         >
           <img src={aplgLogo} alt="Aaspass logo" className="w-8 h-8 rounded-xl object-contain" />
           <span className="text-lg font-semibold tracking-tight text-foreground">Aaspass</span>
-
         </div>
 
         {/* Desktop nav links */}
@@ -50,7 +54,10 @@ const TopBar = () => {
           })}
         </nav>
 
-
+        {/* Right actions */}
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

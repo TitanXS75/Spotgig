@@ -1,10 +1,11 @@
-import { Home, MapPin, Grid3X3, User } from 'lucide-react';
+import { Home, Map, Grid3X3, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const NAV_ITEMS = [
-  { path: '/', icon: Home, label: 'Home' },
+  { path: '/home', icon: Home, label: 'Home' },
   { path: '/categories', icon: Grid3X3, label: 'Explore' },
+  { path: '/map', icon: Map, label: 'Map' },
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
@@ -12,8 +13,11 @@ const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Hide bottom nav on landing and auth pages
+  if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/forgot-password') return null;
+
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl shadow-nav safe-bottom">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl shadow-nav safe-bottom border-t border-border/50">
       <div className="max-w-md mx-auto flex items-center justify-around h-16">
         {NAV_ITEMS.map(({ path, icon: Icon, label }) => {
           const isActive = location.pathname === path;

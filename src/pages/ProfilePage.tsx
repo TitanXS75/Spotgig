@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { User, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
@@ -10,8 +10,8 @@ const ProfilePage = () => {
         <h1 className="text-subhead text-foreground">Profile</h1>
       </motion.div>
       <div className="flex flex-col items-center py-12 text-center">
-        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-          <User className="w-7 h-7 text-muted-foreground" />
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4 text-3xl">
+          👤
         </div>
         <h2 className="font-semibold text-foreground">Sign in to Aaspass</h2>
         <p className="text-sm text-muted-foreground mt-1 max-w-[280px]">
@@ -20,12 +20,14 @@ const ProfilePage = () => {
         <div className="flex gap-2 mt-5">
           <motion.button
             whileTap={{ scale: 0.96 }}
+            onClick={() => navigate('/auth')}
             className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl"
           >
             Sign Up Free
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.96 }}
+            onClick={() => navigate('/auth')}
             className="px-5 py-2.5 bg-muted text-foreground text-sm font-medium rounded-xl"
           >
             Login

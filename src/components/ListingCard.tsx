@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { Listing } from '@/lib/mock-data';
 import { getDistance } from '@/lib/distance';
@@ -11,9 +11,10 @@ interface ListingCardProps {
 
 const ListingCard = ({ listing }: ListingCardProps) => {
   const navigate = useNavigate();
-  const { userLat, userLng } = useAppStore();
+  const { userLat, userLng, toggleFavorite, isFavorited } = useAppStore();
   const distance = getDistance(userLat, userLng, listing.lat, listing.lng);
   const isProduct = listing.type === 'product';
+  const favorited = isFavorited(listing.id);
 
   return (
     <motion.div
@@ -32,6 +33,24 @@ const ListingCard = ({ listing }: ListingCardProps) => {
           <span className="select-none">{listing.emoji}</span>
         )}
       </div>
+
+      {/* Favorite button */}
+      <motion.button
+        whileTap={{ scale: 0.85 }}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleFavorite(listing.id);
+        }}
+        className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-sm shadow-sm"
+        title={favorited ? 'Remove from favorites' : 'Save'}
+      >
+        <Heart
+          className={`w-3.5 h-3.5 transition-colors ${
+            favorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'
+          }`}
+        />
+      </motion.button>
+
       <div className="p-3 flex flex-col gap-1">
         <div className="flex justify-between items-start">
           <span className={`text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded ${

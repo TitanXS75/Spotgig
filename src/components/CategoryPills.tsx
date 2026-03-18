@@ -7,6 +7,18 @@ const CategoryPills = () => {
 
   return (
     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4">
+      <motion.button
+        whileTap={{ scale: 0.96 }}
+        onClick={() => setSelectedCategory(null)}
+        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${
+          selectedCategory === null
+            ? 'bg-primary text-primary-foreground shadow-sm'
+            : 'bg-muted text-foreground'
+        }`}
+      >
+        <span>🌟</span>
+        <span>All</span>
+      </motion.button>
       {CATEGORIES.map(({ name, emoji }) => {
         const isActive = selectedCategory === name;
         return (

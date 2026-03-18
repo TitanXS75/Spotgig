@@ -6,6 +6,8 @@ import { CATEGORIES } from '@/lib/mock-data';
 
 const STEPS = ['Listing Details', 'Contact & Location', 'Review & Pay'];
 
+const SERVICE_TYPES = ['Software', 'Consulting', 'Design', 'Marketing', 'Writing', 'Teaching', 'Photography', 'Editing', 'Fitness Coaching', 'Music Lessons', 'Home Cleaning', 'Maintenance', 'Beauty', 'Healthcare', 'Other'];
+
 const EMOJI_OPTIONS = ['🍱', '🎨', '👗', '📱', '📐', '💄', '🔧', '📷', '🧘', '✨', '🏠', '🎂', '🧵', '🌿', '🍳', '📦', '🎁', '🪴', '🧁', '🖼️', '🧴', '🪡', '🎶', '🛠️'];
 
 const SellerOnboarding = () => {
@@ -16,6 +18,9 @@ const SellerOnboarding = () => {
   const [listingName, setListingName] = useState('');
   const [type, setType] = useState<'product' | 'service'>('product');
   const [category, setCategory] = useState('');
+  const [categorySpecification, setCategorySpecification] = useState(''); // For "Other" category
+  const [serviceType, setServiceType] = useState(''); // For services
+  const [serviceSpecification, setServiceSpecification] = useState(''); // For "Other" service
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
@@ -43,7 +48,11 @@ const SellerOnboarding = () => {
     }
   };
 
-  const step1Valid = listingName && category && description.length > 0;
+  const step1Valid = listingName && 
+    (type === 'product' 
+      ? (category && (category !== 'Other' || categorySpecification.trim()))
+      : (serviceType && (serviceType !== 'Other' || serviceSpecification.trim()))) && 
+    description.length > 0;
   const step2Valid = area && (whatsapp.length === 10 || instagram.length > 0);
 
   return (
@@ -88,11 +97,46 @@ const SellerOnboarding = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground">Category *</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-1 w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20">
-                <option value="">Select a category</option>
-                {CATEGORIES.map((c) => <option key={c.name} value={c.name}>{c.emoji} {c.name}</option>)}
-              </select>
+              <label className="text-sm font-medium text-foreground">{type === 'service' ? 'Service Type' : 'Category'} *</label>
+              {type === 'product' ? (
+                <>
+                  <select value={category} onChange={(e) => {
+                    setCategory(e.target.value);
+                    if (e.target.value !== 'Other') setCategorySpecification('');
+                  }} className="mt-1 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer border border-muted-foreground/10">
+                    <option value="">Select a category</option>
+                    {CATEGORIES.map((c) => <option key={c.name} value={c.name}>{c.emoji} {c.name}</option>)}
+                  </select>
+                  {category === 'Other' && (
+                    <input 
+                      type="text" 
+                      value={categorySpecification} 
+                      onChange={(e) => setCategorySpecification(e.target.value)}
+                      placeholder="Specify what you sell (e.g., Handmade Jewelry)"
+                      className="mt-2 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  <select value={serviceType} onChange={(e) => {
+                    setServiceType(e.target.value);
+                    if (e.target.value !== 'Other') setServiceSpecification('');
+                  }} className="mt-1 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer border border-muted-foreground/10">
+                    <option value="">Select a service type</option>
+                    {SERVICE_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  {serviceType === 'Other' && (
+                    <input 
+                      type="text" 
+                      value={serviceSpecification} 
+                      onChange={(e) => setServiceSpecification(e.target.value)}
+                      placeholder="Specify your service (e.g., Home Renovation)"
+                      className="mt-2 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                  )}
+                </>
+              )}
             </div>
 
             <div>
@@ -130,7 +174,7 @@ const SellerOnboarding = () => {
             </div>
 
             <motion.button whileTap={{ scale: 0.96 }} disabled={!step1Valid} onClick={() => setStep(1)} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2">
-              Next <ArrowRight className="w-4 h-4" />
+              Next
             </motion.button>
           </motion.div>
         )}
@@ -166,7 +210,7 @@ const SellerOnboarding = () => {
             </div>
 
             <motion.button whileTap={{ scale: 0.96 }} disabled={!step2Valid} onClick={() => setStep(2)} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2">
-              Next <ArrowRight className="w-4 h-4" />
+              Next
             </motion.button>
           </motion.div>
         )}
@@ -196,7 +240,7 @@ const SellerOnboarding = () => {
 
             {/* Summary */}
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Category</span><span className="text-foreground font-medium">{category}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{type === 'service' ? 'Service Type' : 'Category'}</span><span className="text-foreground font-medium">{type === 'service' ? (serviceType === 'Other' ? serviceSpecification : serviceType) : (category === 'Other' ? categorySpecification : category)}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Contact</span><span className="text-foreground font-medium">{whatsapp ? `+91 ${whatsapp}` : `@${instagram}`}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span className="text-foreground font-medium">{area}</span></div>
             </div>
@@ -211,7 +255,7 @@ const SellerOnboarding = () => {
                 </div>
                 <div className="flex-1 bg-card rounded-xl p-3 text-center shadow-card ring-2 ring-primary">
                   <p className="text-lg font-bold text-primary">₹1,200</p>
-                  <p className="text-[11px] text-muted-foreground">per year (save 17%)</p>
+                  <p className="text-[11px] text-muted-foreground">per year</p>
                 </div>
               </div>
               <ul className="mt-3 space-y-1.5 text-xs text-muted-foreground">

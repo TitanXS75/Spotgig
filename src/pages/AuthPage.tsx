@@ -4,6 +4,16 @@ import {
   Mail, Lock, User, ArrowRight, Eye, EyeOff, Store, Phone
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAppStore } from '@/store/app-store';
+
+// ─── Test User Data ───────────────────────────────────────────────────────
+const TEST_USER = {
+  email: 'doraemonsnacks@gmail.com',
+  password: '0000000',
+  name: 'Doraemon Snacks',
+  phone: '9876543210',
+  age: 28,
+};
 
 // ─── Simple Left Image Panel ───────────────────────────────────────────────
 const LeftPanel = () => (
@@ -54,9 +64,11 @@ const formVariants = {
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const { setUser } = useAppStore();
   const [mode, setMode] = useState<Mode>('login');
   const [direction, setDirection] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Form fields
   const [name, setName] = useState('');
@@ -64,8 +76,25 @@ const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   
   const [loading, setLoading] = useState(false);
+
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateName = (name: string): boolean => {
+    const nameRegex = /^[a-zA-Z\s]*$/;
+    return nameRegex.test(name) && name.trim().length > 0;
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phone.replace(/\D/g, ''));
+  };
 
   const switchMode = (next: Mode) => {
     setDirection(next === 'signup' ? 1 : -1);
@@ -75,18 +104,69 @@ const AuthPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Add brief frontend validation
-    if (mode === 'signup' && password !== confirmPassword) {
-      alert("Passwords don't match!");
+    const newErrors: Record<string, string> = {};
+
+    // Email validation
+    if (!validateEmail(email)) {
+      newErrors.email = 'Invalid email address';
+    }
+
+    if (mode === 'signup') {
+      // Name validation
+      if (!validateName(name)) {
+        newErrors.name = 'Name should only contain letters and spaces';
+      }
+
+      // Phone validation
+      if (!validatePhone(phone)) {
+        newErrors.phone = 'Phone number must be 10 digits';
+      }
+
+      // Password match validation
+      if (password !== confirmPassword) {
+        newErrors.password = "Passwords don't match!";
+      }
+
+      if (password.length < 6) {
+        newErrors.password = 'Password must be at least 6 characters';
+      }
+    }
+
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
       return;
     }
 
     setLoading(true);
-    // TODO: wire up to src/lib/api/auth.ts → signIn() / signUp()
+    // Simulate API call
     await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    navigate('/');
+
+    if (mode === 'login') {
+      // Check against test user
+      if (email === TEST_USER.email && password === TEST_USER.password) {
+        setUser({
+          email: TEST_USER.email,
+          name: TEST_USER.name,
+          phone: TEST_USER.phone,
+          age: TEST_USER.age,
+        });
+        setLoading(false);
+        navigate('/profile');
+      } else {
+        setLoading(false);
+        setErrors({ email: 'Invalid email or password' });
+      }
+    } else {
+      // Signup - in test mode, create user with provided info
+      setUser({
+        email: email,
+        name: name,
+        phone: phone,
+        age: null,
+      });
+      setLoading(false);
+      navigate('/profile');
+    }
   };
 
   return (
@@ -148,45 +228,66 @@ const AuthPage = () => {
 
               {/* Name field (signup only) */}
               {mode === 'signup' && (
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
-                  />
+                <div>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Full name"
+                      value={name}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+                        setName(value);
+                        if (errors.name) setErrors({ ...errors, name: '' });
+                      }}
+                      required
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                    />
+                  </div>
+                  {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                 </div>
               )}
 
               {/* Phone field (signup only) */}
               {mode === 'signup' && (
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="tel"
-                    placeholder="Phone number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
-                  />
+                <div>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                      type="tel"
+                      placeholder="Phone number (10 digits)"
+                      value={phone}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                        setPhone(value);
+                        if (errors.phone) setErrors({ ...errors, phone: '' });
+                      }}
+                      maxLength={10}
+                      required
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                    />
+                  </div>
+                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                 </div>
               )}
 
               {/* Email */}
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
-                />
+              <div>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="email"
+                    placeholder="Email address"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (errors.email) setErrors({ ...errors, email: '' });
+                    }}
+                    required
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                  />
+                </div>
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
 
               {/* Password */}
@@ -212,17 +313,30 @@ const AuthPage = () => {
 
               {/* Confirm Password (signup only) */}
               {mode === 'signup' && (
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Confirm password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
-                  />
+                <div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="Confirm password"
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        if (errors.password) setErrors({ ...errors, password: '' });
+                      }}
+                      required
+                      minLength={6}
+                      className="w-full pl-10 pr-10 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                 </div>
               )}
 
@@ -251,7 +365,6 @@ const AuthPage = () => {
                 ) : (
                   <>
                     {mode === 'login' ? 'Sign In' : 'Create Account'}
-                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </motion.button>

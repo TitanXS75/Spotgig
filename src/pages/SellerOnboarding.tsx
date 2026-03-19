@@ -14,7 +14,7 @@ const EMOJI_OPTIONS = ['🍱', '🎨', '👗', '📱', '📐', '💄', '🔧', '
 
 const SellerOnboarding = () => {
   const navigate = useNavigate();
-  const { user } = useAppStore();
+  const { user, setUserLocation } = useAppStore();
   const [step, setStep] = useState(0);
 
   // Redirect to auth if not logged in
@@ -44,6 +44,9 @@ const SellerOnboarding = () => {
   const [listingLat, setListingLat] = useState<number | null>(null);
   const [listingLng, setListingLng] = useState<number | null>(null);
   const [detectingLocation, setDetectingLocation] = useState(false);
+  const [showManualCoordinates, setShowManualCoordinates] = useState(false);
+  const [manualLat, setManualLat] = useState('');
+  const [manualLng, setManualLng] = useState('');
 
   const maxDesc = 300;
 
@@ -78,6 +81,8 @@ const SellerOnboarding = () => {
         const lng = pos.coords.longitude;
         setListingLat(lat);
         setListingLng(lng);
+        setManualLat(lat.toString());
+        setManualLng(lng.toString());
 
         // Also store as user's location so distances work across the app.
         setUserLocation(lat, lng);
@@ -93,6 +98,18 @@ const SellerOnboarding = () => {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 30_000 }
     );
+  };
+
+  const handleManualCoordinateSave = () => {
+    const lat = parseFloat(manualLat);
+    const lng = parseFloat(manualLng);
+    
+    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      setListingLat(lat);
+      setListingLng(lng);
+      setUserLocation(lat, lng);
+      setShowManualCoordinates(false);
+    }
   };
 
   return (
@@ -272,7 +289,7 @@ const SellerOnboarding = () => {
                   type="button"
                   onClick={detectListingLocation}
                   disabled={detectingLocation}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/70 text-foreground disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/70 text-foreground disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                 >
                   <LocateFixed className={`w-4 h-4 ${detectingLocation ? 'animate-pulse' : ''}`} />
                   {detectingLocation ? 'Detecting…' : 'Detect location'}
@@ -281,6 +298,75 @@ const SellerOnboarding = () => {
                   {listingLat !== null && listingLng !== null ? `Saved: ${listingLat.toFixed(4)}, ${listingLng.toFixed(4)}` : 'No coordinates saved yet'}
                 </span>
               </div>
+
+              {/* Manual Coordinates Section */}
+              {!showManualCoordinates && listingLat !== null && (
+                <button
+                  type="button"
+                  onClick={() => setShowManualCoordinates(true)}
+                  className="mt-2 text-xs text-primary hover:underline"
+                >
+                  Edit coordinates manually
+                </button>
+              )}
+
+              {showManualCoordinates && (
+                <div className="mt-3 p-3 bg-muted/50 rounded-xl space-y-2">
+                  <p className="text-xs font-semibold text-foreground">Enter Coordinates Manually</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[11px] text-muted-foreground">Latitude</label>
+                      <input
+                        type="number"
+                        step="0.0001"
+                        value={manualLat}
+                        onChange={(e) => setManualLat(e.target.value)}
+                        placeholder="e.g. 21.1458"
+                        className="w-full mt-1 px-2 py-1.5 rounded-lg bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-muted-foreground">Longitude</label>
+                      <input
+                        type="number"
+                        step="0.0001"
+                        value={manualLng}
+                        onChange={(e) => setManualLng(e.target.value)}
+                        placeholder="e.g. 79.0882"
+                        className="w-full mt-1 px-2 py-1.5 rounded-lg bg-background text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <motion.button
+                      type="button"
+                      whileTap={{ scale: 0.96 }}
+                      onClick={handleManualCoordinateSave}
+                      className="flex-1 px-2 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold"
+                    >
+                      Save
+                    </motion.button>
+                    <motion.button
+                      type="button"
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => setShowManualCoordinates(false)}
+                      className="flex-1 px-2 py-1.5 rounded-lg bg-muted text-foreground text-xs font-semibold"
+                    >
+                      Cancel
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+
+              {!showManualCoordinates && listingLat === null && (
+                <button
+                  type="button"
+                  onClick={() => setShowManualCoordinates(true)}
+                  className="mt-2 text-xs text-primary hover:underline"
+                >
+                  Enter coordinates manually
+                </button>
+              )}
             </div>
 
             <div className="bg-muted/50 rounded-xl p-3">

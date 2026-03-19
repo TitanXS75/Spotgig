@@ -170,7 +170,7 @@ const ProfilePage = () => {
             <p className="text-sm text-muted-foreground mt-1">
               List your business for just ₹100/month. Go yearly at ₹1,200 and stay live all year!
             </p>
-            <p className="mt-3 text-sm font-semibold text-primary">Get Started</p>
+            <p className="mt-3 text-sm font-semibold text-primary">Register Business</p>
           </motion.button>
         </div>
       </div>

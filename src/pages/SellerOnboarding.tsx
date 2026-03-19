@@ -68,9 +68,11 @@ const SellerOnboarding = () => {
     <div className="max-w-xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-4 pb-2">
-        <button onClick={() => step > 0 ? setStep(step - 1) : navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground mb-3">
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
+        <div className="flex justify-start">
+          <button onClick={() => step > 0 ? setStep(step - 1) : navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground mb-3 hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back
+          </button>
+        </div>
         <h1 className="text-subhead text-foreground">Get Started as a Seller</h1>
         <p className="text-sm text-muted-foreground mt-1">Complete 3 simple steps to go live</p>
       </motion.div>
@@ -110,7 +112,7 @@ const SellerOnboarding = () => {
               <div className="flex gap-2 mt-1">
                 {(['shop', 'home'] as const).map((t) => (
                   <button key={t} onClick={() => setOperatingType(t)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${operatingType === t ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>
-                    {t === 'shop' ? '🏪 I have a shop' : '🏠 I operate from home'}
+                    {t === 'shop' ? '🏪 Shop' : '🏠 Home'}
                   </button>
                 ))}
               </div>

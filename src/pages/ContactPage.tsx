@@ -28,11 +28,13 @@ const ContactPage = () => {
     <div className="max-w-4xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-4 pb-2">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground mb-3">
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
+        <div className="flex justify-start">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground mb-3 hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back
+          </button>
+        </div>
         <h1 className="text-subhead text-foreground">Contact Us</h1>
-        <p className="text-sm text-muted-foreground mt-1">We're here to help and answer any questions</p>
+        <p className="text-sm text-muted-foreground mt-1">Get in touch with our team</p>
       </motion.div>
 
       <div className="grid md:grid-cols-2 gap-8 mt-8">

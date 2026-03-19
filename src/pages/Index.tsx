@@ -77,7 +77,7 @@ const Index = () => {
         className="pt-6 pb-5"
       >
         <h1 className="text-display text-foreground md:text-5xl">
-          Find home-sellers near you.
+          Find Home sellers near you.
         </h1>
         <p className="text-sm md:text-base text-muted-foreground mt-2">
           Discover local products &amp; services within walking distance.
@@ -85,7 +85,7 @@ const Index = () => {
         {!hasLocation && (
           <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-            Distances from city centre — enable location for accuracy
+            Enable location for accuracy
           </p>
         )}
       </motion.div>

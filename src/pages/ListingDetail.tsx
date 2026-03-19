@@ -8,7 +8,7 @@ import { useAppStore } from '@/store/app-store';
 const ListingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { userLat, userLng } = useAppStore();
+  const { userLat, userLng, hasLocation } = useAppStore();
   const listing = MOCK_LISTINGS.find((l) => l.id === id);
 
   if (!listing) {
@@ -22,7 +22,7 @@ const ListingDetail = () => {
     );
   }
 
-  const distance = getDistance(userLat, userLng, listing.lat, listing.lng);
+  const distance = hasLocation ? getDistance(userLat, userLng, listing.lat, listing.lng) : null;
   const isProduct = listing.type === 'product';
 
   const handleShare = async () => {
@@ -99,9 +99,9 @@ const ListingDetail = () => {
             <span>{listing.seller_name}</span>
             <span className="flex items-center gap-1">
               <MapPin className="w-3 h-3" />
-              {listing.area}
+              {listing.area} · {listing.operating_type === 'home' ? 'Home' : 'Shop'}
             </span>
-            <span className="tabular-nums font-medium">{distance} km</span>
+            <span className="tabular-nums font-medium">{distance === null ? '—' : `${distance} km`}</span>
           </div>
 
           <div className="flex items-center gap-3 mt-2 text-meta text-muted-foreground">

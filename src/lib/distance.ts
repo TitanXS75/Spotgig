@@ -1,6 +1,7 @@
-// Default: Nagpur city center
-export const DEFAULT_LAT = 21.1458;
-export const DEFAULT_LNG = 79.0882;
+// Default fallback: India centroid-ish (used only until we get real user location).
+// We avoid hardcoding a specific city so the app stays "where the user is".
+export const DEFAULT_LAT = 20.5937;
+export const DEFAULT_LNG = 78.9629;
 
 export const getDistance = (
   lat1: number,

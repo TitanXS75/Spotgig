@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, Store, MapPin, CreditCard, Smartphone, Instagram } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Store, MapPin, CreditCard, Smartphone, Instagram, LocateFixed } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
+import { reverseGeocode } from '@/lib/api/location';
 
 const STEPS = ['Listing Details', 'Contact & Location', 'Review & Pay'];
 
@@ -38,7 +39,11 @@ const SellerOnboarding = () => {
   // Step 2
   const [whatsapp, setWhatsapp] = useState('');
   const [instagram, setInstagram] = useState('');
+  const [otherHandle, setOtherHandle] = useState('');
   const [area, setArea] = useState('');
+  const [listingLat, setListingLat] = useState<number | null>(null);
+  const [listingLng, setListingLng] = useState<number | null>(null);
+  const [detectingLocation, setDetectingLocation] = useState(false);
 
   const maxDesc = 300;
 
@@ -62,7 +67,33 @@ const SellerOnboarding = () => {
       ? (category && (category !== 'Other' || categorySpecification.trim()))
       : (serviceType && (serviceType !== 'Other' || serviceSpecification.trim()))) && 
     description.length > 0;
-  const step2Valid = area && (whatsapp.length === 10 || instagram.length > 0);
+  const step2Valid = area && (whatsapp.length === 10 || instagram.length > 0 || otherHandle.trim().length > 0);
+
+  const detectListingLocation = async () => {
+    if (!navigator.geolocation) return;
+    setDetectingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setListingLat(lat);
+        setListingLng(lng);
+
+        // Also store as user's location so distances work across the app.
+        setUserLocation(lat, lng);
+
+        if (!area.trim()) {
+          const approxArea = await reverseGeocode(lat, lng);
+          if (approxArea) setArea(approxArea);
+        }
+        setDetectingLocation(false);
+      },
+      () => {
+        setDetectingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30_000 }
+    );
+  };
 
   return (
     <div className="max-w-xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
@@ -223,8 +254,33 @@ const SellerOnboarding = () => {
             </div>
 
             <div>
+              <label className="text-sm font-medium text-foreground">Other handle (optional)</label>
+              <input
+                value={otherHandle}
+                onChange={(e) => setOtherHandle(e.target.value)}
+                placeholder="e.g. Facebook: mypage, Website: example.com"
+                className="mt-1 w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <span className="text-[11px] text-muted-foreground">Any handle/link buyers can use to reach you.</span>
+            </div>
+
+            <div>
               <label className="text-sm font-medium text-foreground flex items-center gap-1.5"><MapPin className="w-4 h-4" /> Area / Locality *</label>
               <input value={area} onChange={(e) => setArea(e.target.value)} placeholder="e.g. Dharampeth, Nagpur" className="mt-1 w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={detectListingLocation}
+                  disabled={detectingLocation}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/70 text-foreground disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <LocateFixed className={`w-4 h-4 ${detectingLocation ? 'animate-pulse' : ''}`} />
+                  {detectingLocation ? 'Detecting…' : 'Detect location'}
+                </button>
+                <span className="text-[11px] text-muted-foreground tabular-nums">
+                  {listingLat !== null && listingLng !== null ? `Saved: ${listingLat.toFixed(4)}, ${listingLng.toFixed(4)}` : 'No coordinates saved yet'}
+                </span>
+              </div>
             </div>
 
             <div className="bg-muted/50 rounded-xl p-3">

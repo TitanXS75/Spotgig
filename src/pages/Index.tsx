@@ -21,10 +21,12 @@ const Index = () => {
   } = useAppStore();
 
   useEffect(() => {
+    // Get user's real location for distance-based sorting.
+    // We persist the last known location in the store, so this is mostly for first-run / updates.
     navigator.geolocation?.getCurrentPosition(
       (pos) => setUserLocation(pos.coords.latitude, pos.coords.longitude),
       () => {},
-      { enableHighAccuracy: false, timeout: 5000 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 30_000 }
     );
     const t = setTimeout(() => setLoading(false), 600);
     return () => clearTimeout(t);
@@ -50,17 +52,21 @@ const Index = () => {
       items = items.filter((l) => l.type === typeFilter);
     }
     if (distanceFilter > 0) {
-      items = items.filter(
-        (l) => getDistance(userLat, userLng, l.lat, l.lng) <= distanceFilter
-      );
+      if (hasLocation) {
+        items = items.filter(
+          (l) => getDistance(userLat, userLng, l.lat, l.lng) <= distanceFilter
+        );
+      }
     }
 
     if (sortBy === 'distance') {
-      items.sort(
-        (a, b) =>
-          getDistance(userLat, userLng, a.lat, a.lng) -
-          getDistance(userLat, userLng, b.lat, b.lng)
-      );
+      if (hasLocation) {
+        items.sort(
+          (a, b) =>
+            getDistance(userLat, userLng, a.lat, a.lng) -
+            getDistance(userLat, userLng, b.lat, b.lng)
+        );
+      }
     } else {
       items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }

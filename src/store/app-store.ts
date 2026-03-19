@@ -104,9 +104,13 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'aaspass-store',
-      // Only persist certain fields — don't persist geolocation (always re-fetch)
+      // Persist last known location so the app stays in the user's region across reloads.
       partialize: (state) => ({
         user: state.user,
+        userLat: state.userLat,
+        userLng: state.userLng,
+        hasLocation: state.hasLocation,
+        userArea: state.userArea,
         favoritedIds: state.favoritedIds,
         sortBy: state.sortBy,
         distanceFilter: state.distanceFilter,

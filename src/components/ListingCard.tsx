@@ -11,8 +11,8 @@ interface ListingCardProps {
 
 const ListingCard = ({ listing }: ListingCardProps) => {
   const navigate = useNavigate();
-  const { userLat, userLng, toggleFavorite, isFavorited } = useAppStore();
-  const distance = getDistance(userLat, userLng, listing.lat, listing.lng);
+  const { userLat, userLng, hasLocation, toggleFavorite, isFavorited } = useAppStore();
+  const distance = hasLocation ? getDistance(userLat, userLng, listing.lat, listing.lng) : null;
   const isProduct = listing.type === 'product';
   const favorited = isFavorited(listing.id);
 
@@ -61,13 +61,15 @@ const ListingCard = ({ listing }: ListingCardProps) => {
             {listing.type}
           </span>
           <span className="text-meta tabular-nums text-muted-foreground">
-            {distance} km
+            {distance === null ? '—' : `${distance} km`}
           </span>
         </div>
         <h3 className="font-semibold text-card-foreground leading-tight truncate text-sm">
           {listing.name}
         </h3>
-        <p className="text-[11px] text-muted-foreground truncate">{listing.area}</p>
+        <p className="text-[11px] text-muted-foreground truncate">
+          {listing.area} · {listing.operating_type === 'home' ? 'Home' : 'Shop'}
+        </p>
         <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
           {listing.description}
         </p>

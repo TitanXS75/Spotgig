@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, Store, MapPin, CreditCard, Smartphone, Instagram } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '@/lib/mock-data';
+import { useAppStore } from '@/store/app-store';
 
 const STEPS = ['Listing Details', 'Contact & Location', 'Review & Pay'];
 
@@ -12,11 +13,19 @@ const EMOJI_OPTIONS = ['🍱', '🎨', '👗', '📱', '📐', '💄', '🔧', '
 
 const SellerOnboarding = () => {
   const navigate = useNavigate();
+  const { user } = useAppStore();
   const [step, setStep] = useState(0);
+
+  // Redirect to auth if not logged in
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
 
   // Step 1
   const [listingName, setListingName] = useState('');
   const [type, setType] = useState<'product' | 'service'>('product');
+  const [operatingType, setOperatingType] = useState<'shop' | 'home'>('shop');
   const [category, setCategory] = useState('');
   const [categorySpecification, setCategorySpecification] = useState(''); // For "Other" category
   const [serviceType, setServiceType] = useState(''); // For services
@@ -91,6 +100,17 @@ const SellerOnboarding = () => {
                 {(['product', 'service'] as const).map((t) => (
                   <button key={t} onClick={() => setType(t)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${type === t ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>
                     {t === 'product' ? '📦 Product' : '🛠️ Service'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-foreground">Operating Type *</label>
+              <div className="flex gap-2 mt-1">
+                {(['shop', 'home'] as const).map((t) => (
+                  <button key={t} onClick={() => setOperatingType(t)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${operatingType === t ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>
+                    {t === 'shop' ? '🏪 I have a shop' : '🏠 I operate from home'}
                   </button>
                 ))}
               </div>
@@ -240,6 +260,7 @@ const SellerOnboarding = () => {
 
             {/* Summary */}
             <div className="space-y-2 text-sm">
+              <div className="flex justify-between"><span className="text-muted-foreground">Operating Type</span><span className="text-foreground font-medium">{operatingType === 'shop' ? '🏪 I have a shop' : '🏠 I operate from home'}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">{type === 'service' ? 'Service Type' : 'Category'}</span><span className="text-foreground font-medium">{type === 'service' ? (serviceType === 'Other' ? serviceSpecification : serviceType) : (category === 'Other' ? categorySpecification : category)}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Contact</span><span className="text-foreground font-medium">{whatsapp ? `+91 ${whatsapp}` : `@${instagram}`}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span className="text-foreground font-medium">{area}</span></div>

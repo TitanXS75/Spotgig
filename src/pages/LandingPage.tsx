@@ -88,6 +88,11 @@ const STATS = [
 const LandingPage = () => {
   const navigate = useNavigate();
 
+  const handleNavigate = (path: string) => {
+    window.scrollTo(0, 0);
+    navigate(path);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/20">
       {/* ─── NAVBAR ─── */}
@@ -101,13 +106,13 @@ const LandingPage = () => {
           </div>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/auth')}
+              onClick={() => handleNavigate('/auth')}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
             >
               Log in
             </button>
             <button
-              onClick={() => navigate('/auth')}
+              onClick={() => handleNavigate('/auth')}
               className="text-sm font-semibold bg-primary text-primary-foreground px-6 py-2 rounded-full hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Sign up
@@ -145,13 +150,13 @@ const LandingPage = () => {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
           >
             <button
-              onClick={() => navigate('/home')}
+              onClick={() => handleNavigate('/home')}
               className="flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 w-full sm:w-auto justify-center"
             >
               Explore Sellers
             </button>
             <button
-              onClick={() => navigate('/seller/onboarding')}
+              onClick={() => handleNavigate('/profile')}
               className="flex items-center gap-2 bg-muted text-foreground px-8 py-4 rounded-full font-semibold text-lg hover:bg-muted/80 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 w-full sm:w-auto justify-center"
             >
               Become a Seller
@@ -460,13 +465,13 @@ const LandingPage = () => {
             className="flex flex-col sm:flex-row gap-4 items-center justify-center"
           >
             <button
-              onClick={() => navigate('/auth')}
+              onClick={() => handleNavigate('/auth')}
               className="bg-primary text-primary-foreground px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 w-full sm:w-auto"
             >
               Get Started Free
             </button>
             <button
-              onClick={() => navigate('/home')}
+              onClick={() => handleNavigate('/home')}
               className="border-2 border-primary text-primary px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/5 transition-all duration-200 active:scale-95 w-full sm:w-auto"
             >
               Explore as Guest

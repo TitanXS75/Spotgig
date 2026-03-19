@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Store, MapPin, Smartphone, ShieldCheck, Zap, Users, TrendingUp, Star } from 'lucide-react';
+import { ArrowRight, Store, MapPin, Smartphone, ShieldCheck, Zap, Users, TrendingUp, Star, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const CATEGORIES = [
@@ -93,6 +93,13 @@ const LandingPage = () => {
     navigate(path);
   };
 
+  const handleSmoothScroll = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/20">
       {/* ─── NAVBAR ─── */}
@@ -166,7 +173,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─── CATEGORIES SECTION ─── */}
-      <section className="py-20 px-6 bg-gray-50">
+      <section id="browse-sellers" className="py-20 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -209,7 +216,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section className="py-20 px-6">
+      <section id="how-it-works" className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -256,7 +263,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─── FEATURES SECTION ─── */}
-      <section className="py-20 px-6 bg-gray-50">
+      <section id="why-choose-aaspass" className="py-20 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -304,7 +311,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─── TESTIMONIALS SECTION ─── */}
-      <section className="py-20 px-6">
+      <section id="success-stories" className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -378,7 +385,7 @@ const LandingPage = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8"
             >
-              Install Aaspass as an app on your phone for quick access and offline functionality
+              Install Aaspass as an app on your phone for quick access
             </motion.p>
           </div>
 
@@ -496,38 +503,40 @@ const LandingPage = () => {
             <div>
               <h4 className="font-semibold text-foreground mb-4">For Buyers</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Browse Sellers</a></li>
-                <li><a href="#" className="hover:text-foreground transition">How It Works</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Safety Tips</a></li>
+                <li><button onClick={() => handleNavigate('/home')} className="hover:text-foreground transition">Browse Sellers</button></li>
+                <li><button onClick={() => handleSmoothScroll('how-it-works')} className="hover:text-foreground transition">How It Works</button></li>
+                <li><button onClick={() => handleNavigate('/safety-tips')} className="hover:text-foreground transition">Safety Tips</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-foreground mb-4">For Sellers</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">Get Started</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Pricing</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Success Stories</a></li>
+                <li><button onClick={() => handleNavigate('/profile')} className="hover:text-foreground transition">Get Started</button></li>
+                <li><button onClick={() => handleNavigate('/pricing')} className="hover:text-foreground transition">Pricing</button></li>
+                <li><button onClick={() => handleSmoothScroll('success-stories')} className="hover:text-foreground transition">Success Stories</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-foreground mb-4">Company</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">About Us</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Contact</a></li>
-                <li><a href="#" className="hover:text-foreground transition">Privacy Policy</a></li>
+                <li><button onClick={() => handleNavigate('/about')} className="hover:text-foreground transition">About Us</button></li>
+                <li><button onClick={() => handleNavigate('/contact')} className="hover:text-foreground transition">Contact</button></li>
+                <li><button onClick={() => handleNavigate('/privacy')} className="hover:text-foreground transition">Privacy Policy</button></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-border/50 pt-8 flex flex-col md:flex-row items-center justify-between">
-            <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Aaspass. All rights reserved.</p>
-            <div className="flex gap-6 mt-4 md:mt-0">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition text-sm">Terms</a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition text-sm">Privacy</a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition text-sm">Contact</a>
-            </div>
+          {/* Bottom Bar */}
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
+          <p>© {new Date().getFullYear()} Aaspass. All Rights Reserved.</p>
+          <div className="flex gap-4 items-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" className="h-6 opacity-60 hover:opacity-100 transition-opacity" />
+            <span className="flex items-center gap-1 opacity-80">
+              Secured by Razorpay
+            </span>
           </div>
         </div>
-      </footer>
+      </div>
+    </footer>
     </div>
   );
 };

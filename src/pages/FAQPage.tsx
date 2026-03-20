@@ -3,6 +3,99 @@ import { ArrowLeft, HelpCircle, User, Store, CreditCard, Shield, MapPin, Message
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
+export const faqs = [
+  {
+    id: 1,
+    category: 'buyer',
+    question: 'How do I find sellers near me?',
+    answer: 'Simply enable location access when using Aaspass, and the app will automatically show sellers sorted by distance from your current location. You can also search by area name or pincode.'
+  },
+  {
+    id: 2,
+    category: 'buyer',
+    question: 'How do I contact a seller?',
+    answer: 'Each listing shows the seller\'s preferred contact method - usually WhatsApp or Instagram. Simply click on the contact button to reach out directly to the seller.'
+  },
+  {
+    id: 3,
+    category: 'buyer',
+    question: 'Is it safe to buy from sellers on Aaspass?',
+    answer: 'While we verify sellers, always exercise caution. Meet in public places, verify products before payment, and read our safety tips for more guidelines.'
+  },
+  {
+    id: 4,
+    category: 'seller',
+    question: 'How do I start selling on Aaspass?',
+    answer: 'Click "Become a Seller" on the homepage or visit your profile page. Complete the onboarding process, choose your plan, and create your first listing.'
+  },
+  {
+    id: 5,
+    category: 'seller',
+    question: 'What documents do I need to register?',
+    answer: 'You\'ll need basic information like your name, contact details, and business location. For certain categories, additional verification may be required.'
+  },
+  {
+    id: 6,
+    category: 'seller',
+    question: 'How do I manage my listings?',
+    answer: 'Access your seller dashboard from the profile section to add, edit, or deactivate listings, view analytics, and manage customer inquiries.'
+  },
+  {
+    id: 7,
+    category: 'payment',
+    question: 'What are the subscription plans?',
+    answer: 'We offer Monthly (₹100/month) and Annual (₹1,200/year) plans. The annual plan saves you 20% and includes additional features like priority support and advanced analytics.'
+  },
+  {
+    id: 8,
+    category: 'payment',
+    question: 'How do I pay for my subscription?',
+    answer: 'We accept UPI, credit/debit cards, and net banking. Payment is processed securely through our payment partners.'
+  },
+  {
+    id: 9,
+    category: 'payment',
+    question: 'Can I get a refund?',
+    answer: 'Refunds are handled on a case-by-case basis. Please contact our support team within 7 days of payment for refund requests.'
+  },
+  {
+    id: 10,
+    category: 'safety',
+    question: 'How does Aaspass verify sellers?',
+    answer: 'We verify seller identity through phone verification and address confirmation. Additional verification may be required for certain categories.'
+  },
+  {
+    id: 11,
+    category: 'safety',
+    question: 'What should I do if I encounter a fake seller?',
+    answer: 'Report the seller immediately through our app or email safety@aaspass.com. We take such reports seriously and will investigate promptly.'
+  },
+  {
+    id: 12,
+    category: 'safety',
+    question: 'Is my personal information safe?',
+    answer: 'Yes, we protect your data with industry-standard security measures. Your exact address is never shared publicly - only your area name is shown.'
+  },
+  {
+    id: 13,
+    category: 'technical',
+    question: 'The app is not showing my location correctly',
+    answer: 'Ensure location services are enabled for your browser/app. Try refreshing the page or restarting the app. If issues persist, contact support.'
+  },
+  {
+    id: 14,
+    category: 'technical',
+    question: 'How do I report a technical issue?',
+    answer: 'Email support@aaspass.com with details about the issue, including screenshots if possible. We typically respond within 24 hours.'
+  },
+  {
+    id: 15,
+    category: 'technical',
+    question: 'Can I use Aaspass on my desktop?',
+    answer: 'Yes! Aaspass works on both mobile and desktop devices. You can also install it as a PWA on your phone for app-like experience.'
+  }
+];
+
 const FAQPage = () => {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('all');
@@ -14,99 +107,6 @@ const FAQPage = () => {
     { id: 'payment', name: 'Payment & Pricing', icon: CreditCard },
     { id: 'safety', name: 'Safety & Security', icon: Shield },
     { id: 'technical', name: 'Technical Support', icon: Settings }
-  ];
-
-  const faqs = [
-    {
-      id: 1,
-      category: 'buyer',
-      question: 'How do I find sellers near me?',
-      answer: 'Simply enable location access when using Aaspass, and the app will automatically show sellers sorted by distance from your current location. You can also search by area name or pincode.'
-    },
-    {
-      id: 2,
-      category: 'buyer',
-      question: 'How do I contact a seller?',
-      answer: 'Each listing shows the seller\'s preferred contact method - usually WhatsApp or Instagram. Simply click on the contact button to reach out directly to the seller.'
-    },
-    {
-      id: 3,
-      category: 'buyer',
-      question: 'Is it safe to buy from sellers on Aaspass?',
-      answer: 'While we verify sellers, always exercise caution. Meet in public places, verify products before payment, and read our safety tips for more guidelines.'
-    },
-    {
-      id: 4,
-      category: 'seller',
-      question: 'How do I start selling on Aaspass?',
-      answer: 'Click "Become a Seller" on the homepage or visit your profile page. Complete the onboarding process, choose your plan, and create your first listing.'
-    },
-    {
-      id: 5,
-      category: 'seller',
-      question: 'What documents do I need to register?',
-      answer: 'You\'ll need basic information like your name, contact details, and business location. For certain categories, additional verification may be required.'
-    },
-    {
-      id: 6,
-      category: 'seller',
-      question: 'How do I manage my listings?',
-      answer: 'Access your seller dashboard from the profile section to add, edit, or deactivate listings, view analytics, and manage customer inquiries.'
-    },
-    {
-      id: 7,
-      category: 'payment',
-      question: 'What are the subscription plans?',
-      answer: 'We offer Monthly (₹100/month) and Annual (₹1,200/year) plans. The annual plan saves you 20% and includes additional features like priority support and advanced analytics.'
-    },
-    {
-      id: 8,
-      category: 'payment',
-      question: 'How do I pay for my subscription?',
-      answer: 'We accept UPI, credit/debit cards, and net banking. Payment is processed securely through our payment partners.'
-    },
-    {
-      id: 9,
-      category: 'payment',
-      question: 'Can I get a refund?',
-      answer: 'Refunds are handled on a case-by-case basis. Please contact our support team within 7 days of payment for refund requests.'
-    },
-    {
-      id: 10,
-      category: 'safety',
-      question: 'How does Aaspass verify sellers?',
-      answer: 'We verify seller identity through phone verification and address confirmation. Additional verification may be required for certain categories.'
-    },
-    {
-      id: 11,
-      category: 'safety',
-      question: 'What should I do if I encounter a fake seller?',
-      answer: 'Report the seller immediately through our app or email safety@aaspass.com. We take such reports seriously and will investigate promptly.'
-    },
-    {
-      id: 12,
-      category: 'safety',
-      question: 'Is my personal information safe?',
-      answer: 'Yes, we protect your data with industry-standard security measures. Your exact address is never shared publicly - only your area name is shown.'
-    },
-    {
-      id: 13,
-      category: 'technical',
-      question: 'The app is not showing my location correctly',
-      answer: 'Ensure location services are enabled for your browser/app. Try refreshing the page or restarting the app. If issues persist, contact support.'
-    },
-    {
-      id: 14,
-      category: 'technical',
-      question: 'How do I report a technical issue?',
-      answer: 'Email support@aaspass.com with details about the issue, including screenshots if possible. We typically respond within 24 hours.'
-    },
-    {
-      id: 15,
-      category: 'technical',
-      question: 'Can I use Aaspass on my desktop?',
-      answer: 'Yes! Aaspass works on both mobile and desktop devices. You can also install it as a PWA on your phone for app-like experience.'
-    }
   ];
 
   const filteredFAQs = activeCategory === 'all' 

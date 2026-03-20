@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Store, MapPin, Smartphone, ShieldCheck, Zap, Users, TrendingUp, Star, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Lenis from '@studio-freight/lenis';
-import { AnimatedMarqueeHero } from '@/components/ui/hero-3';
 import { FeaturesSectionWithHoverEffects } from '@/components/ui/feature-section-with-hover-effects';
 import { ZoomParallax } from '@/components/ui/zoom-parallax';
 import { UniqueAccordion } from '@/components/ui/interactive-accordion';
+import { ShuffleHero } from '@/components/ui/shuffle-grid';
 
 const DEMO_IMAGES = [
   "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900&auto=format&fit=crop&q=60", // Food
@@ -42,17 +42,17 @@ const FEATURES = [
   {
     icon: <MapPin className="text-secondary w-6 h-6" />,
     title: 'Hyperlocal Discovery',
-    description: 'Find exactly what you need within walking distance. Real-time distance calculations show you the nearest options.',
+    description: 'Find exactly what you need within walking distance. Real time distance calculations show you the nearest options.',
   },
   {
     icon: <Zap className="text-primary w-6 h-6" />,
     title: 'Instant Connection',
-    description: 'Direct WhatsApp and Instagram links for zero-friction communication. Connect with sellers immediately.',
+    description: 'Direct WhatsApp and Instagram links for zero friction communication. Connect with sellers immediately.',
   },
   {
     icon: <ShieldCheck className="text-green-500 w-6 h-6" />,
     title: 'Support Local',
-    description: 'Help home-based entrepreneurs and micro-businesses in your neighbourhood grow and thrive.',
+    description: 'Help home-based entrepreneurs and micro businesses in your neighbourhood grow and thrive.',
   },
   {
     icon: <Smartphone className="text-blue-500 w-6 h-6" />,
@@ -168,64 +168,10 @@ const LandingPage = () => {
       </header>
 
       {/* ─── HERO SECTION ─── */}
-      <AnimatedMarqueeHero
-        tagline="Support Local Business"
-        title={
-          <>
-            Discover Local Sellers,
-            <br className="hidden md:block" /> Support Your Community
-          </>
-        }
-        description="Aaspass is a hyperlocal marketplace connecting you with home-based sellers, freelancers, and local businesses within walking distance. No commissions. No middlemen. Just direct connections with your neighbourhood."
-        ctaText="Get Started"
-        onCtaClick={() => handleNavigate('/auth')}
-        secondaryCtaText="Explore Marketplace"
-        onSecondaryCtaClick={() => handleNavigate('/home')}
-        images={DEMO_IMAGES}
+      <ShuffleHero
+        onGetStarted={() => handleNavigate('/auth')}
+        onExploreMarketplace={() => handleNavigate('/home')}
       />
-
-      {/* ─── CATEGORIES SECTION ─── */}
-      <section id="browse-sellers" className="py-12 md:py-16 px-6 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-4xl md:text-5xl font-bold text-foreground mb-4"
-            >
-              What You Can Find
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-lg text-muted-foreground max-w-2xl mx-auto"
-            >
-              From homemade food to personal services, discover thousands of options right in your neighbourhood
-            </motion.p>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
-            {CATEGORIES.map((card, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="flex flex-col items-center text-center p-6 rounded-2xl bg-white border border-gray-200 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer"
-              >
-                <span className="text-4xl mb-3">{card.emoji}</span>
-                <h3 className="font-semibold text-foreground text-sm md:text-base">{card.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{card.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ─── HOW IT WORKS ─── */}
       <section id="how-it-works" className="py-12 md:py-16 px-6">
@@ -442,20 +388,20 @@ const LandingPage = () => {
       <section className="bg-background pt-16">
         <div className="relative flex items-center justify-center pt-10 pb-4">
           <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-center">
-            Ready to Join Aaspass?
+            Ready to Join Aaspass ?
           </h2>
         </div>
         <ZoomParallax images={DEMO_IMAGES.slice(0, 7).map(src => ({ src }))} />
-        <div className="py-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="py-12 px-6 flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={() => handleNavigate('/auth')}
-            className="bg-primary text-primary-foreground px-10 py-5 rounded-full font-bold text-xl hover:bg-primary/90 transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-95 text-center w-full sm:w-auto"
+            className="bg-primary text-primary-foreground px-6 py-4 rounded-xl font-bold text-base sm:px-10 sm:py-5 sm:text-lg hover:bg-primary/90 transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-95 text-center w-full sm:w-auto"
           >
             Get Started Free
           </button>
           <button
             onClick={() => handleNavigate('/home')}
-            className="px-10 py-5 rounded-full border-2 border-primary text-primary font-bold text-xl transition-all duration-200 hover:bg-primary/5 active:scale-95 text-center w-full sm:w-auto"
+            className="px-6 py-4 rounded-xl border-2 border-primary text-primary font-bold text-base sm:px-10 sm:py-5 sm:text-lg transition-all duration-200 hover:bg-primary/5 active:scale-95 text-center w-full sm:w-auto"
           >
             Explore Marketplace
           </button>

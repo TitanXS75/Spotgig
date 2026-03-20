@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Check, UploadCloud, Smartphone, Instagram, MapPin, LocateFixed } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { EyeToggleIcon } from '@/components/ui/animated-state-icons';
 import { CATEGORIES, MOCK_LISTINGS } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
 import { reverseGeocode } from '@/lib/api/location';
@@ -348,18 +349,16 @@ const EditListing = () => {
           </div>
 
           <div>
-            <label className="flex items-center gap-3 p-3 bg-muted/30 border border-border/50 rounded-xl cursor-pointer hover:bg-muted/50 transition-colors">
-              <input 
-                type="checkbox" 
-                checked={hideLocation} 
-                onChange={(e) => setHideLocation(e.target.checked)}
-                className="w-5 h-5 rounded border-muted-foreground text-primary focus:ring-primary"
-              />
+            <div 
+              onClick={() => setHideLocation(!hideLocation)}
+              className="flex items-center gap-3 p-3 bg-muted/30 border border-border/50 rounded-xl cursor-pointer hover:bg-muted/50 transition-colors"
+            >
+              <EyeToggleIcon size={24} active={hideLocation} />
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">Hide from public map</p>
                 <p className="text-[11px] text-muted-foreground">Buyers will still see your area name but not your exact map pin.</p>
               </div>
-            </label>
+            </div>
           </div>
         </div>
 

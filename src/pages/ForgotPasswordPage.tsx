@@ -47,7 +47,7 @@ const ForgotPasswordPage = () => {
       {/* Right form panel */}
       <div className="flex flex-col items-center justify-center px-6 py-12 bg-background min-h-screen">
         <div className="w-full max-w-sm my-auto pb-10">
-          <button 
+          <button
             onClick={() => navigate('/auth')}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
           >
@@ -94,7 +94,6 @@ const ForgotPasswordPage = () => {
                 ) : (
                   <>
                     Send reset link
-                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </motion.button>

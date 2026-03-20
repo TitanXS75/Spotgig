@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
 import { reverseGeocode } from '@/lib/api/location';
+import { EyeToggleIcon } from '@/components/ui/animated-state-icons';
 
 const STEPS = ['Listing Details', 'Contact & Location', 'Review & Pay'];
 
@@ -432,18 +433,16 @@ const SellerOnboarding = () => {
             </div>
 
             <div>
-              <label className="flex items-center gap-3 p-3 bg-muted/30 border border-border/50 rounded-xl cursor-pointer hover:bg-muted/50 transition-colors">
-                <input 
-                  type="checkbox" 
-                  checked={hideLocation} 
-                  onChange={(e) => setHideLocation(e.target.checked)}
-                  className="w-5 h-5 rounded border-muted-foreground text-primary focus:ring-primary"
-                />
+              <div 
+                onClick={() => setHideLocation(!hideLocation)}
+                className="flex items-center gap-3 p-3 bg-muted/30 border border-border/50 rounded-xl cursor-pointer hover:bg-muted/50 transition-colors"
+              >
+                <EyeToggleIcon size={24} active={hideLocation} />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground">Hide from public map</p>
                   <p className="text-[11px] text-muted-foreground">Buyers will still see your area name but not your exact map pin.</p>
                 </div>
-              </label>
+              </div>
             </div>
 
             <motion.button whileTap={{ scale: 0.96 }} disabled={!step2Valid} onClick={() => setStep(2)} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2">

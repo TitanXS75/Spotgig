@@ -15,18 +15,25 @@ const TEST_USER = {
   gender: null,
 };
 
-// ─── Simple Left Image Panel ───────────────────────────────────────────────
-const LeftPanel = () => (
-  <div className="hidden lg:flex flex-col relative bg-muted overflow-hidden min-h-full">
-    {/* A relatable image representing local markets / shops with slow zoom */}
-    <motion.img
-      initial={{ scale: 1 }}
-      animate={{ scale: 1.15 }}
-      transition={{ duration: 25, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
-      src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=1200"
-      alt="Local neighbourhood shop"
-      className="absolute inset-0 w-full h-full object-cover"
-    />
+// ─── Dynamic Image Panel ───────────────────────────────────────────────
+const ImagePanel = ({ mode }: { mode: 'login' | 'signup' }) => (
+  <div className="hidden lg:flex flex-col relative bg-muted overflow-hidden min-h-screen h-full w-full">
+    <AnimatePresence mode="popLayout">
+      <motion.img
+        key={mode}
+        initial={{ opacity: 0, scale: 1.05 }}
+        animate={{ opacity: 1, scale: 1.15 }}
+        exit={{ opacity: 0, scale: 1.05 }}
+        transition={{ duration: 0.8, ease: "easeInOut" }}
+        src={
+          mode === 'login'
+            ? "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=90&w=1920" // Friends collaborating and building a business together
+            : "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=90&w=1920" // Arts and painting at home
+        }
+        alt="Local neighbourhood shop"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+    </AnimatePresence>
     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
 
     {/* Bottom tagline */}
@@ -38,7 +45,11 @@ const LeftPanel = () => (
         <span className="font-bold text-lg tracking-tight shadow-sm">Aaspass</span>
       </div>
       <h2 className="text-3xl font-bold leading-tight drop-shadow-md">
-        Your neighbourhood,<br />in your pocket.
+        {mode === 'login' ? (
+          <>Welcome back to<br />your local market.</>
+        ) : (
+          <>Your neighbourhood,<br />in your pocket.</>
+        )}
       </h2>
       <p className="text-white/90 text-sm mt-3 max-w-sm leading-relaxed drop-shadow">
         Join the community to discover amazing local sellers, home-chefs, and services just down the street.
@@ -170,11 +181,22 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
-      <LeftPanel />
+    <div className={`min-h-screen flex flex-col ${mode === 'login' ? 'lg:flex-row' : 'lg:flex-row-reverse'} overflow-hidden`}>
+      {/* Image Panel */}
+      <motion.div 
+        layout 
+        transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }} 
+        className="w-full lg:w-1/2 flex-shrink-0"
+      >
+        <ImagePanel mode={mode} />
+      </motion.div>
 
-      {/* Right — Form */}
-      <div className="flex flex-col items-center justify-center px-6 py-12 bg-background overflow-y-auto min-h-screen">
+      {/* Form Panel */}
+      <motion.div 
+        layout 
+        transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }} 
+        className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 bg-background min-h-screen relative z-10"
+      >
         {/* Mobile logo */}
         <div className="lg:hidden flex items-center gap-2 mb-8 mt-4">
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
@@ -418,7 +440,7 @@ const AuthPage = () => {
             </motion.form>
           </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

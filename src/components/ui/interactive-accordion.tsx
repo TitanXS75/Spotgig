@@ -11,7 +11,7 @@ export interface AccordionItem {
 }
 
 export function UniqueAccordion({ items }: { items: AccordionItem[] }) {
-  const [activeId, setActiveId] = useState<string | null>(items[0]?.id || null)
+  const [activeId, setActiveId] = useState<string | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   return (

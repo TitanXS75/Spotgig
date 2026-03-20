@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { MessageCircle, Heart } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
+import { HeartIcon } from '@/components/ui/animated-state-icons';
 import { useNavigate } from 'react-router-dom';
 import type { Listing } from '@/lib/mock-data';
 import { getDistance } from '@/lib/distance';
@@ -35,21 +36,16 @@ const ListingCard = ({ listing }: ListingCardProps) => {
       </div>
 
       {/* Favorite button */}
-      <motion.button
-        whileTap={{ scale: 0.85 }}
+      <div
+        className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-sm shadow-sm"
         onClick={(e) => {
           e.stopPropagation();
           toggleFavorite(listing.id);
         }}
-        className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-sm shadow-sm"
         title={favorited ? 'Remove from favorites' : 'Save'}
       >
-        <Heart
-          className={`w-3.5 h-3.5 transition-colors ${
-            favorited ? 'fill-red-500 text-red-500' : 'text-muted-foreground'
-          }`}
-        />
-      </motion.button>
+        <HeartIcon size={20} active={favorited} />
+      </div>
 
       <div className="p-3 flex flex-col gap-1">
         <div className="flex justify-between items-start">

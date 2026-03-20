@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Mail, Phone, MapPin, MessageCircle, Send } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, MessageCircle, Send, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { UniqueAccordion } from '@/components/ui/interactive-accordion';
+import { faqs } from './FAQPage';
 
 const ContactPage = () => {
   const navigate = useNavigate();
@@ -179,19 +181,49 @@ const ContactPage = () => {
               </motion.button>
             </form>
           </div>
-
-          {/* FAQ Links */}
-          <div className="mt-6 p-4 bg-primary/5 rounded-xl">
-            <h3 className="font-semibold text-foreground mb-2">Quick Help</h3>
-            <p className="text-sm text-muted-foreground mb-3">
-              Before reaching out, check out our FAQ section for quick answers to common questions.
-            </p>
-            <button className="text-sm font-medium text-primary hover:underline">
-              Visit FAQ →
-            </button>
-          </div>
         </motion.div>
       </div>
+
+      {/* Horizontal Full-Width FAQ Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="mt-16 pt-12 border-t border-border"
+      >
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground">Frequently Asked Questions</h2>
+            <p className="text-muted-foreground mt-2">All {faqs.length} commonly asked questions about using the platform</p>
+          </div>
+          <div className="hidden md:flex w-12 h-12 bg-primary/10 rounded-full items-center justify-center">
+            <HelpCircle className="w-6 h-6 text-primary" />
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-x-8 gap-y-2">
+          <div className="space-y-2">
+            <UniqueAccordion 
+              items={faqs.slice(0, Math.ceil(faqs.length / 2)).map((item, i) => ({
+                id: `faq-${item.id}`,
+                number: String(i + 1).padStart(2, '0'),
+                title: item.question,
+                content: item.answer
+              }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <UniqueAccordion 
+              items={faqs.slice(Math.ceil(faqs.length / 2)).map((item, i) => ({
+                id: `faq-${item.id}`,
+                number: String(Math.ceil(faqs.length / 2) + i + 1).padStart(2, '0'),
+                title: item.question,
+                content: item.answer
+              }))}
+            />
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

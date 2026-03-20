@@ -6,12 +6,12 @@ import { useState } from 'react';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { user, logout, updateUserProfile } = useAppStore();
+  const { user, userListings, logout, updateUserProfile } = useAppStore();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
-    age: user?.age || null,
+    gender: user?.gender || null,
   });
 
   const handleLogout = () => {
@@ -79,13 +79,17 @@ const ProfilePage = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground uppercase">Age</label>
-                  <input
-                    type="number"
-                    value={editData.age || ''}
-                    onChange={(e) => setEditData({ ...editData, age: e.target.value ? parseInt(e.target.value) : null })}
+                  <label className="text-xs font-semibold text-muted-foreground uppercase">Gender</label>
+                  <select
+                    value={editData.gender || ''}
+                    onChange={(e) => setEditData({ ...editData, gender: (e.target.value || null) as any })}
                     className="w-full mt-1 px-3 py-2 bg-background rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  />
+                  >
+                    <option value="">Prefer not to say</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-muted-foreground uppercase">Phone</label>
@@ -113,7 +117,7 @@ const ProfilePage = () => {
                       setEditData({
                         name: user?.name || '',
                         phone: user?.phone || '',
-                        age: user?.age || null,
+                        gender: user?.gender || null,
                       });
                     }}
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-semibold"
@@ -129,10 +133,10 @@ const ProfilePage = () => {
                   <label className="text-xs font-semibold text-muted-foreground uppercase">Full Name</label>
                   <p className="text-foreground mt-1">{user.name}</p>
                 </div>
-                {user.age && (
+                {user.gender && (
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground uppercase">Age</label>
-                    <p className="text-foreground mt-1">{user.age} years</p>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase">Gender</label>
+                    <p className="text-foreground mt-1 capitalize">{user.gender}</p>
                   </div>
                 )}
                 {user.phone && (
@@ -157,7 +161,36 @@ const ProfilePage = () => {
             )}
           </motion.div>
 
-          {/* Become a Seller Button */}
+          {/* User Listings Section */}
+          {userListings.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="space-y-4"
+            >
+              <h3 className="font-semibold text-foreground text-lg">My Businesses</h3>
+              <div className="grid gap-3">
+                {userListings.map(listing => (
+                  <div key={listing.id} className="bg-card shadow-sm border border-border rounded-xl p-4 flex gap-4 items-center">
+                    <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center text-3xl shrink-0 overflow-hidden">
+                      {listing.image_url ? <img src={listing.image_url} alt="Logo" className="w-full h-full object-cover" /> : listing.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-foreground truncate">{listing.name}</h4>
+                      <p className="text-sm text-muted-foreground truncate">{listing.category} • {listing.area}</p>
+                    </div>
+                    <button onClick={() => navigate(`/listing/${listing.id}`)} className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-medium rounded-lg shrink-0 transition-colors">
+                      View
+                    </button>
+                    {/* Placeholder for future editing options */}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Become a Seller Button (Only if no listings yet, or "Add Another") */}
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -166,7 +199,7 @@ const ProfilePage = () => {
             onClick={handleSellerClick}
             className="w-full bg-primary/5 rounded-2xl p-5 text-left hover:bg-primary/10 transition-colors"
           >
-            <h3 className="font-semibold text-foreground">Become a seller</h3>
+            <h3 className="font-semibold text-foreground">{userListings.length > 0 ? "Add another business" : "Become a seller"}</h3>
             <p className="text-sm text-muted-foreground mt-1">
               List your business for just ₹100/month. Go yearly at ₹1,200 and stay live all year!
             </p>

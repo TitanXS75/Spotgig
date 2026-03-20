@@ -53,14 +53,23 @@ const ListingCard = ({ listing }: ListingCardProps) => {
 
       <div className="p-3 flex flex-col gap-1">
         <div className="flex justify-between items-start">
-          <span className={`text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded ${
-            isProduct
-              ? 'text-secondary bg-secondary/10'
-              : 'text-accent-service bg-accent-service/10'
-          }`}>
-            {listing.type}
-          </span>
-          <span className="text-meta tabular-nums text-muted-foreground">
+          <div className="flex gap-1.5 flex-wrap">
+            <span className={`text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded ${
+              isProduct
+                ? 'text-secondary bg-secondary/10'
+                : 'text-accent-service bg-accent-service/10'
+            }`}>
+              {listing.type}
+            </span>
+            <span className={`text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded ${
+              listing.operating_type === 'home'
+                ? 'text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-500/10'
+                : 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/10'
+            }`}>
+              {listing.operating_type}
+            </span>
+          </div>
+          <span className="text-meta tabular-nums text-muted-foreground whitespace-nowrap ml-2">
             {distance === null ? '—' : `${distance} km`}
           </span>
         </div>
@@ -68,7 +77,7 @@ const ListingCard = ({ listing }: ListingCardProps) => {
           {listing.name}
         </h3>
         <p className="text-[11px] text-muted-foreground truncate">
-          {listing.area} · {listing.operating_type === 'home' ? 'Home' : 'Shop'}
+          {listing.area}
         </p>
         <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
           {listing.description}

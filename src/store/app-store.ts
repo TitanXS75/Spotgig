@@ -2,10 +2,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { DEFAULT_LAT, DEFAULT_LNG } from '@/lib/distance';
 
+import type { Listing } from '@/lib/mock-data';
+
 interface User {
   email: string;
   name: string;
-  age: number | null;
+  gender: 'male' | 'female' | 'other' | null;
   phone: string | null;
 }
 
@@ -21,8 +23,11 @@ interface AppState {
   searchQuery: string;
   selectedCategory: string | null;
   typeFilter: 'all' | 'product' | 'service';
+  operationTypeFilter: 'all' | 'home' | 'shop';
   distanceFilter: number; // km, 0 = anywhere
   sortBy: 'distance' | 'newest';
+  // User Listings (Persisted)
+  userListings: Listing[];
   // Favorites (local, persisted to localStorage)
   favoritedIds: string[];
   // UI State
@@ -37,6 +42,7 @@ interface AppState {
   setSearchQuery: (q: string) => void;
   setSelectedCategory: (c: string | null) => void;
   setTypeFilter: (t: 'all' | 'product' | 'service') => void;
+  setOperationTypeFilter: (t: 'all' | 'home' | 'shop') => void;
   setDistanceFilter: (d: number) => void;
   setSortBy: (s: 'distance' | 'newest') => void;
   setLoading: (loading: boolean) => void;
@@ -44,6 +50,9 @@ interface AppState {
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
   toggleFavorite: (id: string) => void;
   isFavorited: (id: string) => boolean;
+  addListing: (listing: Listing) => void;
+  updateListing: (id: string, updates: Partial<Listing>) => void;
+  deleteListing: (id: string) => void;
   resetFilters: () => void;
 }
 
@@ -58,8 +67,10 @@ export const useAppStore = create<AppState>()(
       searchQuery: '',
       selectedCategory: null,
       typeFilter: 'all',
+      operationTypeFilter: 'all',
       distanceFilter: 0,
       sortBy: 'distance',
+      userListings: [],
       favoritedIds: [],
       isLoading: false,
       isSidebarOpen: false,
@@ -78,6 +89,7 @@ export const useAppStore = create<AppState>()(
       setSearchQuery: (q) => set({ searchQuery: q }),
       setSelectedCategory: (c) => set({ selectedCategory: c }),
       setTypeFilter: (t) => set({ typeFilter: t }),
+      setOperationTypeFilter: (t) => set({ operationTypeFilter: t }),
       setDistanceFilter: (d) => set({ distanceFilter: d }),
       setSortBy: (s) => set({ sortBy: s }),
       setLoading: (loading) => set({ isLoading: loading }),
@@ -92,15 +104,24 @@ export const useAppStore = create<AppState>()(
         });
       },
       isFavorited: (id) => get().favoritedIds.includes(id),
+
+      addListing: (listing) => set((state) => ({ userListings: [listing, ...state.userListings] })),
+      updateListing: (id, updates) => set((state) => ({
+        userListings: state.userListings.map(l => l.id === id ? { ...l, ...updates } : l)
+      })),
       
       resetFilters: () =>
         set({
           searchQuery: '',
           selectedCategory: null,
           typeFilter: 'all',
+          operationTypeFilter: 'all',
           distanceFilter: 0,
           sortBy: 'distance',
         }),
+      deleteListing: (id) => set((state) => ({
+        userListings: state.userListings.filter(l => l.id !== id)
+      })),
     }),
     {
       name: 'aaspass-store',
@@ -111,8 +132,10 @@ export const useAppStore = create<AppState>()(
         userLng: state.userLng,
         hasLocation: state.hasLocation,
         userArea: state.userArea,
+        userListings: state.userListings,
         favoritedIds: state.favoritedIds,
         sortBy: state.sortBy,
+        operationTypeFilter: state.operationTypeFilter,
         distanceFilter: state.distanceFilter,
         theme: state.theme,
       }),

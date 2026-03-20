@@ -20,8 +20,9 @@ export interface Listing {
   emoji: string;
   image_url: string | null;
   status: ListingStatus;
-  created_at: string;
+  created_at: string; // ISO string
   views: number;
+  hide_location?: boolean;
 }
 
 export const CATEGORIES = [

@@ -1,6 +1,33 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Store, MapPin, Smartphone, ShieldCheck, Zap, Users, TrendingUp, Star, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Lenis from '@studio-freight/lenis';
+import { AnimatedMarqueeHero } from '@/components/ui/hero-3';
+import { FeaturesSectionWithHoverEffects } from '@/components/ui/feature-section-with-hover-effects';
+import { ZoomParallax } from '@/components/ui/zoom-parallax';
+import { UniqueAccordion } from '@/components/ui/interactive-accordion';
+
+const DEMO_IMAGES = [
+  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900&auto=format&fit=crop&q=60", // Food
+  "https://images.unsplash.com/photo-1558024920-b41e1887dc32?w=900&auto=format&fit=crop&q=60", // Tailor / Boutique
+  "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=900&auto=format&fit=crop&q=60", // Repair / Services
+  "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=900&auto=format&fit=crop&q=60", // Tutoring / Education
+  "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=900&auto=format&fit=crop&q=60", // Yoga / Fitness
+  "https://images.unsplash.com/photo-1460518451285-97b6aa326961?w=900&auto=format&fit=crop&q=60", // Arts / Crafts
+  "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=900&auto=format&fit=crop&q=60", // Beauty / Salon
+  "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=900&auto=format&fit=crop&q=60", // Salad
+  "https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=900&auto=format&fit=crop&q=60", // Crafts
+  "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=900&auto=format&fit=crop&q=60", // Makeup
+  "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?w=900&auto=format&fit=crop&q=60", // Cleaning
+  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&auto=format&fit=crop&q=60", // Dining
+  "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=900&auto=format&fit=crop&q=60", // Handyman
+  "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=900&auto=format&fit=crop&q=60", // Transport
+  "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=900&auto=format&fit=crop&q=60", // Photography
+  "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=900&auto=format&fit=crop&q=60", // Event
+  "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&auto=format&fit=crop&q=60", // Gardening
+  "https://images.unsplash.com/photo-1520601344403-1070ff37651c?w=900&auto=format&fit=crop&q=60", // Laundry
+];
 
 const CATEGORIES = [
   { emoji: '🍱', title: 'Food & Snacks', desc: 'Homemade tiffins & bakes', color: 'bg-orange-50 dark:bg-orange-950/30' },
@@ -13,48 +40,49 @@ const CATEGORIES = [
 
 const FEATURES = [
   {
-    icon: MapPin,
+    icon: <MapPin className="text-secondary w-6 h-6" />,
     title: 'Hyperlocal Discovery',
-    desc: 'Find exactly what you need within walking distance. Real-time distance calculations show you the nearest options.',
-    color: 'text-secondary',
+    description: 'Find exactly what you need within walking distance. Real-time distance calculations show you the nearest options.',
   },
   {
-    icon: Zap,
+    icon: <Zap className="text-primary w-6 h-6" />,
     title: 'Instant Connection',
-    desc: 'Direct WhatsApp and Instagram links for zero-friction communication. Connect with sellers immediately.',
-    color: 'text-primary',
+    description: 'Direct WhatsApp and Instagram links for zero-friction communication. Connect with sellers immediately.',
   },
   {
-    icon: ShieldCheck,
+    icon: <ShieldCheck className="text-green-500 w-6 h-6" />,
     title: 'Support Local',
-    desc: 'Help home-based entrepreneurs and micro-businesses in your neighbourhood grow and thrive.',
-    color: 'text-green-500',
+    description: 'Help home-based entrepreneurs and micro-businesses in your neighbourhood grow and thrive.',
   },
   {
-    icon: Smartphone,
+    icon: <Smartphone className="text-blue-500 w-6 h-6" />,
     title: 'Mobile First',
-    desc: 'Optimized for mobile devices. Browse, search, and contact sellers on the go.',
-    color: 'text-blue-500',
+    description: 'Optimized for mobile devices. Browse, search, and contact sellers on the go.',
   },
   {
-    icon: Users,
+    icon: <Users className="text-purple-500 w-6 h-6" />,
     title: 'Community Driven',
-    desc: 'Share your ratings to help others decide. Read what neighbourhood members think.',
-    color: 'text-purple-500',
+    description: 'Share your ratings to help others decide. Read what neighbourhood members think.',
   },
   {
-    icon: TrendingUp,
+    icon: <TrendingUp className="text-amber-500 w-6 h-6" />,
     title: 'Grow Your Business',
-    desc: 'Easy seller onboarding. Start selling in minutes with affordable monthly plans.',
-    color: 'text-amber-500',
+    description: 'Easy seller onboarding. Start selling in minutes with affordable monthly plans.',
   },
 ];
 
-const HOW_IT_WORKS = [
+const BUYERS_HOW_IT_WORKS = [
   { step: 1, title: 'Enable Location', desc: 'Allow access to your location for accurate distance calculations.' },
   { step: 2, title: 'Browse Nearby', desc: 'See sellers sorted by distance, category, and type (product/service).' },
   { step: 3, title: 'Check Details', desc: 'View full listing, reviews, ratings, and seller information.' },
   { step: 4, title: 'Connect Now', desc: 'Message on WhatsApp or Instagram to place orders and inquire.' },
+];
+
+const SELLERS_HOW_IT_WORKS = [
+  { step: 1, title: 'Create Profile', desc: 'Set up your business profile with photos, description, and location.' },
+  { step: 2, title: 'Add Listings', desc: 'List your products or services with pricing and details.' },
+  { step: 3, title: 'Get Discovered', desc: 'Nearby customers find you instantly through our location-based search.' },
+  { step: 4, title: 'Grow Business', desc: 'Receive inquiries directly on WhatsApp and build your local customer base.' },
 ];
 
 const TESTIMONIALS = [
@@ -87,6 +115,17 @@ const STATS = [
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [howItWorksMode, setHowItWorksMode] = useState<'buyer' | 'seller'>('buyer');
+
+  useEffect(() => {
+    const lenis = new Lenis();
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+    return () => lenis.destroy();
+  }, []);
 
   const handleNavigate = (path: string) => {
     window.scrollTo(0, 0);
@@ -129,51 +168,24 @@ const LandingPage = () => {
       </header>
 
       {/* ─── HERO SECTION ─── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20 pb-20 overflow-hidden">
-        <div className="max-w-5xl mx-auto text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-extrabold tracking-tight text-foreground mb-6"
-            style={{ textWrap: 'balance' }}
-          >
-            Discover Local Sellers,<br className="hidden md:block" /> Support Your Community
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed"
-          >
-            Aaspass is a hyperlocal marketplace connecting you with home-based sellers, freelancers, and local businesses within walking distance. No commissions. No middlemen. Just direct connections with your neighbourhood.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
-          >
-            <button
-              onClick={() => handleNavigate('/home')}
-              className="flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 w-full sm:w-auto justify-center"
-            >
-              Explore Sellers
-            </button>
-            <button
-              onClick={() => handleNavigate('/profile')}
-              className="flex items-center gap-2 bg-muted text-foreground px-8 py-4 rounded-full font-semibold text-lg hover:bg-muted/80 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 w-full sm:w-auto justify-center"
-            >
-              Become a Seller
-            </button>
-          </motion.div>
-        </div>
-      </section>
+      <AnimatedMarqueeHero
+        tagline="Support Local Business"
+        title={
+          <>
+            Discover Local Sellers,
+            <br className="hidden md:block" /> Support Your Community
+          </>
+        }
+        description="Aaspass is a hyperlocal marketplace connecting you with home-based sellers, freelancers, and local businesses within walking distance. No commissions. No middlemen. Just direct connections with your neighbourhood."
+        ctaText="Get Started"
+        onCtaClick={() => handleNavigate('/auth')}
+        secondaryCtaText="Explore Marketplace"
+        onSecondaryCtaClick={() => handleNavigate('/home')}
+        images={DEMO_IMAGES}
+      />
 
       {/* ─── CATEGORIES SECTION ─── */}
-      <section id="browse-sellers" className="py-20 px-6 bg-gray-50">
+      <section id="browse-sellers" className="py-12 md:py-16 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -216,9 +228,9 @@ const LandingPage = () => {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section id="how-it-works" className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+      <section id="how-it-works" className="py-12 md:py-16 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col items-center">
+          <div className="text-center mb-8">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -239,31 +251,34 @@ const LandingPage = () => {
             </motion.p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {HOW_IT_WORKS.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="relative"
-              >
-                <div className="bg-white rounded-2xl p-8 border border-gray-200 h-full shadow-sm hover:shadow-md transition-shadow">
-                  <div className="w-12 h-12 rounded-full bg-gray-800 text-white flex items-center justify-center font-bold text-lg mb-4">
-                    {item.step}
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
+          <div className="flex bg-muted p-1 rounded-full w-max mx-auto mb-10">
+            <button
+              onClick={() => setHowItWorksMode('buyer')}
+              className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${howItWorksMode === 'buyer' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              For Buyers
+            </button>
+            <button
+              onClick={() => setHowItWorksMode('seller')}
+              className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${howItWorksMode === 'seller' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              For Sellers
+            </button>
           </div>
+
+          <UniqueAccordion
+            items={(howItWorksMode === 'buyer' ? BUYERS_HOW_IT_WORKS : SELLERS_HOW_IT_WORKS).map((item) => ({
+              id: item.title.toLowerCase().replace(/\s+/g, '-'),
+              number: String(item.step).padStart(2, '0'),
+              title: item.title,
+              content: item.desc,
+            }))}
+          />
         </div>
       </section>
 
       {/* ─── FEATURES SECTION ─── */}
-      <section id="why-choose-aaspass" className="py-20 px-6 bg-gray-50">
+      <section id="why-choose-aaspass" className="py-12 md:py-16 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -286,32 +301,12 @@ const LandingPage = () => {
             </motion.p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {FEATURES.map((feature, i) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: i * 0.1 }}
-                  className="bg-background rounded-2xl p-8 border border-border/50 hover:shadow-lg hover:border-primary/30 transition-all duration-300"
-                >
-                  <div className={`w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5`}>
-                    <Icon className={`w-7 h-7 ${feature.color}`} />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
-                </motion.div>
-              );
-            })}
-          </div>
+          <FeaturesSectionWithHoverEffects features={FEATURES} />
         </div>
       </section>
 
       {/* ─── TESTIMONIALS SECTION ─── */}
-      <section id="success-stories" className="py-20 px-6">
+      <section id="success-stories" className="py-12 md:py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -366,7 +361,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─── DOWNLOAD PWA SECTION ─── */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-12 md:py-16 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -443,47 +438,27 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ─── CTA SECTION ─── */}
-      <section className="py-20 px-6 bg-gray-50 border-t border-gray-200">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl font-bold text-foreground mb-6"
+      {/* ─── ZOOM PARALLAX CTA SECTION ─── */}
+      <section className="bg-background pt-16">
+        <div className="relative flex items-center justify-center pt-10 pb-4">
+          <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-center">
+            Ready to Join Aaspass?
+          </h2>
+        </div>
+        <ZoomParallax images={DEMO_IMAGES.slice(0, 7).map(src => ({ src }))} />
+        <div className="py-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button
+            onClick={() => handleNavigate('/auth')}
+            className="bg-primary text-primary-foreground px-10 py-5 rounded-full font-bold text-xl hover:bg-primary/90 transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-95 text-center w-full sm:w-auto"
           >
-            Ready to Join ?
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
+            Get Started Free
+          </button>
+          <button
+            onClick={() => handleNavigate('/home')}
+            className="px-10 py-5 rounded-full border-2 border-primary text-primary font-bold text-xl transition-all duration-200 hover:bg-primary/5 active:scale-95 text-center w-full sm:w-auto"
           >
-            Download Aaspass today and start discovering amazing local sellers in your neighbourhood. It only takes 2 minutes to sign up!
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-4 items-center justify-center"
-          >
-            <button
-              onClick={() => handleNavigate('/auth')}
-              className="bg-primary text-primary-foreground px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 w-full sm:w-auto"
-            >
-              Get Started Free
-            </button>
-            <button
-              onClick={() => handleNavigate('/home')}
-              className="border-2 border-primary text-primary px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/5 transition-all duration-200 active:scale-95 w-full sm:w-auto"
-            >
-              Explore as Guest
-            </button>
-          </motion.div>
+            Explore Marketplace
+          </button>
         </div>
       </section>
 

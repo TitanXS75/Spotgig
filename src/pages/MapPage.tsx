@@ -44,15 +44,17 @@ const MapPage = () => {
     distanceFilter,
     sortBy,
     setUserLocation,
+    userListings,
   } = useAppStore();
 
   const center = useMemo<[number, number]>(() => {
-    if (Number.isFinite(userLat) && Number.isFinite(userLng)) return [userLat, userLng];
-    return [DEFAULT_LAT, DEFAULT_LNG];
-  }, [userLat, userLng]);
+    if (hasLocation && Number.isFinite(userLat) && Number.isFinite(userLng)) return [userLat, userLng];
+    // Default to Center of India
+    return [20.5937, 78.9629];
+  }, [userLat, userLng, hasLocation]);
 
   const listingsForMap = useMemo(() => {
-    let items = MOCK_LISTINGS.filter((l) => l.status === 'live');
+    let items = [...userListings, ...MOCK_LISTINGS].filter((l) => l.status === 'live' && !l.hide_location);
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -103,13 +105,7 @@ const MapPage = () => {
     );
   };
 
-  // Auto-request location when opening the map page (so it uses real location by default).
-  useEffect(() => {
-    if (!hasLocation && navigator.geolocation && !isLocating) {
-      requestLocation();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasLocation]);
+  // Previously auto-requested. Now user must explicitly click the prompt.
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
@@ -167,11 +163,11 @@ const MapPage = () => {
           <div className="h-[calc(100vh-260px)] min-h-[420px] w-full">
             <MapContainer
               center={center}
-              zoom={hasLocation ? 14 : 12}
+              zoom={hasLocation ? 14 : 5}
               scrollWheelZoom
               className="h-full w-full"
             >
-              <RecenterOnLocation center={center} zoom={hasLocation ? 14 : 12} />
+              <RecenterOnLocation center={center} zoom={hasLocation ? 14 : 5} />
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -217,8 +213,21 @@ const MapPage = () => {
           </div>
 
           {!navigator.geolocation && (
-            <div className="absolute top-3 left-3 right-3 md:left-auto md:right-3 md:w-[420px] rounded-2xl bg-background/90 backdrop-blur border border-border px-3 py-2 text-xs text-muted-foreground">
+            <div className="absolute top-3 left-3 right-3 md:left-auto md:right-3 md:w-[420px] rounded-2xl bg-background/90 backdrop-blur border border-border px-3 py-2 text-xs text-muted-foreground z-[1000]">
               Your browser doesn’t support geolocation, so the map is using the default location.
+            </div>
+          )}
+
+          {!hasLocation && navigator.geolocation && (
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[1000]">
+              <button 
+                onClick={requestLocation} 
+                disabled={isLocating}
+                className="bg-primary text-primary-foreground px-6 py-3 rounded-full shadow-2xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-transform active:scale-95 animate-bounce disabled:animate-none disabled:opacity-75"
+              >
+                {isLocating ? <Navigation className="w-5 h-5 animate-pulse" /> : <LocateFixed className="w-5 h-5" />}
+                {isLocating ? 'Detecting Location...' : 'Detect My Location'}
+              </button>
             </div>
           )}
         </div>

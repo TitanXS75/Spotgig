@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, Store, MapPin, CreditCard, Smartphone, Instagram, LocateFixed } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Store, MapPin, CreditCard, Smartphone, Instagram, LocateFixed, UploadCloud } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
@@ -14,7 +14,7 @@ const EMOJI_OPTIONS = ['🍱', '🎨', '👗', '📱', '📐', '💄', '🔧', '
 
 const SellerOnboarding = () => {
   const navigate = useNavigate();
-  const { user, setUserLocation } = useAppStore();
+  const { user, setUserLocation, addListing } = useAppStore();
   const [step, setStep] = useState(0);
 
   // Redirect to auth if not logged in
@@ -34,6 +34,7 @@ const SellerOnboarding = () => {
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [emoji, setEmoji] = useState('🏠');
 
   // Step 2
@@ -47,6 +48,7 @@ const SellerOnboarding = () => {
   const [showManualCoordinates, setShowManualCoordinates] = useState(false);
   const [manualLat, setManualLat] = useState('');
   const [manualLng, setManualLng] = useState('');
+  const [hideLocation, setHideLocation] = useState(false);
 
   const maxDesc = 300;
 
@@ -110,6 +112,36 @@ const SellerOnboarding = () => {
       setUserLocation(lat, lng);
       setShowManualCoordinates(false);
     }
+  };
+
+  const handlePayAndGoLive = () => {
+    // Register business
+    const newListing = {
+      id: Math.random().toString(36).substring(7),
+      user_id: user?.email || 'u99',
+      name: listingName,
+      seller_name: user?.name || 'Local Seller',
+      type: type,
+      operating_type: operatingType,
+      category: type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType),
+      description: description,
+      tags: tags,
+      whatsapp: whatsapp || null,
+      instagram: instagram || null,
+      other_handle: otherHandle || null,
+      area: area,
+      lat: listingLat || 0,
+      lng: listingLng || 0,
+      emoji: emoji,
+      image_url: imageUrl || null,
+      hide_location: hideLocation,
+      status: 'live' as const,
+      created_at: new Date().toISOString(),
+      views: 0,
+    };
+    
+    addListing(newListing);
+    navigate('/profile');
   };
 
   return (
@@ -233,13 +265,39 @@ const SellerOnboarding = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground">Choose an Emoji</label>
-              <div className="grid grid-cols-8 gap-2 mt-2">
-                {EMOJI_OPTIONS.map((e) => (
-                  <button key={e} onClick={() => setEmoji(e)} className={`text-2xl p-1.5 rounded-lg transition-colors ${emoji === e ? 'bg-primary/20 ring-2 ring-primary' : 'bg-muted hover:bg-muted/80'}`}>
-                    {e}
-                  </button>
-                ))}
+              <label className="text-sm font-medium text-foreground">Add Image (Logo, Product, etc.)</label>
+              <div className="mt-2 w-full">
+                {imageUrl ? (
+                  <div className="flex flex-col gap-3 w-full">
+                    <div className="relative w-full h-40 rounded-xl overflow-hidden border border-border">
+                      <img src={imageUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+                    </div>
+                    <div className="flex items-center justify-end gap-3 mt-1">
+                      <label className="cursor-pointer px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-foreground text-xs font-semibold transition-colors">
+                        Replace
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setImageUrl(URL.createObjectURL(file));
+                        }} />
+                      </label>
+                      <button type="button" onClick={(e) => { e.preventDefault(); setImageUrl(''); }} className="px-4 py-2 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-lg text-xs font-semibold transition-colors">
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <UploadCloud className="w-8 h-8 text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">Upload your logo, product image etc.</p>
+                    </div>
+                    <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setImageUrl(URL.createObjectURL(file));
+                    }} />
+                  </label>
+                )}
               </div>
             </div>
 
@@ -373,6 +431,21 @@ const SellerOnboarding = () => {
               <p className="text-[11px] text-muted-foreground">📍 Your exact address is never shown publicly. Only your area name and approximate distance are displayed to buyers.</p>
             </div>
 
+            <div>
+              <label className="flex items-center gap-3 p-3 bg-muted/30 border border-border/50 rounded-xl cursor-pointer hover:bg-muted/50 transition-colors">
+                <input 
+                  type="checkbox" 
+                  checked={hideLocation} 
+                  onChange={(e) => setHideLocation(e.target.checked)}
+                  className="w-5 h-5 rounded border-muted-foreground text-primary focus:ring-primary"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">Hide from public map</p>
+                  <p className="text-[11px] text-muted-foreground">Buyers will still see your area name but not your exact map pin.</p>
+                </div>
+              </label>
+            </div>
+
             <motion.button whileTap={{ scale: 0.96 }} disabled={!step2Valid} onClick={() => setStep(2)} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2">
               Next
             </motion.button>
@@ -384,8 +457,8 @@ const SellerOnboarding = () => {
           <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4 mt-4">
             {/* Preview card */}
             <div className="bg-card rounded-2xl shadow-card overflow-hidden">
-              <div className="h-28 flex items-center justify-center bg-primary/10">
-                <span className="text-5xl">{emoji}</span>
+              <div className="h-28 flex items-center justify-center bg-primary/10 overflow-hidden relative">
+                {imageUrl ? <img src={imageUrl} className="absolute inset-0 w-full h-full object-cover" alt="Banner" /> : <span className="text-5xl">{emoji}</span>}
               </div>
               <div className="p-3">
                 <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${type === 'product' ? 'bg-accent text-accent-foreground' : 'bg-secondary text-secondary-foreground'}`}>
@@ -432,8 +505,8 @@ const SellerOnboarding = () => {
               </ul>
             </div>
 
-            <motion.button whileTap={{ scale: 0.96 }} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2">
-              <CreditCard className="w-4 h-4" /> Pay & Go Live
+            <motion.button onClick={handlePayAndGoLive} whileTap={{ scale: 0.96 }} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2">
+              <Check className="w-4 h-4" /> Register & Go Live
             </motion.button>
           </motion.div>
         )}

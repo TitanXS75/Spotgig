@@ -11,6 +11,7 @@ import ListingDetail from "./pages/ListingDetail";
 import CategoriesPage from "./pages/CategoriesPage";
 import ProfilePage from "./pages/ProfilePage";
 import SellerOnboarding from "./pages/SellerOnboarding";
+import EditListing from "./pages/EditListing";
 import MapPage from "./pages/MapPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
@@ -47,6 +48,7 @@ const AppContent = () => {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/seller/onboarding" element={<SellerOnboarding />} />
+          <Route path="/edit-listing/:id" element={<EditListing />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />

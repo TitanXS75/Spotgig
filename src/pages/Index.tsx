@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SearchBar from '@/components/SearchBar';
 import CategoryPills from '@/components/CategoryPills';
 import TypeToggle from '@/components/TypeToggle';
+import OperationToggle from '@/components/OperationToggle';
 import ListingCard from '@/components/ListingCard';
 import ListingCardSkeleton from '@/components/ListingCardSkeleton';
 import SellerCTA from '@/components/SellerCTA';
@@ -16,8 +17,8 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const {
     userLat, userLng, hasLocation,
-    searchQuery, selectedCategory, typeFilter, distanceFilter, sortBy,
-    setUserLocation, setSortBy,
+    searchQuery, selectedCategory, typeFilter, operationTypeFilter, distanceFilter, sortBy,
+    setUserLocation, setSortBy, userListings,
   } = useAppStore();
 
   useEffect(() => {
@@ -33,7 +34,7 @@ const Index = () => {
   }, [setUserLocation]);
 
   const filtered = useMemo(() => {
-    let items = MOCK_LISTINGS.filter((l) => l.status === 'live');
+    let items = [...userListings, ...MOCK_LISTINGS].filter((l) => l.status === 'live');
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -50,6 +51,9 @@ const Index = () => {
     }
     if (typeFilter !== 'all') {
       items = items.filter((l) => l.type === typeFilter);
+    }
+    if (operationTypeFilter !== 'all') {
+      items = items.filter((l) => l.operating_type === operationTypeFilter);
     }
     if (distanceFilter > 0) {
       if (hasLocation) {
@@ -72,7 +76,7 @@ const Index = () => {
     }
 
     return items;
-  }, [searchQuery, selectedCategory, typeFilter, distanceFilter, sortBy, userLat, userLng]);
+  }, [searchQuery, selectedCategory, typeFilter, operationTypeFilter, distanceFilter, sortBy, userLat, userLng]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
@@ -100,7 +104,10 @@ const Index = () => {
         {/* Search & Filters */}
         <div className="flex flex-col gap-3 mb-4">
           <SearchBar />
-          <TypeToggle />
+          <div className="grid grid-cols-2 gap-2">
+            <TypeToggle />
+            <OperationToggle />
+          </div>
           <CategoryPills />
         </div>
 

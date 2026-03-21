@@ -51,9 +51,9 @@ const ListingCard = ({ listing }: ListingCardProps) => {
         <div className="flex justify-between items-start">
           <div className="flex gap-1.5 flex-wrap">
             <span className={`text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded ${
-              isProduct
-                ? 'text-secondary bg-secondary/10'
-                : 'text-accent-service bg-accent-service/10'
+              listing.type === 'product'
+                ? 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-500/10'
+                : 'text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-500/10'
             }`}>
               {listing.type}
             </span>

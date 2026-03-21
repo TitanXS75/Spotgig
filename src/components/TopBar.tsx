@@ -28,8 +28,7 @@ const TopBar = () => {
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => navigate('/home')}
         >
-          <img src={aplgLogo} alt="Aaspass logo" className="w-8 h-8 rounded-xl object-contain" />
-          <span className="text-lg font-semibold tracking-tight text-foreground">Aaspass</span>
+          <img src={aplgLogo} alt="Aaspass logo" className="w-auto h-8 object-contain transform scale-110" />
         </div>
 
         {/* Desktop nav links */}

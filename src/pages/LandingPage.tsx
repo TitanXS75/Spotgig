@@ -85,26 +85,7 @@ const SELLERS_HOW_IT_WORKS = [
   { step: 4, title: 'Grow Business', desc: 'Receive inquiries directly on WhatsApp and build your local customer base.' },
 ];
 
-const TESTIMONIALS = [
-  {
-    name: 'Priya M.',
-    role: 'Home Cook',
-    text: 'Aaspass helped me reach 50+ customers in my first month. No commissions, just direct sales!',
-    avatar: '👩‍🍳',
-  },
-  {
-    name: 'Rahul K.',
-    role: 'Customer',
-    text: 'Found amazing homemade food 200m away from my apartment. So convenient and affordable!',
-    avatar: '👨‍💼',
-  },
-  {
-    name: 'Divya S.',
-    role: 'Fashion Designer',
-    text: 'The onboarding was super simple. Now I get tailoring orders from my neighbourhood regularly.',
-    avatar: '👩‍🎨',
-  },
-];
+
 
 const STATS = [
   { number: '10K+', label: 'Active Sellers', icon: Store },
@@ -251,61 +232,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ─── TESTIMONIALS SECTION ─── */}
-      <section id="success-stories" className="py-12 md:py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-4xl md:text-5xl font-bold text-foreground mb-4"
-            >
-              Loved by Our Community
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-lg text-muted-foreground max-w-2xl mx-auto"
-            >
-              Real ratings from sellers and buyers
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {TESTIMONIALS.map((testimonial, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="bg-white rounded-2xl p-8 border border-gray-200 hover:shadow-lg transition-all duration-300"
-              >
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-2xl">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <p className="font-bold text-foreground">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                  </div>
-                </div>
-                <p className="text-muted-foreground leading-relaxed italic">"{testimonial.text}"</p>
-                <div className="flex gap-1 mt-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ─── DOWNLOAD PWA SECTION ─── */}
       <section className="py-12 md:py-16 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -434,7 +360,6 @@ const LandingPage = () => {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><button onClick={() => handleNavigate('/profile')} className="hover:text-foreground transition">Get Started</button></li>
                 <li><button onClick={() => handleNavigate('/pricing')} className="hover:text-foreground transition">Pricing</button></li>
-                <li><button onClick={() => handleSmoothScroll('success-stories')} className="hover:text-foreground transition">Success Stories</button></li>
               </ul>
             </div>
             <div>

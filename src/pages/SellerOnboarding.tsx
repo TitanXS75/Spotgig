@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, Store, MapPin, CreditCard, Smartphone, Instagram, LocateFixed, UploadCloud } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AnimatedDropdown from '@/components/ui/animated-dropdown';
 import { CATEGORIES } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
 import { reverseGeocode } from '@/lib/api/location';
@@ -50,6 +51,8 @@ const SellerOnboarding = () => {
   const [manualLat, setManualLat] = useState('');
   const [manualLng, setManualLng] = useState('');
   const [hideLocation, setHideLocation] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly' | null>(null);
+  const [showRazorpay, setShowRazorpay] = useState(false);
 
   const maxDesc = 300;
 
@@ -116,6 +119,10 @@ const SellerOnboarding = () => {
   };
 
   const handlePayAndGoLive = () => {
+    // Calculate subscription expiry date (30 days from now)
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 30);
+
     // Register business
     const newListing = {
       id: Math.random().toString(36).substring(7),
@@ -138,11 +145,42 @@ const SellerOnboarding = () => {
       hide_location: hideLocation,
       status: 'live' as const,
       created_at: new Date().toISOString(),
+      plan_expires_at: expiryDate.toISOString(),
+      plan: selectedPlan || 'monthly',
       views: 0,
     };
     
     addListing(newListing);
     navigate('/profile');
+  };
+
+  const handleRazorpayPayment = () => {
+    if (!selectedPlan) return;
+    
+    const amount = selectedPlan === 'monthly' ? 100 : 1200;
+    const planName = selectedPlan === 'monthly' ? 'Monthly' : 'Yearly';
+
+    // Initialize Razorpay
+    const options = {
+      key: 'rzp_test_placeholder', // Replace with actual Razorpay key
+      amount: amount * 100, // Amount in paise
+      currency: 'INR',
+      name: 'Aaspass',
+      description: `${planName} Subscription`,
+      handler: function() {
+        handlePayAndGoLive();
+      },
+      prefill: {
+        name: user?.name || '',
+        email: user?.email || '',
+      },
+      theme: {
+        color: 'var(--primary)',
+      },
+    };
+
+    const razorpay = new (window as any).Razorpay(options);
+    razorpay.open();
   };
 
   return (
@@ -203,39 +241,51 @@ const SellerOnboarding = () => {
               <label className="text-sm font-medium text-foreground">{type === 'service' ? 'Service Type' : 'Category'} *</label>
               {type === 'product' ? (
                 <>
-                  <select value={category} onChange={(e) => {
-                    setCategory(e.target.value);
-                    if (e.target.value !== 'Other') setCategorySpecification('');
-                  }} className="mt-1 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer border border-muted-foreground/10">
-                    <option value="">Select a category</option>
-                    {CATEGORIES.map((c) => <option key={c.name} value={c.name}>{c.emoji} {c.name}</option>)}
-                  </select>
+                  <AnimatedDropdown
+                    items={CATEGORIES.map((c) => ({
+                      id: c.name,
+                      name: `${c.emoji} ${c.name}`,
+                    }))}
+                    selectedId={category}
+                    text="Select a category"
+                    onSelect={(item) => {
+                      setCategory(item.id || '');
+                      setCategorySpecification('');
+                    }}
+                    className="w-full mt-1"
+                  />
                   {category === 'Other' && (
                     <input 
                       type="text" 
                       value={categorySpecification} 
                       onChange={(e) => setCategorySpecification(e.target.value)}
                       placeholder="Specify what you sell (e.g., Handmade Jewelry)"
-                      className="mt-2 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      className="mt-2 w-full px-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                   )}
                 </>
               ) : (
                 <>
-                  <select value={serviceType} onChange={(e) => {
-                    setServiceType(e.target.value);
-                    if (e.target.value !== 'Other') setServiceSpecification('');
-                  }} className="mt-1 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer border border-muted-foreground/10">
-                    <option value="">Select a service type</option>
-                    {SERVICE_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  <AnimatedDropdown
+                    items={SERVICE_TYPES.map((s) => ({
+                      id: s,
+                      name: s,
+                    }))}
+                    selectedId={serviceType}
+                    text="Select a service type"
+                    onSelect={(item) => {
+                      setServiceType(item.id || '');
+                      setServiceSpecification('');
+                    }}
+                    className="w-full mt-1"
+                  />
                   {serviceType === 'Other' && (
                     <input 
                       type="text" 
                       value={serviceSpecification} 
                       onChange={(e) => setServiceSpecification(e.target.value)}
                       placeholder="Specify your service (e.g., Home Renovation)"
-                      className="mt-2 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      className="mt-2 w-full px-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                     />
                   )}
                 </>
@@ -483,30 +533,90 @@ const SellerOnboarding = () => {
             </div>
 
             {/* Pricing */}
-            <div className="bg-primary/5 rounded-2xl p-4">
-              <h3 className="font-semibold text-foreground">Go Live on Aaspass</h3>
-              <div className="flex gap-3 mt-3">
-                <div className="flex-1 bg-card rounded-xl p-3 text-center shadow-card">
-                  <p className="text-lg font-bold text-foreground">₹100</p>
-                  <p className="text-[11px] text-muted-foreground">per month</p>
-                </div>
-                <div className="flex-1 bg-card rounded-xl p-3 text-center shadow-card ring-2 ring-primary">
-                  <p className="text-lg font-bold text-primary">₹1,200</p>
-                  <p className="text-[11px] text-muted-foreground">per year</p>
+            <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl p-5 border border-primary/20">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="font-bold text-foreground text-lg">Go Live on Aaspass</h3>
+                <span className="text-xs font-semibold text-primary bg-primary/20 px-3 py-1 rounded-full">30-Day Trial</span>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">Your subscription will automatically expire after 30 days. Renew anytime to keep your listing active.</p>
+              
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {/* Monthly Plan */}
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setSelectedPlan('monthly')}
+                  className={`relative rounded-xl p-4 transition-all duration-200 border-2 overflow-hidden group ${
+                    selectedPlan === 'monthly'
+                      ? 'border-primary bg-primary/10 shadow-lg shadow-primary/30'
+                      : 'border-border hover:border-primary/50 bg-card'
+                  }`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative">
+                    {selectedPlan === 'monthly' && (
+                      <motion.div
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center"
+                      >
+                        <Check className="w-3.5 h-3.5 text-primary-foreground" />
+                      </motion.div>
+                    )}
+                    <p className="text-2xl font-bold text-foreground">₹100</p>
+                    <p className="text-xs text-muted-foreground mt-1">per month</p>
+                  </div>
+                </motion.button>
+
+                {/* Yearly Plan */}
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setSelectedPlan('yearly')}
+                  className={`relative rounded-xl p-4 transition-all duration-200 border-2 overflow-hidden group ${
+                    selectedPlan === 'yearly'
+                      ? 'border-primary bg-primary/10 shadow-lg shadow-primary/30'
+                      : 'border-border hover:border-primary/50 bg-card'
+                  }`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute top-2 right-2">
+                    <span className="text-[10px] font-bold text-white bg-primary px-2 py-0.5 rounded-full">Save 17%</span>
+                  </div>
+                  <div className="relative">
+                    {selectedPlan === 'yearly' && (
+                      <motion.div
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center"
+                      >
+                        <Check className="w-3.5 h-3.5 text-primary-foreground" />
+                      </motion.div>
+                    )}
+                    <p className="text-2xl font-bold text-foreground">₹1,200</p>
+                    <p className="text-xs text-muted-foreground mt-1">per year</p>
+                  </div>
+                </motion.button>
+              </div>
+
+              <div className="space-y-2 mb-5">
+                <p className="text-xs font-semibold text-foreground mb-3">What's Included:</p>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">Public listing on Aaspass</span></div>
+                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">WhatsApp / Instagram connect</span></div>
+                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">Distance-based discovery</span></div>
+                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">Searchable by keyword & category</span></div>
+                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">Shareable listing URL</span></div>
                 </div>
               </div>
-              <ul className="mt-3 space-y-1.5 text-xs text-muted-foreground">
-                <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-primary" /> Public listing on Aaspass</li>
-                <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-primary" /> WhatsApp / Instagram connect</li>
-                <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-primary" /> Distance-based discovery</li>
-                <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-primary" /> Searchable by keyword & category</li>
-                <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-primary" /> Shareable listing URL</li>
-              </ul>
-            </div>
 
-            <motion.button onClick={handlePayAndGoLive} whileTap={{ scale: 0.96 }} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2">
-              <Check className="w-4 h-4" /> Register & Go Live
-            </motion.button>
+              <motion.button 
+                whileTap={{ scale: 0.96 }} 
+                disabled={!selectedPlan}
+                onClick={handleRazorpayPayment}
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/30"
+              >
+                <CreditCard className="w-4 h-4" /> Review & Pay
+              </motion.button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

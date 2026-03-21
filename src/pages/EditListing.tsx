@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Check, UploadCloud, Smartphone, Instagram, MapPin, LocateFixed } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { EyeToggleIcon } from '@/components/ui/animated-state-icons';
+import AnimatedDropdown from '@/components/ui/animated-dropdown';
 import { CATEGORIES, MOCK_LISTINGS } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
 import { reverseGeocode } from '@/lib/api/location';
@@ -222,30 +223,40 @@ const EditListing = () => {
             <label className="text-sm font-medium text-foreground">{type === 'service' ? 'Service Type' : 'Category'} *</label>
             {type === 'product' ? (
               <>
-                <select value={category} onChange={(e) => {
-                  setCategory(e.target.value);
-                  if (e.target.value !== 'Other') setCategorySpecification('');
-                }} className="mt-1 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer border border-muted-foreground/10">
-                  <option value="">Select a category</option>
-                  {CATEGORIES.map((c) => <option key={c.name} value={c.name}>{c.emoji} {c.name}</option>)}
-                  <option value="Other">Other</option>
-                </select>
+                <AnimatedDropdown
+                  items={CATEGORIES.map((c) => ({
+                    id: c.name,
+                    name: `${c.emoji} ${c.name}`,
+                  }))}
+                  selectedId={category}
+                  text="Select a category"
+                  onSelect={(item) => {
+                    setCategory(item.id || '');
+                    setCategorySpecification('');
+                  }}
+                  className="w-full mt-1"
+                />
                 {category === 'Other' && (
-                  <input type="text" value={categorySpecification} onChange={(e) => setCategorySpecification(e.target.value)} placeholder="Specify what you sell" className="mt-2 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <input type="text" value={categorySpecification} onChange={(e) => setCategorySpecification(e.target.value)} placeholder="Specify what you sell" className="mt-2 w-full px-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 )}
               </>
             ) : (
               <>
-                <select value={serviceType} onChange={(e) => {
-                  setServiceType(e.target.value);
-                  if (e.target.value !== 'Other') setServiceSpecification('');
-                }} className="mt-1 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer border border-muted-foreground/10">
-                  <option value="">Select a service type</option>
-                  {SERVICE_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
-                  <option value="Other">Other</option>
-                </select>
+                <AnimatedDropdown
+                  items={SERVICE_TYPES.map((s) => ({
+                    id: s,
+                    name: s,
+                  }))}
+                  selectedId={serviceType}
+                  text="Select a service type"
+                  onSelect={(item) => {
+                    setServiceType(item.id || '');
+                    setServiceSpecification('');
+                  }}
+                  className="w-full mt-1"
+                />
                 {serviceType === 'Other' && (
-                  <input type="text" value={serviceSpecification} onChange={(e) => setServiceSpecification(e.target.value)} placeholder="Specify your service" className="mt-2 w-full px-4 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <input type="text" value={serviceSpecification} onChange={(e) => setServiceSpecification(e.target.value)} placeholder="Specify your service" className="mt-2 w-full px-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 )}
               </>
             )}

@@ -14,7 +14,7 @@ const CategoriesPage = () => {
   // The currently viewed category (null = viewing all categories)
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   
-  const { userLat, userLng } = useAppStore();
+  const { userLat, userLng, favoritedIds, userListings } = useAppStore();
 
   const handleCategoryTap = (name: string) => {
     setActiveCategory(name);
@@ -39,9 +39,14 @@ const CategoriesPage = () => {
   const filteredListings = useMemo(() => {
     if (!activeCategory) return [];
 
-    let items = MOCK_LISTINGS.filter(
-      (l) => l.status === 'live' && l.category === activeCategory
-    );
+    let items;
+    if (activeCategory === 'Favourites') {
+      items = [...MOCK_LISTINGS, ...userListings].filter((l) => favoritedIds.includes(l.id));
+    } else {
+      items = [...MOCK_LISTINGS, ...userListings].filter(
+        (l) => l.status === 'live' && l.category === activeCategory
+      );
+    }
 
     if (listingQuery.trim()) {
       const q = listingQuery.toLowerCase();
@@ -95,8 +100,26 @@ const CategoriesPage = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                {(!categoryQuery.trim() || 'favourites saved'.includes(categoryQuery.toLowerCase())) && (
+                  <motion.button
+                    key="Favourites"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => handleCategoryTap('Favourites')}
+                    className="flex flex-col items-center gap-2 p-5 bg-card rounded-2xl shadow-card hover:shadow-card-hover transition-shadow border border-primary/20 bg-primary/5"
+                  >
+                    <span className="text-4xl mt-1">❤️</span>
+                    <span className="text-sm font-medium text-foreground text-center leading-tight mt-1">
+                      Favourites
+                    </span>
+                    <span className="text-meta text-muted-foreground mt-auto">
+                      {favoritedIds.length} saved
+                    </span>
+                  </motion.button>
+                )}
                 {filteredCategories.map(({ name, emoji }, i) => {
-                  const count = MOCK_LISTINGS.filter((l) => l.category === name && l.status === 'live').length;
+                  const count = [...MOCK_LISTINGS, ...userListings].filter((l) => l.category === name && l.status === 'live').length;
                   return (
                     <motion.button
                       key={name}

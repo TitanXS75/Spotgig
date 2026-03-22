@@ -142,9 +142,9 @@ const LandingPage = () => {
       />
 
       {/* ─── HOW IT WORKS ─── */}
-      <section id="how-it-works" className="py-12 md:py-16 px-6">
+      <section id="how-it-works" className="pt-12 pb-4 md:pt-16 md:pb-8 px-6">
         <div className="max-w-7xl mx-auto flex flex-col items-center">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -165,7 +165,7 @@ const LandingPage = () => {
             </motion.p>
           </div>
 
-          <div className="flex bg-muted p-1 rounded-full w-max mx-auto mb-10">
+          <div className="flex bg-muted p-1 rounded-full w-max mx-auto mb-6">
             <button
               onClick={() => setHowItWorksMode('buyer')}
               className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${howItWorksMode === 'buyer' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
@@ -192,9 +192,9 @@ const LandingPage = () => {
       </section>
 
       {/* ─── WHY CHOOSE AASPASS SECTION ─── */}
-      <section id="why-choose-aaspass" className="py-12 md:py-16 px-6 bg-background">
+      <section id="why-choose-aaspass" className="pt-12 pb-4 md:pt-16 md:pb-8 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -220,7 +220,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─── DOWNLOAD PWA SECTION ─── */}
-      <section className="pt-12 pb-4 md:pt-16 md:pb-8 px-6 bg-background">
+      <section className="pt-4 pb-4 md:pt-6 md:pb-8 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -295,7 +295,7 @@ const LandingPage = () => {
               transition={{ duration: 0.5 }}
               className="text-sm text-muted-foreground"
             >
-              <strong>💡 Benefits:</strong> Fast loading, no app store needed, saves storage space
+              <strong>Benefits:</strong> Fast loading, no app store needed, saves storage space
             </motion.p>
           </div>
         </div>
@@ -304,7 +304,7 @@ const LandingPage = () => {
       {/* ─── ZOOM PARALLAX CTA SECTION ─── */}
       <section className="bg-background pt-4 md:pt-8">
         <div className="relative flex items-center justify-center pt-6 pb-4">
-          <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-center">
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tighter text-center">
             Ready to Join Aaspass ?
           </h2>
         </div>
@@ -363,17 +363,17 @@ const LandingPage = () => {
             </div>
           </div>
           {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} Aaspass. All Rights Reserved.</p>
-          <div className="flex gap-4 items-center">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" className="h-6 opacity-60 hover:opacity-100 transition-opacity" />
-            <span className="flex items-center gap-1 opacity-80">
-              Secured by Razorpay
-            </span>
+          <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
+            <p>© {new Date().getFullYear()} Aaspass. All Rights Reserved.</p>
+            <div className="flex gap-4 items-center">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" className="h-6 opacity-60 hover:opacity-100 transition-opacity" />
+              <span className="flex items-center gap-1 opacity-80">
+                Secured by Razorpay
+              </span>
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
     </div>
   );
 };

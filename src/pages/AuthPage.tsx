@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail, Lock, User, ArrowRight, Eye, EyeOff, Store, Phone
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '@/store/app-store';
 
 // ─── Test User Data ───────────────────────────────────────────────────────
@@ -38,11 +38,8 @@ const ImagePanel = ({ mode }: { mode: 'login' | 'signup' }) => (
 
     {/* Bottom tagline */}
     <div className="relative z-10 mt-auto p-12 text-white">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-          <Store className="w-4 h-4 text-white" />
-        </div>
-        <span className="font-bold text-lg tracking-tight shadow-sm">Aaspass</span>
+      <div className="mb-2">
+        <img src="/aplg.png" alt="Aaspass" className="h-16 w-auto object-contain" />
       </div>
       <h2 className="text-3xl font-bold leading-tight drop-shadow-md">
         {mode === 'login' ? (
@@ -76,7 +73,8 @@ const formVariants = {
 const AuthPage = () => {
   const navigate = useNavigate();
   const { setUser } = useAppStore();
-  const [mode, setMode] = useState<Mode>('login');
+  const location = useLocation();
+  const [mode, setMode] = useState<Mode>((location.state as any)?.mode || 'login');
   const [direction, setDirection] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -195,19 +193,16 @@ const AuthPage = () => {
       <motion.div 
         layout 
         transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }} 
-        className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 bg-background min-h-screen relative z-10"
+        className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-8 bg-background min-h-screen relative z-10 overflow-y-auto"
       >
         {/* Mobile logo */}
-        <div className="lg:hidden flex items-center gap-2 mb-8 mt-4">
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-            <Store className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-foreground">Aaspass</span>
+        <div className="lg:hidden flex items-center gap-2 mb-6 mt-4">
+          <img src="/aplg.png" alt="Aaspass" className="h-10 w-auto object-contain" />
         </div>
 
-        <div className="w-full max-w-md my-auto pb-10">
+        <div className="w-full max-w-md my-auto">
           {/* Tab switcher */}
-          <div className="flex gap-1 p-1 bg-muted rounded-xl mb-10">
+          <div className="flex gap-1 p-1 bg-muted rounded-xl mb-8">
             {(['login', 'signup'] as Mode[]).map((m) => (
               <button
                 key={m}
@@ -238,10 +233,10 @@ const AuthPage = () => {
               className="flex flex-col gap-4"
             >
               <div>
-                <h1 className="text-2xl font-bold text-foreground">
+                <h1 className="text-xl md:text-2xl font-bold text-foreground">
                   {mode === 'login' ? 'Welcome back 👋' : 'Create account 🎉'}
                 </h1>
-                <p className="text-sm text-muted-foreground mt-1 mb-2">
+                <p className="text-xs md:text-sm text-muted-foreground mt-1 mb-3">
                   {mode === 'login'
                     ? 'Sign in to discover local sellers near you.'
                     : 'Join Aaspass and explore your neighbourhood.'}
@@ -263,7 +258,7 @@ const AuthPage = () => {
                         if (errors.name) setErrors({ ...errors, name: '' });
                       }}
                       required
-                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 rounded-xl bg-muted text-xs md:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
                     />
                   </div>
                   {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -286,7 +281,7 @@ const AuthPage = () => {
                       }}
                       maxLength={10}
                       required
-                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 rounded-xl bg-muted text-xs md:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
                     />
                   </div>
                   {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
@@ -306,7 +301,7 @@ const AuthPage = () => {
                       if (errors.email) setErrors({ ...errors, email: '' });
                     }}
                     required
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                    className="w-full pl-10 pr-4 py-2.5 md:py-3 rounded-xl bg-muted text-xs md:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
                   />
                 </div>
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
@@ -322,7 +317,7 @@ const AuthPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="w-full pl-10 pr-10 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                  className="w-full pl-10 pr-10 py-2.5 md:py-3 rounded-xl bg-muted text-xs md:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
                 />
                 <button
                   type="button"
@@ -348,7 +343,7 @@ const AuthPage = () => {
                       }}
                       required
                       minLength={6}
-                      className="w-full pl-10 pr-10 py-3 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
+                      className="w-full pl-10 pr-10 py-2.5 md:py-3 rounded-xl bg-muted text-xs md:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition"
                     />
                     <button
                       type="button"

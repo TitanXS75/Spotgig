@@ -7,11 +7,12 @@ import { FeaturesSectionWithHoverEffects } from '@/components/ui/feature-section
 import { ZoomParallax } from '@/components/ui/zoom-parallax';
 import { UniqueAccordion } from '@/components/ui/interactive-accordion';
 import { ShuffleHero } from '@/components/ui/shuffle-grid';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const DEMO_IMAGES = [
-  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900&auto=format&fit=crop&q=60", // Food
-  "https://images.unsplash.com/photo-1558024920-b41e1887dc32?w=900&auto=format&fit=crop&q=60", // Tailor / Boutique
-  "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=900&auto=format&fit=crop&q=60", // Repair / Services
+  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&auto=format&fit=crop&q=60", // Dining
+  "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&auto=format&fit=crop&q=60", // Gardening
+  "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=900&auto=format&fit=crop&q=60", // Transport
   "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=900&auto=format&fit=crop&q=60", // Tutoring / Education
   "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=900&auto=format&fit=crop&q=60", // Yoga / Fitness
   "https://images.unsplash.com/photo-1460518451285-97b6aa326961?w=900&auto=format&fit=crop&q=60", // Arts / Crafts
@@ -20,22 +21,12 @@ const DEMO_IMAGES = [
   "https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=900&auto=format&fit=crop&q=60", // Crafts
   "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=900&auto=format&fit=crop&q=60", // Makeup
   "https://images.unsplash.com/photo-1562240020-ce31ccb0fa7d?w=900&auto=format&fit=crop&q=60", // Cleaning
-  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&auto=format&fit=crop&q=60", // Dining
+  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900&auto=format&fit=crop&q=60", // Food
   "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=900&auto=format&fit=crop&q=60", // Handyman
-  "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=900&auto=format&fit=crop&q=60", // Transport
+  "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=900&auto=format&fit=crop&q=60", // Repair / Services
   "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=900&auto=format&fit=crop&q=60", // Photography
   "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=900&auto=format&fit=crop&q=60", // Event
-  "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&auto=format&fit=crop&q=60", // Gardening
-  "https://images.unsplash.com/photo-1520601344403-1070ff37651c?w=900&auto=format&fit=crop&q=60", // Laundry
-];
-
-const CATEGORIES = [
-  { emoji: '🍱', title: 'Food & Snacks', desc: 'Homemade tiffins & bakes', color: 'bg-orange-50 dark:bg-orange-950/30' },
-  { emoji: '🔧', title: 'Home Repair', desc: 'Plumbers & electricians', color: 'bg-blue-50 dark:bg-blue-950/30' },
-  { emoji: '👗', title: 'Boutiques', desc: 'Custom tailored clothing', color: 'bg-pink-50 dark:bg-pink-950/30' },
-  { emoji: '🧘', title: 'Fitness', desc: 'Yoga & personal trainers', color: 'bg-green-50 dark:bg-green-950/30' },
-  { emoji: '📚', title: 'Tutoring', desc: 'Classes & coaching', color: 'bg-purple-50 dark:bg-purple-950/30' },
-  { emoji: '💐', title: 'Art & Crafts', desc: 'Handmade creations', color: 'bg-rose-50 dark:bg-rose-950/30' },
+  "https://images.unsplash.com/photo-1556910103-1c02745a30bf?w=900&auto=format&fit=crop&q=60", // Kitchen/Cooking
 ];
 
 const FEATURES = [
@@ -108,9 +99,13 @@ const LandingPage = () => {
     return () => lenis.destroy();
   }, []);
 
-  const handleNavigate = (path: string) => {
+  const handleNavigate = (path: string, mode?: 'login' | 'signup') => {
     window.scrollTo(0, 0);
-    navigate(path);
+    if (mode) {
+      navigate(path, { state: { mode } });
+    } else {
+      navigate(path);
+    }
   };
 
   const handleSmoothScroll = (sectionId: string) => {
@@ -125,24 +120,16 @@ const LandingPage = () => {
       {/* ─── NAVBAR ─── */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Store className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg tracking-tight">Aaspass</span>
+          <div className="flex items-center">
+            <img src="/aplg.png" alt="Aaspass" className="w-auto h-10 object-contain transform scale-125" />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <button
-              onClick={() => handleNavigate('/auth')}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
-            >
-              Log in
-            </button>
-            <button
-              onClick={() => handleNavigate('/auth')}
+              onClick={() => handleNavigate('/auth', 'login')}
               className="text-sm font-semibold bg-primary text-primary-foreground px-6 py-2 rounded-full hover:bg-primary/90 transition-all duration-200 shadow-sm hover:shadow-md"
             >
-              Sign up
+              Log in
             </button>
           </div>
         </div>
@@ -150,7 +137,7 @@ const LandingPage = () => {
 
       {/* ─── HERO SECTION ─── */}
       <ShuffleHero
-        onGetStarted={() => handleNavigate('/auth')}
+        onGetStarted={() => handleNavigate('/auth', 'signup')}
         onExploreMarketplace={() => handleNavigate('/home')}
       />
 
@@ -204,8 +191,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ─── FEATURES SECTION ─── */}
-      <section id="why-choose-aaspass" className="py-12 md:py-16 px-6 bg-white">
+      {/* ─── WHY CHOOSE AASPASS SECTION ─── */}
+      <section id="why-choose-aaspass" className="py-12 md:py-16 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -233,7 +220,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─── DOWNLOAD PWA SECTION ─── */}
-      <section className="py-12 md:py-16 px-6 bg-white">
+      <section className="py-12 md:py-16 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -263,10 +250,12 @@ const LandingPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="bg-gray-50 rounded-2xl p-8 border border-gray-200 shadow-sm"
+              className="bg-muted rounded-2xl p-8 border border-border shadow-sm"
             >
-              <div className="text-4xl mb-4">📱</div>
-              <h3 className="text-2xl font-bold text-foreground mb-4">iPhone</h3>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="iOS" className="h-10 w-auto object-contain dark:invert" />
+                <h3 className="text-3xl font-bold text-foreground">iOS</h3>
+              </div>
               <ol className="space-y-3 text-muted-foreground text-sm leading-relaxed">
                 <li><strong>1.</strong> Open this website in Safari</li>
                 <li><strong>2.</strong> Tap the Share button (box icon)</li>
@@ -282,10 +271,12 @@ const LandingPage = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="bg-gray-50 rounded-2xl p-8 border border-gray-200 shadow-sm"
+              className="bg-muted rounded-2xl p-8 border border-border shadow-sm"
             >
-              <div className="text-4xl mb-4">🤖</div>
-              <h3 className="text-2xl font-bold text-foreground mb-4">Android</h3>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android" className="h-10 w-auto object-contain" />
+                <h3 className="text-3xl font-bold text-foreground">Android</h3>
+              </div>
               <ol className="space-y-3 text-muted-foreground text-sm leading-relaxed">
                 <li><strong>1.</strong> Open this website in Chrome</li>
                 <li><strong>2.</strong> Tap the menu (three dots)</li>
@@ -320,7 +311,7 @@ const LandingPage = () => {
         <ZoomParallax images={DEMO_IMAGES.slice(0, 7).map(src => ({ src }))} />
         <div className="py-12 px-6 flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
-            onClick={() => handleNavigate('/auth')}
+            onClick={() => handleNavigate('/auth', 'signup')}
             className="bg-primary text-primary-foreground px-6 py-4 rounded-xl font-bold text-base sm:px-10 sm:py-5 sm:text-lg hover:bg-primary/90 transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-95 text-center w-full sm:w-auto"
           >
             Get Started Free
@@ -358,7 +349,7 @@ const LandingPage = () => {
             <div>
               <h4 className="font-semibold text-foreground mb-4">For Sellers</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><button onClick={() => handleNavigate('/profile')} className="hover:text-foreground transition">Get Started</button></li>
+                <li><button onClick={() => handleNavigate('/auth', 'signup')} className="hover:text-foreground transition">Get Started</button></li>
                 <li><button onClick={() => handleNavigate('/pricing')} className="hover:text-foreground transition">Pricing</button></li>
               </ul>
             </div>

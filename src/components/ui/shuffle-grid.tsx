@@ -6,8 +6,8 @@ import { ArrowRight, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const squareData = [
-  { id: 1, src: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=60" },
-  { id: 2, src: "https://images.unsplash.com/photo-1558024920-b41e1887dc32?w=600&auto=format&fit=crop&q=60" },
+  { id: 1, src: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&auto=format&fit=crop&q=60" },
+  { id: 2, src: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop&q=60" },
   { id: 3, src: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&auto=format&fit=crop&q=60" },
   { id: 4, src: "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=600&auto=format&fit=crop&q=60" },
   { id: 5, src: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&auto=format&fit=crop&q=60" },

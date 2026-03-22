@@ -220,7 +220,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─── DOWNLOAD PWA SECTION ─── */}
-      <section className="py-12 md:py-16 px-6 bg-background">
+      <section className="pt-12 pb-4 md:pt-16 md:pb-8 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
@@ -287,7 +287,7 @@ const LandingPage = () => {
             </motion.div>
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-8">
             <motion.p
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -302,8 +302,8 @@ const LandingPage = () => {
       </section>
 
       {/* ─── ZOOM PARALLAX CTA SECTION ─── */}
-      <section className="bg-background pt-16">
-        <div className="relative flex items-center justify-center pt-10 pb-4">
+      <section className="bg-background pt-4 md:pt-8">
+        <div className="relative flex items-center justify-center pt-6 pb-4">
           <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-center">
             Ready to Join Aaspass ?
           </h2>

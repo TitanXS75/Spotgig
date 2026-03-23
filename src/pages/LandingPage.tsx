@@ -331,10 +331,7 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                  <Store className="w-4 h-4 text-primary-foreground" />
-                </div>
-                <span className="font-bold text-lg">Aaspass</span>
+                <img src="/aplg.png" alt="Aaspass" className="h-12 w-auto object-contain" />
               </div>
               <p className="text-sm text-muted-foreground">Your neighbourhood, in your pocket. Support local, think global.</p>
             </div>

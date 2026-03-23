@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Share2, MessageCircle, MapPin, Calendar, Eye, Edit2, Settings } from 'lucide-react';
+import { ArrowLeft, Share2, MessageCircle, MapPin, Calendar, Eye, Edit2, Settings, ThumbsUp, ThumbsDown, Trash2, Send } from 'lucide-react';
 import { MOCK_LISTINGS } from '@/lib/mock-data';
 import { getDistance } from '@/lib/distance';
 import { useAppStore } from '@/store/app-store';
@@ -10,6 +11,50 @@ const ListingDetail = () => {
   const navigate = useNavigate();
   const { user, userLat, userLng, hasLocation, userListings } = useAppStore();
   const listing = [...userListings, ...MOCK_LISTINGS].find((l) => l.id === id);
+
+  const [likes, setLikes] = useState(124);
+  const [dislikes, setDislikes] = useState(12);
+  const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
+
+  const [comments, setComments] = useState([
+    { id: '1', user: 'Rohan Sharma', text: 'Great service! Highly recommended.', time: '2 days ago', email: 'mock1@example.com' },
+    { id: '2', user: 'Priya Patel', text: 'Very professional and quick response.', time: '1 week ago', email: 'mock2@example.com' }
+  ]);
+  const [newComment, setNewComment] = useState('');
+  
+  const handleVote = (type: 'up' | 'down') => {
+    if (userVote === type) {
+      setUserVote(null);
+      if (type === 'up') setLikes(prev => prev - 1);
+      else setDislikes(prev => prev - 1);
+    } else {
+      if (userVote === 'up') setLikes(prev => prev - 1);
+      if (userVote === 'down') setDislikes(prev => prev - 1);
+      
+      setUserVote(type);
+      if (type === 'up') setLikes(prev => prev + 1);
+      else setDislikes(prev => prev + 1);
+    }
+  };
+
+  const handleAddComment = () => {
+    if (!newComment.trim()) return;
+    setComments([
+      {
+        id: Date.now().toString(),
+        user: user?.email ? user.email.split('@')[0] : 'Guest User',
+        email: user?.email || '',
+        text: newComment.trim(),
+        time: 'Just now'
+      },
+      ...comments
+    ]);
+    setNewComment('');
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+    setComments(comments.filter(c => c.id !== commentId));
+  };
 
   // Check if current logged-in user owns this listing
   const isOwner = user?.email && listing?.user_id && user.email === listing.user_id;
@@ -189,6 +234,95 @@ const ListingDetail = () => {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Comments & Reactions Section */}
+      <div className="mt-12 md:mt-16 border-t border-border pt-8 mb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <h2 className="text-xl md:text-2xl font-semibold text-foreground">Community Feedback</h2>
+          
+          <div className="flex items-center gap-3 backdrop-blur-md bg-muted/50 p-1.5 rounded-full border border-border/50">
+            <button 
+              onClick={() => handleVote('up')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                userVote === 'up' ? 'bg-primary text-primary-foreground' : 'hover:bg-background text-muted-foreground'
+              }`}
+            >
+              <ThumbsUp className={`w-4 h-4 ${userVote === 'up' ? 'fill-current' : ''}`} />
+              {likes}
+            </button>
+            <div className="w-px h-4 bg-border"></div>
+            <button 
+              onClick={() => handleVote('down')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                userVote === 'down' ? 'bg-destructive/10 text-destructive' : 'hover:bg-background text-muted-foreground'
+              }`}
+            >
+              <ThumbsDown className={`w-4 h-4 ${userVote === 'down' ? 'fill-current' : ''}`} />
+              {dislikes}
+            </button>
+          </div>
+        </div>
+
+        {/* Add Comment */}
+        <div className="flex gap-3 mb-8">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <span className="text-primary font-semibold text-sm">
+              {user?.email ? user.email[0].toUpperCase() : 'G'}
+            </span>
+          </div>
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
+              placeholder="Add a public comment..."
+              className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+            <button
+              onClick={handleAddComment}
+              disabled={!newComment.trim()}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/10 rounded-lg transition-colors"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Comments List */}
+        <div className="space-y-6">
+          {comments.map((comment) => (
+            <div key={comment.id} className="flex gap-3 group">
+              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
+                <span className="text-secondary font-semibold text-sm">
+                  {comment.user[0].toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-semibold text-sm text-foreground">{comment.user}</span>
+                  <span className="text-xs text-muted-foreground">{comment.time}</span>
+                </div>
+                <p className="text-sm text-foreground/90">{comment.text}</p>
+              </div>
+              {comment.email === user?.email && (
+                <button
+                  onClick={() => handleDeleteComment(comment.id)}
+                  className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-destructive transition-all"
+                  title="Delete comment"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          ))}
+          {comments.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              No comments yet. Be the first to share your thoughts!
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

@@ -53,8 +53,8 @@ const ProfilePage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center text-center py-6"
           >
-            <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mb-4 text-4xl">
-              👤
+            <div className="w-28 h-28 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-4xl overflow-hidden shadow-md ring-4 ring-primary/5">
+              <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=300&q=80" alt={user.name} className="w-full h-full object-cover" />
             </div>
             <h2 className="text-2xl font-bold text-foreground">{user.name}</h2>
             <p className="text-sm text-muted-foreground mt-1">{user.email}</p>
@@ -216,8 +216,8 @@ const ProfilePage = () => {
         <h1 className="text-subhead text-foreground">Profile</h1>
       </motion.div>
       <div className="flex flex-col items-center py-12 text-center">
-        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4 text-3xl">
-          👤
+        <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-4 text-3xl overflow-hidden ring-4 ring-muted/50">
+          <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=300&q=80" alt="Guest" className="w-full h-full object-cover" />
         </div>
         <h2 className="font-semibold text-foreground">Sign in to Aaspass</h2>
         <p className="text-sm text-muted-foreground mt-1 max-w-[280px]">

@@ -29,6 +29,8 @@ export type Database = {
           lng: number;
           emoji: string;
           image_url: string | null;
+          supportive_images: string[] | null;
+          website: string | null;
           price: number | null;
           price_unit: string | null; // e.g. 'per month', 'per kg', 'fixed'
           status: 'pending' | 'live' | 'suspended';

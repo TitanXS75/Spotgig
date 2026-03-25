@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, Store, MapPin, CreditCard, Smartphone, Instagram, LocateFixed, UploadCloud } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Store, MapPin, CreditCard, Smartphone, Instagram, LocateFixed, UploadCloud, Globe, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AnimatedDropdown from '@/components/ui/animated-dropdown';
 import { CATEGORIES } from '@/lib/mock-data';
@@ -37,11 +37,13 @@ const SellerOnboarding = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [supportiveImages, setSupportiveImages] = useState<string[]>([]);
   const [emoji, setEmoji] = useState('🏠');
 
   // Step 2
   const [whatsapp, setWhatsapp] = useState('');
   const [instagram, setInstagram] = useState('');
+  const [website, setWebsite] = useState('');
   const [otherHandle, setOtherHandle] = useState('');
   const [area, setArea] = useState('');
   const [listingLat, setListingLat] = useState<number | null>(null);
@@ -142,6 +144,8 @@ const SellerOnboarding = () => {
       lng: listingLng || 0,
       emoji: emoji,
       image_url: imageUrl || null,
+      supportive_images: supportiveImages,
+      website: website || null,
       hide_location: hideLocation,
       status: 'live' as const,
       created_at: new Date().toISOString(),
@@ -316,7 +320,7 @@ const SellerOnboarding = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground">Add Image (Logo, Product, etc.)</label>
+              <label className="text-sm font-medium text-foreground">Add Logo</label>
               <div className="mt-2 w-full">
                 {imageUrl ? (
                   <div className="flex flex-col gap-3 w-full">
@@ -352,6 +356,40 @@ const SellerOnboarding = () => {
               </div>
             </div>
 
+            <div>
+              <label className="text-sm font-medium text-foreground">Supportive Images (Max 3)</label>
+              <div className="mt-2 grid grid-cols-3 gap-2 w-full">
+                {[0, 1, 2].map(idx => {
+                  const src = supportiveImages[idx];
+                  return src ? (
+                    <div key={idx} className="relative w-full aspect-square rounded-xl overflow-hidden border border-border">
+                      <img src={src} alt={`Supportive ${idx}`} className="absolute inset-0 w-full h-full object-cover" />
+                      <button type="button" onClick={() => {
+                        const newImgs = [...supportiveImages];
+                        newImgs.splice(idx, 1);
+                        setSupportiveImages(newImgs);
+                      }} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 hover:bg-black/70">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label key={idx} className="flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20">
+                      <div className="flex flex-col items-center justify-center text-center p-1">
+                        <UploadCloud className="w-5 h-5 text-muted-foreground mb-1" />
+                        <span className="text-[10px] font-semibold text-primary">Add</span>
+                      </div>
+                      <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setSupportiveImages([...supportiveImages, URL.createObjectURL(file)]);
+                        }
+                      }} />
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
             <motion.button whileTap={{ scale: 0.96 }} disabled={!step1Valid} onClick={() => setStep(1)} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2">
               Next
             </motion.button>
@@ -377,6 +415,14 @@ const SellerOnboarding = () => {
                 <input value={instagram} onChange={(e) => setInstagram(e.target.value.replace(/\s/g, ''))} placeholder="yourhandle" className="flex-1 px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20" />
               </div>
               <span className="text-[11px] text-muted-foreground">At least one contact method required</span>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-foreground flex items-center gap-1.5"><Globe className="w-4 h-4" /> Website</label>
+              <div className="flex gap-2 mt-1">
+                <span className="px-3 py-2.5 rounded-xl bg-muted text-sm text-muted-foreground">https://</span>
+                <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="www.yourdomain.com" className="flex-1 px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
             </div>
 
             <div>
@@ -528,7 +574,7 @@ const SellerOnboarding = () => {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Operating Type</span><span className="text-foreground font-medium">{operatingType === 'shop' ? '🏪 I have a shop' : '🏠 I operate from home'}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">{type === 'service' ? 'Service Type' : 'Category'}</span><span className="text-foreground font-medium">{type === 'service' ? (serviceType === 'Other' ? serviceSpecification : serviceType) : (category === 'Other' ? categorySpecification : category)}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Contact</span><span className="text-foreground font-medium">{whatsapp ? `+91 ${whatsapp}` : `@${instagram}`}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Contact</span><span className="text-foreground font-medium flex items-center gap-2">{whatsapp ? `+91 ${whatsapp}` : instagram ? `@${instagram}` : website ? website : '-'}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Location</span><span className="text-foreground font-medium">{area}</span></div>
             </div>
 

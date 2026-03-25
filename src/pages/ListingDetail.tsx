@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Share2, MessageCircle, MapPin, Calendar, Eye, Edit2, Settings, ThumbsUp, ThumbsDown, Trash2, Send } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Share2, MessageCircle, MapPin, Calendar, Eye, Edit2, Settings, ThumbsUp, ThumbsDown, Trash2, Send, Globe, X } from 'lucide-react';
 import { MOCK_LISTINGS } from '@/lib/mock-data';
 import { getDistance } from '@/lib/distance';
 import { useAppStore } from '@/store/app-store';
@@ -22,6 +22,8 @@ const ListingDetail = () => {
   ]);
   const [newComment, setNewComment] = useState('');
   
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
   const handleVote = (type: 'up' | 'down') => {
     if (userVote === type) {
       setUserVote(null);
@@ -96,12 +98,12 @@ const ListingDetail = () => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-5xl mx-auto px-4 md:px-6 pb-24 md:pb-10"
+      className="max-w-5xl mx-auto px-4 md:px-6 pb-28 md:pb-10"
     >
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-1.5 text-sm text-muted-foreground mt-4 mb-4 hover:text-foreground transition-colors"
+        className="flex items-center gap-1.5 text-sm text-muted-foreground mt-4 mb-3 hover:text-foreground transition-colors"
       >
         <ArrowLeft className="w-4 h-4" /> Back
       </button>
@@ -110,17 +112,22 @@ const ListingDetail = () => {
       <div className="md:grid md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-8 lg:gap-12">
 
         {/* Left — Image */}
-        <div className={`relative rounded-2xl overflow-hidden aspect-square md:aspect-auto md:min-h-[400px] flex items-center justify-center text-8xl ${
+        <div className={`relative rounded-2xl overflow-hidden flex items-center justify-center text-8xl h-52 sm:h-64 md:h-auto md:min-h-[400px] ${
           isProduct ? 'bg-secondary/10' : 'bg-accent-service/10'
         }`}>
           {listing.image_url ? (
-            <img src={listing.image_url} className="object-cover w-full h-full" alt={listing.name} />
+            <img 
+              src={listing.image_url} 
+              className="object-cover w-full h-full cursor-pointer hover:scale-[1.02] transition-transform duration-300" 
+              alt={listing.name} 
+              onClick={() => setPreviewImage(listing.image_url)}
+            />
           ) : (
             <span className="select-none">{listing.emoji}</span>
           )}
           <button
             onClick={handleShare}
-            className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-background/80 backdrop-blur-sm flex items-center justify-center"
+            className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-background/80 backdrop-blur-sm flex items-center justify-center"
           >
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
@@ -139,20 +146,20 @@ const ListingDetail = () => {
             <span className="text-meta text-muted-foreground">{listing.category}</span>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
+          <h1 className="text-xl md:text-3xl font-semibold tracking-tight text-foreground leading-tight">
             {listing.name}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-3 mt-2 text-meta text-muted-foreground">
-            <span>{listing.seller_name}</span>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-muted-foreground">
+            <span className="font-medium">{listing.seller_name}</span>
             <span className="flex items-center gap-1">
               <MapPin className="w-3 h-3" />
               {listing.area} · {listing.operating_type === 'home' ? 'Home' : 'Shop'}
             </span>
-            <span className="tabular-nums font-medium">{distance === null ? '—' : `${distance} km`}</span>
+            {distance !== null && <span className="tabular-nums font-medium">{distance} km away</span>}
           </div>
 
-          <div className="flex items-center gap-3 mt-2 text-meta text-muted-foreground">
+          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
               Joined {new Date(listing.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
@@ -163,20 +170,20 @@ const ListingDetail = () => {
             </span>
           </div>
 
-          <p className="text-body text-foreground mt-4 leading-relaxed">
+          <p className="text-sm text-foreground mt-3 leading-relaxed">
             {listing.description}
           </p>
 
-          <div className="flex flex-wrap gap-2 mt-3">
+          <div className="flex flex-wrap gap-1.5 mt-3">
             {listing.tags.map((tag) => (
-              <span key={tag} className="text-meta text-muted-foreground bg-muted px-2 py-1 rounded-lg">
+              <span key={tag} className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-lg">
                 {tag}
               </span>
             ))}
           </div>
 
           {/* Actions */}
-          <div className="mt-6 flex flex-col gap-2 md:mt-auto md:pt-6">
+          <div className="mt-5 flex flex-col gap-2">
             {whatsappUrl && (
               <motion.a
                 whileTap={{ scale: 0.96 }}
@@ -203,39 +210,77 @@ const ListingDetail = () => {
                 View on Instagram
               </motion.a>
             )}
-            {!whatsappUrl && !instagramUrl && (
-              <p className="text-sm text-muted-foreground text-center py-3">
-                Contact info not available
-              </p>
+            {listing.website && (
+              <motion.a
+                whileTap={{ scale: 0.96 }}
+                href={listing.website.startsWith('http') ? listing.website : `https://${listing.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-3 bg-card border border-border text-foreground font-semibold rounded-xl text-sm hover:bg-muted/50"
+              >
+                <Globe className="w-5 h-5" />
+                Visit Website
+              </motion.a>
+            )}
+            {!whatsappUrl && !instagramUrl && !listing.website && (
+              <p className="text-sm text-muted-foreground text-center py-2">Contact info not available</p>
+            )}
+
+            {listing.other_handle && (
+              <p className="text-xs text-muted-foreground text-center px-2">{listing.other_handle}</p>
             )}
 
             {isOwner && (
-              <div className="mt-4 pt-4 border-t border-border flex flex-col gap-2">
-                <div className="p-3 bg-primary/10 rounded-xl border border-primary/20 text-center mb-2">
+              <div className="mt-3 pt-3 border-t border-border flex flex-col gap-2">
+                <div className="p-3 bg-primary/10 rounded-xl border border-primary/20 text-center">
                   <p className="text-sm font-semibold text-primary">This is your business listing</p>
-                  <p className="text-xs text-primary/70 mt-0.5">You are seeing it exactly as customers do.</p>
+                  <p className="text-[11px] text-primary/70 mt-0.5">You are seeing it exactly as customers do.</p>
                 </div>
-                <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => navigate(`/edit-listing/${listing.id}`)}
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-primary-foreground font-semibold rounded-xl text-sm"
-                >
-                  <Edit2 className="w-5 h-5" />
-                  Edit Details
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => navigate('/profile')}
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-muted text-foreground font-semibold rounded-xl text-sm hover:bg-muted/80"
-                >
-                  <Settings className="w-5 h-5" />
-                  Manage Business
-                </motion.button>
+                <div className="flex gap-2">
+                  <motion.button
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => navigate(`/edit-listing/${listing.id}`)}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary text-primary-foreground font-semibold rounded-xl text-sm"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    Edit
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => navigate('/profile')}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-muted text-foreground font-semibold rounded-xl text-sm hover:bg-muted/80"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Manage
+                  </motion.button>
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Supportive Images Gallery (Below Hero, Above Comments) */}
+      {listing.supportive_images && listing.supportive_images.length > 0 && (
+        <div className="mt-8 md:mt-12">
+          <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-4">Gallery</h2>
+          <div className="flex flex-wrap gap-3 md:gap-4">
+            {listing.supportive_images.map((img, idx) => (
+              <div 
+                key={idx} 
+                className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border border-border overflow-hidden bg-muted/20 cursor-pointer shrink-0"
+                onClick={() => setPreviewImage(img)}
+              >
+                <img 
+                  src={img} 
+                  alt={`${listing.name} gallery ${idx + 1}`} 
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300" 
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Comments & Reactions Section */}
       <div className="mt-12 md:mt-16 border-t border-border pt-8 mb-8">
@@ -325,6 +370,36 @@ const ListingDetail = () => {
           )}
         </div>
       </div>
+
+      {/* Image Preview Overlay */}
+      <AnimatePresence>
+        {previewImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out"
+            onClick={() => setPreviewImage(null)}
+          >
+            <button
+              className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-colors"
+              onClick={() => setPreviewImage(null)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <motion.img
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              src={previewImage}
+              alt="Preview"
+              className="max-w-full max-h-full object-contain rounded-lg cursor-default shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

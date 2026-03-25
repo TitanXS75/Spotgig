@@ -19,6 +19,8 @@ export interface Listing {
   lng: number;
   emoji: string;
   image_url: string | null;
+  supportive_images?: string[];
+  website?: string | null;
   status: ListingStatus;
   created_at: string; // ISO string
   views: number;
@@ -56,7 +58,13 @@ export const MOCK_LISTINGS: Listing[] = [
     lat: 18.5074,
     lng: 73.8077,
     emoji: '🍱',
-    image_url: null,
+    image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80',
+    supportive_images: [
+      'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80',
+      'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400&q=80',
+      'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80',
+    ],
+    website: 'www.auntieskitchen.in',
     status: 'live',
     created_at: '2024-01-15',
     views: 234,
@@ -100,7 +108,12 @@ export const MOCK_LISTINGS: Listing[] = [
     lat: 18.5308,
     lng: 73.8475,
     emoji: '🔧',
-    image_url: null,
+    image_url: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400&q=80',
+    supportive_images: [
+      'https://images.unsplash.com/photo-1588508065123-287b28e0131b?w=400&q=80',
+      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&q=80',
+    ],
+    website: 'techfixpune.com',
     status: 'live',
     created_at: '2024-01-20',
     views: 312,

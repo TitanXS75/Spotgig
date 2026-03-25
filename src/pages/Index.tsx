@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SearchBar from '@/components/SearchBar';
 import CategoryPills from '@/components/CategoryPills';
 import TypeToggle from '@/components/TypeToggle';
-import OperationToggle from '@/components/OperationToggle';
 import ListingCard from '@/components/ListingCard';
 import ListingCardSkeleton from '@/components/ListingCardSkeleton';
 import SellerCTA from '@/components/SellerCTA';
@@ -13,12 +12,13 @@ import { getDistance } from '@/lib/distance';
 import { useAppStore } from '@/store/app-store';
 import { PackageOpen } from 'lucide-react';
 
+
 const Index = () => {
   const [loading, setLoading] = useState(true);
   const {
     userLat, userLng, hasLocation,
-    searchQuery, selectedCategory, typeFilter, operationTypeFilter, distanceFilter, sortBy,
-    setUserLocation, setSortBy, userListings,
+    searchQuery, selectedCategory, typeFilter,
+    setUserLocation, userListings,
   } = useAppStore();
 
   useEffect(() => {
@@ -52,31 +52,17 @@ const Index = () => {
     if (typeFilter !== 'all') {
       items = items.filter((l) => l.type === typeFilter);
     }
-    if (operationTypeFilter !== 'all') {
-      items = items.filter((l) => l.operating_type === operationTypeFilter);
-    }
-    if (distanceFilter > 0) {
-      if (hasLocation) {
-        items = items.filter(
-          (l) => getDistance(userLat, userLng, l.lat, l.lng) <= distanceFilter
-        );
-      }
-    }
 
-    if (sortBy === 'distance') {
-      if (hasLocation) {
+    if (hasLocation) {
         items.sort(
           (a, b) =>
             getDistance(userLat, userLng, a.lat, a.lng) -
             getDistance(userLat, userLng, b.lat, b.lng)
         );
       }
-    } else {
-      items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    }
 
     return items;
-  }, [searchQuery, selectedCategory, typeFilter, operationTypeFilter, distanceFilter, sortBy, userLat, userLng]);
+  }, [searchQuery, selectedCategory, typeFilter, userLat, userLng]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
@@ -104,31 +90,8 @@ const Index = () => {
         {/* Search & Filters */}
         <div className="flex flex-col gap-3 mb-4">
           <SearchBar />
-          <div className="grid grid-cols-2 gap-2">
-            <TypeToggle />
-            <OperationToggle />
-          </div>
+          <TypeToggle />
           <CategoryPills />
-        </div>
-
-        {/* Results meta */}
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-meta text-muted-foreground">
-            {filtered.length} seller{filtered.length !== 1 ? 's' : ''} found
-            {distanceFilter > 0 && (
-              <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-semibold bg-primary/10 text-primary rounded-full">
-                Within {distanceFilter}km
-              </span>
-            )}
-          </span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'distance' | 'newest')}
-            className="text-meta text-muted-foreground bg-transparent focus:outline-none cursor-pointer"
-          >
-            <option value="distance">Nearest first</option>
-            <option value="newest">Newest first</option>
-          </select>
         </div>
 
         {/* Grid */}

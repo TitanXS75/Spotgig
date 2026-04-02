@@ -55,6 +55,7 @@ const SellerOnboarding = () => {
   const [hideLocation, setHideLocation] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly' | null>(null);
   const [showRazorpay, setShowRazorpay] = useState(false);
+  const [usedFreeTrial, setUsedFreeTrial] = useState(false);
 
   const maxDesc = 300;
 
@@ -120,10 +121,50 @@ const SellerOnboarding = () => {
     }
   };
 
-  const handlePayAndGoLive = () => {
-    // Calculate subscription expiry date (30 days from now)
+  const handleStartFreeTrial = () => {
+    // Calculate free trial expiry date (7 days from now)
     const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 30);
+    expiryDate.setDate(expiryDate.getDate() + 7);
+
+    // Register business with free trial
+    const newListing = {
+      id: Math.random().toString(36).substring(7),
+      user_id: user?.email || 'u99',
+      name: listingName,
+      seller_name: user?.name || 'Local Seller',
+      type: type,
+      operating_type: operatingType,
+      category: type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType),
+      description: description,
+      tags: tags,
+      whatsapp: whatsapp || null,
+      instagram: instagram || null,
+      other_handle: otherHandle || null,
+      area: area,
+      lat: listingLat || 0,
+      lng: listingLng || 0,
+      emoji: emoji,
+      image_url: imageUrl || null,
+      supportive_images: supportiveImages,
+      website: website || null,
+      hide_location: hideLocation,
+      status: 'live' as const,
+      created_at: new Date().toISOString(),
+      plan_expires_at: expiryDate.toISOString(),
+      plan: 'free_trial',
+      views: 0,
+    };
+    
+    addListing(newListing);
+    setUsedFreeTrial(true);
+    navigate('/profile');
+  };
+
+  const handlePayAndGoLive = () => {
+    // Calculate subscription expiry date based on selected plan
+    const expiryDate = new Date();
+    const daysToAdd = selectedPlan === 'yearly' ? 365 : 30;
+    expiryDate.setDate(expiryDate.getDate() + daysToAdd);
 
     // Register business
     const newListing = {
@@ -156,35 +197,6 @@ const SellerOnboarding = () => {
     
     addListing(newListing);
     navigate('/profile');
-  };
-
-  const handleRazorpayPayment = () => {
-    if (!selectedPlan) return;
-    
-    const amount = selectedPlan === 'monthly' ? 100 : 1200;
-    const planName = selectedPlan === 'monthly' ? 'Monthly' : 'Yearly';
-
-    // Initialize Razorpay
-    const options = {
-      key: 'rzp_test_placeholder', // Replace with actual Razorpay key
-      amount: amount * 100, // Amount in paise
-      currency: 'INR',
-      name: 'Aaspass',
-      description: `${planName} Subscription`,
-      handler: function() {
-        handlePayAndGoLive();
-      },
-      prefill: {
-        name: user?.name || '',
-        email: user?.email || '',
-      },
-      theme: {
-        color: 'var(--primary)',
-      },
-    };
-
-    const razorpay = new (window as any).Razorpay(options);
-    razorpay.open();
   };
 
   return (
@@ -582,9 +594,9 @@ const SellerOnboarding = () => {
             <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl p-5 border border-primary/20">
               <div className="flex items-center justify-between mb-1">
                 <h3 className="font-bold text-foreground text-lg">Go Live on Aaspass</h3>
-                <span className="text-xs font-semibold text-primary bg-primary/20 px-3 py-1 rounded-full">30-Day Trial</span>
+                <span className="text-xs font-semibold text-primary bg-primary/20 px-3 py-1 rounded-full">7-Day Trial</span>
               </div>
-              <p className="text-xs text-muted-foreground mb-4">Your subscription will automatically expire after 30 days. Renew anytime to keep your listing active.</p>
+              <p className="text-xs text-muted-foreground mb-4">Your subscription will automatically expire after 7 days. Renew anytime to keep your listing active.</p>
               
               <div className="grid grid-cols-2 gap-3 mb-4">
                 {/* Monthly Plan */}
@@ -624,10 +636,7 @@ const SellerOnboarding = () => {
                   }`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute top-2 right-2">
-                    <span className="text-[10px] font-bold text-white bg-primary px-2 py-0.5 rounded-full">Save 17%</span>
-                  </div>
-                  <div className="relative">
+                                    <div className="relative">
                     {selectedPlan === 'yearly' && (
                       <motion.div
                         initial={{ scale: 0.5, opacity: 0 }}
@@ -654,14 +663,28 @@ const SellerOnboarding = () => {
                 </div>
               </div>
 
-              <motion.button 
-                whileTap={{ scale: 0.96 }} 
-                disabled={!selectedPlan}
-                onClick={handleRazorpayPayment}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/30"
-              >
-                <CreditCard className="w-4 h-4" /> Review & Pay
-              </motion.button>
+              <div className="grid grid-cols-2 gap-3">
+                {!usedFreeTrial ? (
+                  <motion.button 
+                    whileTap={{ scale: 0.96 }} 
+                    onClick={handleStartFreeTrial}
+                    className="col-span-1 py-3 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/30"
+                  >
+                  Start Free Trial
+                  </motion.button>
+                ) : null}
+                
+                <motion.button 
+                  whileTap={{ scale: 0.96 }} 
+                  disabled={!selectedPlan}
+                  onClick={handlePayAndGoLive}
+                  className={`col-span-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/30 ${
+                    usedFreeTrial ? '' : 'opacity-50'
+                  }`}
+                >
+                  <CreditCard className="w-4 h-4" /> Pay
+                </motion.button>
+              </div>
             </div>
           </motion.div>
         )}

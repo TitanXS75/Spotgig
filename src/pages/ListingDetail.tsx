@@ -236,24 +236,14 @@ const ListingDetail = () => {
                   <p className="text-sm font-semibold text-primary">This is your business listing</p>
                   <p className="text-[11px] text-primary/70 mt-0.5">You are seeing it exactly as customers do.</p>
                 </div>
-                <div className="flex gap-2">
-                  <motion.button
+                <motion.button
                     whileTap={{ scale: 0.96 }}
                     onClick={() => navigate(`/edit-listing/${listing.id}`)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary text-primary-foreground font-semibold rounded-xl text-sm"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-muted text-foreground font-semibold rounded-xl text-sm hover:bg-muted/80"
                   >
                     <Edit2 className="w-4 h-4" />
                     Edit
                   </motion.button>
-                  <motion.button
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => navigate('/profile')}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-muted text-foreground font-semibold rounded-xl text-sm hover:bg-muted/80"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Manage
-                  </motion.button>
-                </div>
               </div>
             )}
           </div>

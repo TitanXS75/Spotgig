@@ -25,6 +25,8 @@ export interface Listing {
   created_at: string; // ISO string
   views: number;
   hide_location?: boolean;
+  plan_expires_at?: string; // ISO string
+  plan?: 'free_trial' | 'monthly' | 'yearly';
 }
 
 export const CATEGORIES = [

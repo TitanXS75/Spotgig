@@ -11,19 +11,24 @@ const ListingDetail = () => {
   const { user, userLat, userLng, hasLocation, userListings } = useAppStore();
   const listing = userListings.find((l) => l.slug === id || l.id === id);
 
-  const [likes, setLikes] = useState(124);
-  const [dislikes, setDislikes] = useState(12);
+  // TODO: Fetch from backend
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
 
-  const [comments, setComments] = useState([
-    { id: '1', user: 'Rohan Sharma', text: 'Great service! Highly recommended.', time: '2 days ago', email: 'mock1@example.com' },
-    { id: '2', user: 'Priya Patel', text: 'Very professional and quick response.', time: '1 week ago', email: 'mock2@example.com' }
-  ]);
+  // TODO: Replace with real comments when backend is integrated
+  const [comments, setComments] = useState<Array<{id: string, user: string, text: string, time: string, email: string}>>([]);
   const [newComment, setNewComment] = useState('');
   
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleVote = (type: 'up' | 'down') => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     if (userVote === type) {
       setUserVote(null);
       if (type === 'up') setLikes(prev => prev - 1);
@@ -39,6 +44,10 @@ const ListingDetail = () => {
   };
 
   const handleAddComment = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
     if (!newComment.trim()) return;
     setComments([
       {
@@ -183,12 +192,28 @@ const ListingDetail = () => {
 
           {/* Actions */}
           <div className="mt-5 flex flex-col gap-2">
+            {!listing.hide_location && (
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() => navigate('/map', { state: { focusListingId: listing.id } })}
+                className="group flex items-center justify-center gap-2 w-full py-3.5 bg-muted/40 text-foreground font-semibold rounded-xl text-sm border border-border/50 hover:bg-card hover:border-border hover:shadow-md transition-all duration-300"
+              >
+                <MapPin className="w-4 h-4 text-foreground transition-transform group-hover:scale-110" />
+                View on Map
+              </motion.button>
+            )}
             {whatsappUrl && (
               <motion.a
                 whileTap={{ scale: 0.96 }}
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!user) {
+                    e.preventDefault();
+                    setShowAuthModal(true);
+                  }
+                }}
                 className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-primary-foreground font-semibold rounded-xl text-sm"
               >
                 <MessageCircle className="w-5 h-5" />
@@ -201,6 +226,12 @@ const ListingDetail = () => {
                 href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!user) {
+                    e.preventDefault();
+                    setShowAuthModal(true);
+                  }
+                }}
                 className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white font-semibold rounded-xl text-sm"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -215,6 +246,12 @@ const ListingDetail = () => {
                 href={listing.website.startsWith('http') ? listing.website : `https://${listing.website}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!user) {
+                    e.preventDefault();
+                    setShowAuthModal(true);
+                  }
+                }}
                 className="flex items-center justify-center gap-2 w-full py-3 bg-card border border-border text-foreground font-semibold rounded-xl text-sm hover:bg-muted/50"
               >
                 <Globe className="w-5 h-5" />
@@ -353,12 +390,68 @@ const ListingDetail = () => {
             </div>
           ))}
           {comments.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No comments yet. Be the first to share your thoughts!
+            <div className="flex flex-col items-center justify-center py-10 px-4 border border-dashed border-border rounded-2xl bg-muted/30">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-3">
+                <MessageCircle className="w-6 h-6" />
+              </div>
+              <h4 className="text-base font-semibold text-foreground mb-1">No feedback yet</h4>
+              <p className="text-sm text-muted-foreground text-center max-w-xs">
+                Be the first to share your experience and help others learn about this business.
+              </p>
             </div>
           )}
         </div>
       </div>
+
+      {/* Auth Modal Overlay */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setShowAuthModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-card w-full max-w-sm rounded-[24px] p-6 shadow-2xl border border-border flex flex-col items-center text-center relative overflow-hidden"
+            >
+              <div className="mb-6 mt-2 flex justify-center w-full">
+                <img src="/aplg.png" alt="Aaspass logo" className="w-32 md:w-36 h-auto object-contain drop-shadow-sm" />
+              </div>
+              <div className="flex items-center justify-center gap-2.5 mb-2">
+                <h3 className="text-xl font-bold text-foreground tracking-tight">Login Required</h3>
+                <div className="w-7 h-7 bg-primary/10 rounded-full flex items-center justify-center text-primary shrink-0 shadow-sm border border-primary/20">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+                Please login to interact with this business or share your feedback.
+              </p>
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => setShowAuthModal(false)}
+                  className="flex-1 py-3 rounded-xl bg-muted text-foreground font-semibold hover:bg-muted/80 transition-colors text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors text-sm shadow-md"
+                >
+                  Login Now
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Image Preview Overlay */}
       <AnimatePresence>

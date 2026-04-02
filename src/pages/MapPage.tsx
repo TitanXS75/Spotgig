@@ -6,7 +6,7 @@ import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '@/store/app-store';
 import { DEFAULT_LAT, DEFAULT_LNG, getDistance } from '@/lib/distance';
 
@@ -31,6 +31,8 @@ function RecenterOnLocation({ center, zoom }: { center: [number, number]; zoom: 
 
 const MapPage = () => {
   const navigate = useNavigate();
+  const locationState = useLocation().state as { focusListingId?: string } | null;
+  const focusListingId = locationState?.focusListingId;
   const [isLocating, setIsLocating] = useState(false);
 
   const {
@@ -47,10 +49,16 @@ const MapPage = () => {
   } = useAppStore();
 
   const center = useMemo<[number, number]>(() => {
+    if (focusListingId) {
+      const focusListing = userListings.find(l => l.id === focusListingId);
+      if (focusListing && !focusListing.hide_location && Number.isFinite(focusListing.lat) && Number.isFinite(focusListing.lng)) {
+        return [focusListing.lat, focusListing.lng];
+      }
+    }
     if (hasLocation && Number.isFinite(userLat) && Number.isFinite(userLng)) return [userLat, userLng];
     // Default to Center of India
     return [20.5937, 78.9629];
-  }, [userLat, userLng, hasLocation]);
+  }, [userLat, userLng, hasLocation, focusListingId, userListings]);
 
   const listingsForMap = useMemo(() => {
     let items = userListings.filter((l) => l.status === 'live' && !l.hide_location);
@@ -186,8 +194,28 @@ const MapPage = () => {
 
               {listingsForMap.map((listing) => {
                 const distanceKm = getDistance(center[0], center[1], listing.lat, listing.lng);
+                const isFocused = listing.id === focusListingId;
+                
+                const customIcon = L.divIcon({
+                  className: 'bg-transparent border-0',
+                  html: isFocused 
+                    ? `<div class="flex items-center justify-center transition-all duration-300 animate-bounce" style="filter: drop-shadow(0 8px 6px rgba(0,0,0,0.25));">
+                         <span class="text-5xl">📍</span>
+                       </div>`
+                    : `<div class="relative flex items-center justify-center w-9 h-9 bg-card shadow-md opacity-90 rounded-full border-2 border-border transition-all duration-300">
+                         <span class="text-base">${listing.emoji || '🏬'}</span>
+                       </div>`,
+                  iconSize: isFocused ? [48, 48] : [36, 36],
+                  iconAnchor: isFocused ? [24, 48] : [18, 18],
+                });
+
                 return (
-                  <Marker key={listing.id} position={[listing.lat, listing.lng]}>
+                  <Marker 
+                    key={listing.id} 
+                    position={[listing.lat, listing.lng]}
+                    icon={customIcon}
+                    zIndexOffset={isFocused ? 1000 : 0}
+                  >
                     <Popup>
                       <div className="text-sm min-w-[180px]">
                         <div className="flex items-center gap-2">

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ArrowLeft, PackageOpen } from 'lucide-react';
-import { CATEGORIES, MOCK_LISTINGS } from '@/lib/mock-data';
+import { CATEGORIES } from '@/lib/mock-data';
 import ListingCard from '@/components/ListingCard';
 import { useAppStore } from '@/store/app-store';
 import { getDistance } from '@/lib/distance';
@@ -41,9 +41,9 @@ const CategoriesPage = () => {
 
     let items;
     if (activeCategory === 'Favourites') {
-      items = [...MOCK_LISTINGS, ...userListings].filter((l) => favoritedIds.includes(l.id));
+      items = userListings.filter((l) => favoritedIds.includes(l.id));
     } else {
-      items = [...MOCK_LISTINGS, ...userListings].filter(
+      items = userListings.filter(
         (l) => l.status === 'live' && l.category === activeCategory
       );
     }
@@ -119,7 +119,7 @@ const CategoriesPage = () => {
                   </motion.button>
                 )}
                 {filteredCategories.map(({ name, emoji }, i) => {
-                  const count = [...MOCK_LISTINGS, ...userListings].filter((l) => l.category === name && l.status === 'live').length;
+                  const count = userListings.filter((l) => l.category === name && l.status === 'live').length;
                   return (
                     <motion.button
                       key={name}

@@ -7,6 +7,7 @@ import { CATEGORIES } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
 import { reverseGeocode } from '@/lib/api/location';
 import { EyeToggleIcon } from '@/components/ui/animated-state-icons';
+import { generateUniqueSlug } from '@/lib/utils';
 
 const STEPS = ['Listing Details', 'Contact & Location', 'Review & Pay'];
 
@@ -16,7 +17,7 @@ const EMOJI_OPTIONS = ['🍱', '🎨', '👗', '📱', '📐', '💄', '🔧', '
 
 const SellerOnboarding = () => {
   const navigate = useNavigate();
-  const { user, setUserLocation, addListing } = useAppStore();
+  const { user, setUserLocation, addListing, userListings } = useAppStore();
   const [step, setStep] = useState(0);
 
   // Redirect to auth if not logged in
@@ -126,9 +127,14 @@ const SellerOnboarding = () => {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 7);
 
+    // Generate unique slug
+    const existingSlugs = userListings.map(l => l.slug || '');
+    const slug = generateUniqueSlug(listingName, existingSlugs);
+
     // Register business with free trial
     const newListing = {
       id: Math.random().toString(36).substring(7),
+      slug: slug,
       user_id: user?.email || 'u99',
       name: listingName,
       seller_name: user?.name || 'Local Seller',
@@ -166,9 +172,14 @@ const SellerOnboarding = () => {
     const daysToAdd = selectedPlan === 'yearly' ? 365 : 30;
     expiryDate.setDate(expiryDate.getDate() + daysToAdd);
 
+    // Generate unique slug
+    const existingSlugs = userListings.map(l => l.slug || '');
+    const slug = generateUniqueSlug(listingName, existingSlugs);
+
     // Register business
     const newListing = {
       id: Math.random().toString(36).substring(7),
+      slug: slug,
       user_id: user?.email || 'u99',
       name: listingName,
       seller_name: user?.name || 'Local Seller',
@@ -191,7 +202,7 @@ const SellerOnboarding = () => {
       status: 'live' as const,
       created_at: new Date().toISOString(),
       plan_expires_at: expiryDate.toISOString(),
-      plan: selectedPlan || 'monthly',
+      plan: selectedPlan as 'monthly' | 'yearly',
       views: 0,
     };
     

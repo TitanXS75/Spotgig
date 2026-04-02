@@ -7,7 +7,6 @@ import ListingCard from '@/components/ListingCard';
 import ListingCardSkeleton from '@/components/ListingCardSkeleton';
 import SellerCTA from '@/components/SellerCTA';
 
-import { MOCK_LISTINGS } from '@/lib/mock-data';
 import { getDistance } from '@/lib/distance';
 import { useAppStore } from '@/store/app-store';
 import { PackageOpen } from 'lucide-react';
@@ -34,7 +33,7 @@ const Index = () => {
   }, [setUserLocation]);
 
   const filtered = useMemo(() => {
-    let items = [...userListings, ...MOCK_LISTINGS].filter((l) => l.status === 'live');
+    let items = userListings.filter((l) => l.status === 'live');
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();

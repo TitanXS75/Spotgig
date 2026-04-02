@@ -202,7 +202,7 @@ const ProfilePage = () => {
                             </span>
                           </div>
                         </div>
-                        <button onClick={() => navigate(`/listing/${listing.id}`)} className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-medium rounded-lg shrink-0 transition-colors">
+                        <button onClick={() => navigate(`/listing/${listing.slug || listing.id}`)} className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-medium rounded-lg shrink-0 transition-colors">
                           View
                         </button>
                       </div>

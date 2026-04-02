@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import AnimatedDropdown from '@/components/ui/animated-dropdown';
 import { Trash2, LogOut, Mail, Calendar, Search, Filter, Store, Home, Eye, EyeOff } from 'lucide-react';
-import { MOCK_LISTINGS, CATEGORIES, type Listing } from '@/lib/mock-data';
+import { CATEGORIES, type Listing } from '@/lib/mock-data';
 
 // Hardcoded admin credentials
 const ADMIN_EMAIL = 'sarthak.sontakke05@gmail.com';
@@ -95,37 +95,8 @@ export default function AdminAuth75() {
   const fetchAdminData = () => {
     setDataLoading(true);
     try {
-      // Group listings by user (seller_name)
-      const userMap = new Map<string, AdminUser>();
-
-      MOCK_LISTINGS.forEach((listing) => {
-        const userId = listing.user_id;
-        
-        if (!userMap.has(userId)) {
-          // Assign random membership type
-          const membershipType = Math.random() > 0.5 ? 'yearly' : 'monthly';
-          const revenue = membershipType === 'yearly' ? 1200 : 100;
-          
-          userMap.set(userId, {
-            id: userId,
-            seller_name: listing.seller_name,
-            category: listing.category,
-            operating_type: listing.operating_type,
-            created_at: listing.created_at,
-            location: listing.area,
-            listings: [],
-            membershipType,
-            revenue,
-          });
-        }
-
-        const user = userMap.get(userId)!;
-        user.listings.push(listing);
-      });
-
-      const usersArray = Array.from(userMap.values());
-      setUsers(usersArray);
-      calculateStats(usersArray);
+      // TODO: Replace with actual Supabase query
+      setUsers([]);
     } catch (error) {
       console.error('Error fetching admin data:', error);
     } finally {

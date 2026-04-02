@@ -4,7 +4,7 @@ import { ArrowLeft, Check, UploadCloud, Smartphone, Instagram, MapPin, LocateFix
 import { useNavigate, useParams } from 'react-router-dom';
 import { EyeToggleIcon } from '@/components/ui/animated-state-icons';
 import AnimatedDropdown from '@/components/ui/animated-dropdown';
-import { CATEGORIES, MOCK_LISTINGS } from '@/lib/mock-data';
+import { CATEGORIES, type Listing } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
 import { reverseGeocode } from '@/lib/api/location';
 
@@ -16,7 +16,7 @@ const EditListing = () => {
   const { user, userListings, updateListing, deleteListing, setUserLocation } = useAppStore();
   
   // Find listing to edit
-  const listing = [...userListings, ...MOCK_LISTINGS].find((l) => l.id === id);
+  const listing = userListings.find((l) => l.slug === id || l.id === id);
 
   const [listingName, setListingName] = useState(listing?.name || '');
   const [type, setType] = useState<'product' | 'service'>(listing?.type || 'product');

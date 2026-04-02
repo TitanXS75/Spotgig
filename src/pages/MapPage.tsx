@@ -8,7 +8,6 @@ import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/app-store';
-import { MOCK_LISTINGS } from '@/lib/mock-data';
 import { DEFAULT_LAT, DEFAULT_LNG, getDistance } from '@/lib/distance';
 
 // Fix Leaflet default marker icons under Vite bundling.
@@ -54,7 +53,7 @@ const MapPage = () => {
   }, [userLat, userLng, hasLocation]);
 
   const listingsForMap = useMemo(() => {
-    let items = [...userListings, ...MOCK_LISTINGS].filter((l) => l.status === 'live' && !l.hide_location);
+    let items = userListings.filter((l) => l.status === 'live' && !l.hide_location);
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -199,7 +198,7 @@ const MapPage = () => {
                         <div className="text-muted-foreground mt-1 tabular-nums">{distanceKm} km away</div>
                         <button
                           type="button"
-                          onClick={() => navigate(`/listing/${listing.id}`)}
+                          onClick={() => navigate(`/listing/${listing.slug || listing.id}`)}
                           className="mt-2 inline-flex items-center justify-center w-full px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold"
                         >
                           View details

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Share2, MessageCircle, MapPin, Calendar, Eye, Edit2, Settings, ThumbsUp, ThumbsDown, Trash2, Send, Globe, X } from 'lucide-react';
-import { MOCK_LISTINGS } from '@/lib/mock-data';
 import { getDistance } from '@/lib/distance';
 import { useAppStore } from '@/store/app-store';
 
@@ -10,7 +9,7 @@ const ListingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, userLat, userLng, hasLocation, userListings } = useAppStore();
-  const listing = [...userListings, ...MOCK_LISTINGS].find((l) => l.id === id);
+  const listing = userListings.find((l) => l.slug === id || l.id === id);
 
   const [likes, setLikes] = useState(124);
   const [dislikes, setDislikes] = useState(12);
@@ -238,7 +237,7 @@ const ListingDetail = () => {
                 </div>
                 <motion.button
                     whileTap={{ scale: 0.96 }}
-                    onClick={() => navigate(`/edit-listing/${listing.id}`)}
+                    onClick={() => navigate(`/edit-listing/${listing.slug || listing.id}`)}
                     className="w-full flex items-center justify-center gap-2 py-3 bg-muted text-foreground font-semibold rounded-xl text-sm hover:bg-muted/80"
                   >
                     <Edit2 className="w-4 h-4" />

@@ -4,7 +4,8 @@ import { DEFAULT_LAT, DEFAULT_LNG } from '@/lib/distance';
 
 import type { Listing } from '@/lib/mock-data';
 
-interface User {
+export interface User {
+  id: string; // Supabase user ID
   email: string;
   name: string;
   gender: 'male' | 'female' | 'other' | null;
@@ -26,10 +27,6 @@ interface AppState {
   operationTypeFilter: 'all' | 'home' | 'shop';
   distanceFilter: number; // km, 0 = anywhere
   sortBy: 'distance' | 'newest';
-  // User Listings (Persisted)
-  userListings: Listing[];
-  // Favorites (local, persisted to localStorage)
-  favoritedIds: string[];
   // UI State
   isLoading: boolean;
   isSidebarOpen: boolean;
@@ -48,11 +45,6 @@ interface AppState {
   setLoading: (loading: boolean) => void;
   setSidebarOpen: (open: boolean) => void;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
-  toggleFavorite: (id: string) => void;
-  isFavorited: (id: string) => boolean;
-  addListing: (listing: Listing) => void;
-  updateListing: (id: string, updates: Partial<Listing>) => void;
-  deleteListing: (id: string) => void;
   resetFilters: () => void;
 }
 
@@ -70,8 +62,6 @@ export const useAppStore = create<AppState>()(
       operationTypeFilter: 'all',
       distanceFilter: 0,
       sortBy: 'distance',
-      userListings: [],
-      favoritedIds: [],
       isLoading: false,
       isSidebarOpen: false,
       theme: 'system',
@@ -96,20 +86,6 @@ export const useAppStore = create<AppState>()(
       setSidebarOpen: (open) => set({ isSidebarOpen: open }),
       setTheme: (theme) => set({ theme }),
 
-      toggleFavorite: (id) => {
-        const { favoritedIds } = get();
-        const exists = favoritedIds.includes(id);
-        set({
-          favoritedIds: exists ? favoritedIds.filter((x) => x !== id) : [...favoritedIds, id],
-        });
-      },
-      isFavorited: (id) => get().favoritedIds.includes(id),
-
-      addListing: (listing) => set((state) => ({ userListings: [listing, ...state.userListings] })),
-      updateListing: (id, updates) => set((state) => ({
-        userListings: state.userListings.map(l => l.id === id ? { ...l, ...updates } : l)
-      })),
-      
       resetFilters: () =>
         set({
           searchQuery: '',
@@ -119,9 +95,6 @@ export const useAppStore = create<AppState>()(
           distanceFilter: 0,
           sortBy: 'distance',
         }),
-      deleteListing: (id) => set((state) => ({
-        userListings: state.userListings.filter(l => l.id !== id)
-      })),
     }),
     {
       name: 'aaspass-store',
@@ -131,9 +104,6 @@ export const useAppStore = create<AppState>()(
         userLat: state.userLat,
         userLng: state.userLng,
         hasLocation: state.hasLocation,
-        userArea: state.userArea,
-        userListings: state.userListings,
-        favoritedIds: state.favoritedIds,
         sortBy: state.sortBy,
         operationTypeFilter: state.operationTypeFilter,
         distanceFilter: state.distanceFilter,

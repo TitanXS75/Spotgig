@@ -5,6 +5,9 @@ import { CATEGORIES } from '@/lib/mock-data';
 import ListingCard from '@/components/ListingCard';
 import { useAppStore } from '@/store/app-store';
 import { getDistance } from '@/lib/distance';
+import { getListings } from '@/lib/api/listings';
+import { getMyFavorites } from '@/lib/api/favorites';
+import { useQuery } from '@tanstack/react-query';
 
 const CategoriesPage = () => {
   // Two separate query states: one for category search, one for shop search
@@ -14,7 +17,22 @@ const CategoriesPage = () => {
   // The currently viewed category (null = viewing all categories)
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   
-  const { userLat, userLng, favoritedIds, userListings } = useAppStore();
+  const { userLat, userLng, user } = useAppStore();
+
+  const { data: allListings = [] } = useQuery({
+    queryKey: ['listings', 'all'],
+    queryFn: () => getListings({ limit: 1000 }),
+    staleTime: 60000,
+  });
+
+  const { data: favoriteListings = [] } = useQuery({
+    queryKey: ['favorites', 'me'],
+    queryFn: async () => {
+      if (!user) return [];
+      return getMyFavorites();
+    },
+    enabled: !!user,
+  });
 
   const handleCategoryTap = (name: string) => {
     setActiveCategory(name);
@@ -39,11 +57,11 @@ const CategoriesPage = () => {
   const filteredListings = useMemo(() => {
     if (!activeCategory) return [];
 
-    let items;
+    let items: any[] = [];
     if (activeCategory === 'Favourites') {
-      items = userListings.filter((l) => favoritedIds.includes(l.id));
+      items = [...favoriteListings];
     } else {
-      items = userListings.filter(
+      items = allListings.filter(
         (l) => l.status === 'live' && l.category === activeCategory
       );
     }
@@ -62,7 +80,7 @@ const CategoriesPage = () => {
     // Sort by distance
     items.sort((a, b) => getDistance(userLat, userLng, a.lat, a.lng) - getDistance(userLat, userLng, b.lat, b.lng));
     return items;
-  }, [listingQuery, activeCategory, userLat, userLng]);
+  }, [listingQuery, activeCategory, userLat, userLng, allListings, favoriteListings]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
@@ -114,12 +132,12 @@ const CategoriesPage = () => {
                       Favourites
                     </span>
                     <span className="text-meta text-muted-foreground mt-auto">
-                      {favoritedIds.length} saved
+                      {favoriteListings.length} saved
                     </span>
                   </motion.button>
                 )}
                 {filteredCategories.map(({ name, emoji }, i) => {
-                  const count = userListings.filter((l) => l.category === name && l.status === 'live').length;
+                  const count = allListings.filter((l) => l.category === name && l.status === 'live').length;
                   return (
                     <motion.button
                       key={name}

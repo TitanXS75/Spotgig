@@ -2,20 +2,45 @@ import { motion } from 'framer-motion';
 import { MessageCircle, Globe } from 'lucide-react';
 import { HeartIcon } from '@/components/ui/animated-state-icons';
 import { useNavigate } from 'react-router-dom';
-import type { Listing } from '@/lib/mock-data';
+import type { Database } from '@/lib/db-types';
 import { getDistance } from '@/lib/distance';
 import { useAppStore } from '@/store/app-store';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getMyFavorites, toggleFavorite } from '@/lib/api/favorites';
+
+export type DbListing = Database['public']['Tables']['listings']['Row'];
 
 interface ListingCardProps {
-  listing: Listing;
+  listing: DbListing;
 }
 
 const ListingCard = ({ listing }: ListingCardProps) => {
   const navigate = useNavigate();
-  const { userLat, userLng, hasLocation, toggleFavorite, isFavorited } = useAppStore();
+  const queryClient = useQueryClient();
+  const { user, userLat, userLng, hasLocation } = useAppStore();
   const distance = hasLocation ? getDistance(userLat, userLng, listing.lat, listing.lng) : null;
   const isProduct = listing.type === 'product';
-  const favorited = isFavorited(listing.id);
+  
+  const { data: favorites = [] } = useQuery({
+    queryKey: ['favorites', 'me'],
+    queryFn: async () => {
+      if (!user) return [];
+      return getMyFavorites();
+    },
+    enabled: !!user,
+  });
+
+  const favorited = favorites.some((f: any) => f.id === listing.id);
+
+  const toggleMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) return; // or navigate to auth
+      await toggleFavorite(listing.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorites', 'me'] });
+    }
+  });
 
   return (
     <motion.div
@@ -40,7 +65,11 @@ const ListingCard = ({ listing }: ListingCardProps) => {
         className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-sm shadow-sm"
         onClick={(e) => {
           e.stopPropagation();
-          toggleFavorite(listing.id);
+          if (!user) {
+            navigate('/auth');
+          } else {
+            toggleMutation.mutate();
+          }
         }}
         title={favorited ? 'Remove from favorites' : 'Save'}
       >
@@ -79,7 +108,7 @@ const ListingCard = ({ listing }: ListingCardProps) => {
           {listing.description}
         </p>
         <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-          {listing.tags.slice(0, 3).map((tag) => (
+          {listing.tags?.slice(0, 3).map((tag) => (
             <span key={tag} className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
               {tag}
             </span>

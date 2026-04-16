@@ -10,9 +10,8 @@ import AnimatedDropdown from '@/components/ui/animated-dropdown';
 import { Trash2, LogOut, Mail, Calendar, Search, Filter, Store, Home, Eye, EyeOff } from 'lucide-react';
 import { CATEGORIES, type Listing } from '@/lib/mock-data';
 
-// Hardcoded admin credentials
+// Admin email for display only — actual auth is verified via Supabase + is_admin flag
 const ADMIN_EMAIL = 'sarthak.sontakke05@gmail.com';
-const ADMIN_PASSWORD = 'admin123'; // for testing
 
 interface AdminUser {
   id: string;
@@ -64,13 +63,34 @@ export default function AdminAuth75() {
     e.preventDefault();
     setLoading(true);
 
-    // Hardcoded authentication check
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      fetchAdminData();
-    } else {
-      alert('Invalid credentials');
+    // Step 1: Sign in with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError || !authData.user) {
+      alert('Invalid email or password.');
+      setLoading(false);
+      return;
     }
+
+    // Step 2: Verify this user has is_admin = true in profiles
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (profileError || !profile?.is_admin) {
+      await supabase.auth.signOut();
+      alert('Access denied. You are not an admin.');
+      setLoading(false);
+      return;
+    }
+
+    setIsAuthenticated(true);
+    fetchAdminData();
     setLoading(false);
   };
 
@@ -92,13 +112,46 @@ export default function AdminAuth75() {
     };
   }, [searchQuery]);
 
-  const fetchAdminData = () => {
+  const fetchAdminData = async () => {
     setDataLoading(true);
     try {
-      // TODO: Replace with actual Supabase query
-      setUsers([]);
+      const { data: listings, error } = await supabase.from('listings').select('*').neq('status', 'suspended');
+      if (error) throw error;
+      
+      // Transform listings into AdminUser format
+      const usersMap: Record<string, AdminUser> = {};
+      
+      listings.forEach((listing: any) => {
+        const userId = listing.user_id;
+        if (!usersMap[userId]) {
+          usersMap[userId] = {
+            id: userId,
+            seller_name: listing.seller_name,
+            category: listing.category,
+            operating_type: listing.operating_type,
+            created_at: listing.created_at,
+            location: listing.area,
+            listings: [],
+            membershipType: listing.plan === 'yearly' ? 'yearly' : 'monthly',
+            revenue: 0,
+          };
+        }
+        
+        usersMap[userId].listings.push(listing);
+        usersMap[userId].revenue += listing.plan === 'yearly' ? 1200 : 100;
+        
+        // Also keep track of membership visually
+        if (listing.plan === 'yearly') {
+          usersMap[userId].membershipType = 'yearly';
+        }
+      });
+      
+      const adminUsers = Object.values(usersMap);
+      setUsers(adminUsers);
+      calculateStats(adminUsers);
     } catch (error) {
       console.error('Error fetching admin data:', error);
+      alert('Error fetching data.');
     } finally {
       setDataLoading(false);
     }
@@ -141,16 +194,25 @@ export default function AdminAuth75() {
     setTotalRevenue(totalRev);
   };
 
-  const handleDeleteUser = (userToDelete: AdminUser) => {
-    // In real app, would delete from database
-    const updatedUsers = users.filter((u) => u.id !== userToDelete.id);
-    setUsers(updatedUsers);
-    setDeleteConfirmOpen(false);
-    calculateStats(updatedUsers);
-    alert('User deleted successfully!');
+  const handleDeleteUser = async (userToDelete: AdminUser) => {
+    try {
+      // Soft delete by suspending all their listings
+      const { error } = await supabase.from('listings').update({ status: 'suspended' }).eq('user_id', userToDelete.id);
+      if (error) throw error;
+      
+      const updatedUsers = users.filter((u) => u.id !== userToDelete.id);
+      setUsers(updatedUsers);
+      setDeleteConfirmOpen(false);
+      calculateStats(updatedUsers);
+      alert('User suspended successfully!');
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to suspend user');
+      console.error(err);
+    }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
     setEmail('');
     setPassword('');
@@ -232,7 +294,7 @@ export default function AdminAuth75() {
           </form>
 
           <p className="text-xs text-muted-foreground mt-6 text-center">
-            Demo: {ADMIN_EMAIL}
+            🔒 Restricted. Authorised personnel only.
           </p>
         </Card>
       </div>

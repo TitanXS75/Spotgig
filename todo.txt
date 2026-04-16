@@ -1,0 +1,15 @@
+# Aaspass Production Migration - Remaining Tasks
+
+[ ] 1. Razorpay Payments Integration
+    - Create Supabase Edge Functions in TypeScript/Deno
+    - `create-razorpay-order`: Generate secure orders via Razorpay API
+    - `verify-razorpay-payment`: Verify payment HMAC signature via Webhook
+    - Replace fake payment flow in `SellerOnboarding.tsx` with actual calls to Edge Functions
+
+[ ] 2. Admin Panel Migration
+    - Refactor `adminauth75.tsx` to read real user and listing data from Supabase instead of hardcoded arrays.
+    - Implement the ability for an admin to suspend, delete, or moderate live listings securely.
+
+[ ] 3. Forgot Password Flow
+    - Convert `ForgotPasswordPage.tsx` from its mocked state.
+    - Implement `supabase.auth.resetPasswordForEmail` to send genuine password recovery emails.

@@ -2,16 +2,24 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Edit2, X, Check } from 'lucide-react';
 import { useAppStore } from '@/store/app-store';
+import { getMyListings } from '@/lib/api/listings';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { user, userListings, logout, updateUserProfile } = useAppStore();
+  const { user, logout, updateUserProfile } = useAppStore();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
     gender: user?.gender || null,
+  });
+
+  const { data: userListings = [] } = useQuery({
+    queryKey: ['listings', 'me'],
+    queryFn: getMyListings,
+    enabled: !!user,
   });
 
   const calculateDaysRemaining = (expiryDate: string) => {
@@ -182,29 +190,36 @@ const ProfilePage = () => {
                 {userListings.map(listing => {
                     const daysRemaining = calculateDaysRemaining(listing.plan_expires_at);
                     return (
-                      <div key={listing.id} className="bg-card shadow-sm border border-border rounded-xl p-4 flex gap-4 items-center">
-                        <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center text-3xl shrink-0 overflow-hidden">
-                          {listing.image_url ? <img src={listing.image_url} alt="Logo" className="w-full h-full object-cover" /> : listing.emoji}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-foreground truncate">{listing.name}</h4>
-                          <p className="text-sm text-muted-foreground truncate">{listing.category} • {listing.area}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                              daysRemaining > 30 ? 'bg-green-100 text-green-700' :
-                              daysRemaining > 7 ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-red-100 text-red-700'
-                            }`}>
-                              {daysRemaining} days left
-                            </span>
-                            <span className="text-xs text-muted-foreground capitalize">
-                              {listing.plan === 'free_trial' ? 'Free Trial' : listing.plan}
-                            </span>
+                      <div key={listing.id} className="bg-card shadow-sm border border-border rounded-xl p-4 flex flex-col gap-4">
+                        <div className="flex gap-4 items-center">
+                          <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center text-3xl shrink-0 overflow-hidden">
+                            {listing.image_url ? <img src={listing.image_url} alt="Logo" className="w-full h-full object-cover" /> : listing.emoji}
                           </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-foreground truncate">{listing.name}</h4>
+                            <p className="text-sm text-muted-foreground truncate">{listing.category} • {listing.area}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                                daysRemaining > 30 ? 'bg-green-100 text-green-700' :
+                                daysRemaining > 7 ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                              }`}>
+                                {daysRemaining} days left
+                              </span>
+                              <span className="text-xs text-muted-foreground capitalize">
+                                {listing.plan === 'free_trial' ? 'Free Trial' : listing.plan}
+                              </span>
+                            </div>
+                          </div>
+                          <button onClick={() => navigate(`/listing/${listing.slug || listing.id}`)} className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-medium rounded-lg shrink-0 transition-colors">
+                            View
+                          </button>
                         </div>
-                        <button onClick={() => navigate(`/listing/${listing.slug || listing.id}`)} className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-medium rounded-lg shrink-0 transition-colors">
-                          View
-                        </button>
+                        {daysRemaining === 0 && (
+                          <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-900/30">
+                            <p className="text-xs text-red-600 dark:text-red-400 font-medium">Your services has been paused, renew to get visible again.</p>
+                          </div>
+                        )}
                       </div>
                     );
                   })}

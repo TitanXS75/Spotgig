@@ -4,16 +4,9 @@ import {
   Mail, Lock, User, ArrowRight, Eye, EyeOff, Store, Phone
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAppStore } from '@/store/app-store';
-
-// ─── Test User Data ───────────────────────────────────────────────────────
-const TEST_USER = {
-  email: 'doraemonsnacks@gmail.com',
-  password: '0000000',
-  name: 'Doraemon Snacks',
-  phone: '9876543210',
-  gender: null,
-};
+import { supabase } from '@/lib/supabase';
+import { signIn, signUp } from '@/lib/api/auth';
+import { useToast } from '@/hooks/use-toast';
 
 // ─── Dynamic Image Panel ───────────────────────────────────────────────
 const ImagePanel = ({ mode }: { mode: 'login' | 'signup' }) => (
@@ -72,7 +65,7 @@ const formVariants = {
 
 const AuthPage = () => {
   const navigate = useNavigate();
-  const { setUser } = useAppStore();
+  const { toast } = useToast();
   const location = useLocation();
   const [mode, setMode] = useState<Mode>((location.state as any)?.mode || 'login');
   const [direction, setDirection] = useState(1);
@@ -147,34 +140,38 @@ const AuthPage = () => {
     }
 
     setLoading(true);
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 1200));
 
-    if (mode === 'login') {
-      // Check against test user
-      if (email === TEST_USER.email && password === TEST_USER.password) {
-        setUser({
-          email: TEST_USER.email,
-          name: TEST_USER.name,
-          phone: TEST_USER.phone,
-          gender: null,
-        });
-        setLoading(false);
+    try {
+      if (mode === 'login') {
+        await signIn(email, password);
+        toast({ title: 'Welcome back!' });
         navigate('/profile');
       } else {
-        setLoading(false);
-        setErrors({ email: 'Invalid email or password' });
+        await signUp(email, password, name);
+        // Supabase often requires email confirmation, handled automatically by auth listener if auto-confirmed.
+        toast({ title: 'Account created!', description: 'Welcome to Aaspass.' });
+        navigate('/profile');
       }
-    } else {
-      // Signup - in test mode, create user with provided info
-      setUser({
-        email: email,
-        name: name,
-        phone: phone,
-        gender: null,
-      });
+    } catch (err: any) {
+      setErrors({ email: err.message || 'Authentication failed' });
+    } finally {
       setLoading(false);
-      navigate('/profile');
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/profile`
+        }
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      setErrors({ email: err.message || 'Google login failed' });
+      setLoading(false);
     }
   };
 
@@ -396,19 +393,7 @@ const AuthPage = () => {
               {/* Google Button */}
               <button
                 type="button"
-                onClick={() => {
-                  setLoading(true);
-                  setTimeout(() => {
-                    setUser({
-                      email: 'googleuser@gmail.com',
-                      name: 'Google User',
-                      phone: null,
-                      gender: null,
-                    });
-                    setLoading(false);
-                    navigate('/profile');
-                  }, 800);
-                }}
+                onClick={handleGoogleLogin}
                 className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-border bg-background hover:bg-muted text-foreground text-sm font-semibold transition-colors mb-2"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">

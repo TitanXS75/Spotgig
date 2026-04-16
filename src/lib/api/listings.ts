@@ -15,6 +15,7 @@ export async function getListings(options?: {
     .from('listings')
     .select('*')
     .eq('status', 'live')
+    .gte('plan_expires_at', new Date().toISOString())
     .order('created_at', { ascending: false });
 
   if (options?.category) query = query.eq('category', options.category);
@@ -26,12 +27,30 @@ export async function getListings(options?: {
   return data as Listing[];
 }
 
+/** Fetch live listings within a radius (default 10km) */
+export async function getListingsNearby(lat: number, lng: number, radiusKm: number = 10) {
+  const { data, error } = await supabase.rpc('get_listings_nearby', {
+    user_lat: lat,
+    user_lng: lng,
+    radius_km: radiusKm,
+  });
+  
+  if (error) throw error;
+  
+  const now = new Date().getTime();
+  const validData = (data as (Listing & { distance_km: number })[]).filter(
+    (listing) => new Date(listing.plan_expires_at).getTime() > now
+  );
+  
+  return validData;
+}
+
 /** Fetch a single listing by ID and increment its view count. */
-export async function getListingById(id: string) {
+export async function getListingById(idOrSlug: string) {
   const { data, error } = await supabase
     .from('listings')
     .select('*')
-    .eq('id', id)
+    .or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`)
     .single();
   if (error) throw error;
 
@@ -39,7 +58,7 @@ export async function getListingById(id: string) {
   supabase
     .from('listings')
     .update({ views: (data.views ?? 0) + 1 })
-    .eq('id', id)
+    .eq('id', data.id)
     .then(() => {});
 
   return data as Listing;
@@ -90,12 +109,25 @@ export async function suspendListing(id: string) {
   return updateListing(id, { status: 'suspended' });
 }
 
+/** Hard delete a listing */
+export async function deleteListing(id: string) {
+  const { error } = await supabase
+    .from('listings')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+
+
 /** Search listings by keyword across name, description, tags. */
 export async function searchListings(query: string) {
   const { data, error } = await supabase
     .from('listings')
     .select('*')
     .eq('status', 'live')
+    .gte('plan_expires_at', new Date().toISOString())
     .or(`name.ilike.%${query}%,description.ilike.%${query}%`);
   if (error) throw error;
   return data as Listing[];

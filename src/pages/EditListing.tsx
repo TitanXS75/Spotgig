@@ -4,48 +4,58 @@ import { ArrowLeft, Check, UploadCloud, Smartphone, Instagram, MapPin, LocateFix
 import { useNavigate, useParams } from 'react-router-dom';
 import { EyeToggleIcon } from '@/components/ui/animated-state-icons';
 import AnimatedDropdown from '@/components/ui/animated-dropdown';
-import { CATEGORIES, type Listing } from '@/lib/mock-data';
+import { CATEGORIES } from '@/lib/mock-data';
 import { useAppStore } from '@/store/app-store';
 import { reverseGeocode } from '@/lib/api/location';
+import { getListingById, updateListing, deleteListing as apiDeleteListing } from '@/lib/api/listings';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMultiImageUpload } from '@/hooks/use-cloudinary-upload';
+import { useToast } from '@/hooks/use-toast';
 
 const SERVICE_TYPES = ['Software', 'Consulting', 'Design', 'Marketing', 'Writing', 'Teaching', 'Photography', 'Editing', 'Fitness Coaching', 'Music Lessons', 'Home Cleaning', 'Maintenance', 'Beauty', 'Healthcare', 'Other'];
 
 const EditListing = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, userListings, updateListing, deleteListing, setUserLocation } = useAppStore();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { user, setUserLocation } = useAppStore();
   
-  // Find listing to edit
-  const listing = userListings.find((l) => l.slug === id || l.id === id);
+  // Fetch listing to edit
+  const { data: listing, isLoading: loadingListing } = useQuery({
+    queryKey: ['listing', id],
+    queryFn: () => getListingById(id as string),
+    enabled: !!id,
+  });
 
-  const [listingName, setListingName] = useState(listing?.name || '');
-  const [type, setType] = useState<'product' | 'service'>(listing?.type || 'product');
-  const [operatingType, setOperatingType] = useState<'shop' | 'home'>(listing?.operating_type || 'shop');
-  const [category, setCategory] = useState(listing?.category || '');
-  const [categorySpecification, setCategorySpecification] = useState(''); // Only used if matching 'Other' originally
-  const [serviceType, setServiceType] = useState(listing?.category || '');
+  const [listingName, setListingName] = useState('');
+  const [type, setType] = useState<'product' | 'service'>('product');
+  const [operatingType, setOperatingType] = useState<'shop' | 'home'>('shop');
+  const [category, setCategory] = useState('');
+  const [categorySpecification, setCategorySpecification] = useState('');
+  const [serviceType, setServiceType] = useState('');
   const [serviceSpecification, setServiceSpecification] = useState('');
   
-  const [description, setDescription] = useState(listing?.description || '');
-  const [tags, setTags] = useState<string[]>(listing?.tags || []);
+  const [description, setDescription] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
-  const [imageUrl, setImageUrl] = useState(listing?.image_url || '');
-  const [supportiveImages, setSupportiveImages] = useState<string[]>(listing?.supportive_images || []);
+  
+  const { slots, uploading, errors: uploadErrors, uploadSlot, clearSlot, reset } = useMultiImageUpload();
 
   // Contact / Location
-  const [whatsapp, setWhatsapp] = useState(listing?.whatsapp || '');
-  const [instagram, setInstagram] = useState(listing?.instagram || '');
-  const [website, setWebsite] = useState(listing?.website || '');
-  const [otherHandle, setOtherHandle] = useState(listing?.other_handle || '');
-  const [area, setArea] = useState(listing?.area || '');
-  const [listingLat, setListingLat] = useState<number | null>(listing?.lat || null);
-  const [listingLng, setListingLng] = useState<number | null>(listing?.lng || null);
+  const [whatsapp, setWhatsapp] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [website, setWebsite] = useState('');
+  const [otherHandle, setOtherHandle] = useState('');
+  const [area, setArea] = useState('');
+  const [listingLat, setListingLat] = useState<number | null>(null);
+  const [listingLng, setListingLng] = useState<number | null>(null);
 
   const [detectingLocation, setDetectingLocation] = useState(false);
   const [showManualCoordinates, setShowManualCoordinates] = useState(false);
-  const [manualLat, setManualLat] = useState(listing?.lat?.toString() || '');
-  const [manualLng, setManualLng] = useState(listing?.lng?.toString() || '');
-  const [hideLocation, setHideLocation] = useState(listing?.hide_location || false);
+  const [manualLat, setManualLat] = useState('');
+  const [manualLng, setManualLng] = useState('');
+  const [hideLocation, setHideLocation] = useState(false);
 
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -55,24 +65,60 @@ const EditListing = () => {
   useEffect(() => {
     if (!listing) return;
     
+    setListingName(listing.name);
+    setType(listing.type);
+    setOperatingType(listing.operating_type);
+    setDescription(listing.description);
+    setTags(listing.tags);
+    setWhatsapp(listing.whatsapp || '');
+    setInstagram(listing.instagram || '');
+    setWebsite(listing.website || '');
+    setOtherHandle(listing.other_handle || '');
+    setArea(listing.area);
+    setListingLat(listing.lat);
+    setListingLng(listing.lng);
+    setManualLat(listing.lat.toString());
+    setManualLng(listing.lng.toString());
+    setHideLocation(listing.hide_location);
+
+    // Provide initial slots data
+    reset({
+      logo: listing.image_url,
+      gallery_0: listing.supportive_images?.[0] || null,
+      gallery_1: listing.supportive_images?.[1] || null,
+      gallery_2: listing.supportive_images?.[2] || null,
+    });
+    
     // Check if category matches our mock array, otherwise it's "Other"
     if (listing.type === 'product') {
       const isKnown = CATEGORIES.find(c => c.name === listing.category);
-      if (!isKnown) {
+      if (isKnown) {
+        setCategory(listing.category);
+      } else {
         setCategory('Other');
         setCategorySpecification(listing.category);
       }
     } else {
       const isKnown = SERVICE_TYPES.includes(listing.category);
-      if (!isKnown) {
+      if (isKnown) {
+        setServiceType(listing.category);
+      } else {
         setServiceType('Other');
         setServiceSpecification(listing.category);
       }
     }
   }, [listing]);
 
+  if (loadingListing) {
+    return (
+      <div className="max-w-xl mx-auto px-4 pt-20 text-center">
+        <p className="text-muted-foreground animate-pulse">Loading listing...</p>
+      </div>
+    );
+  }
+
   // Authorization fallback
-  if (!user || !listing || (user.email !== listing.user_id)) {
+  if (!user || !listing || (user.id !== listing.user_id)) {
     return (
       <div className="max-w-xl mx-auto px-4 pt-20 text-center">
         <p className="text-muted-foreground">You do not have permission to edit this listing.</p>
@@ -144,35 +190,62 @@ const EditListing = () => {
     area && 
     (whatsapp.length === 10 || instagram.length > 0 || otherHandle.trim().length > 0);
 
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      const resolvedCategory = type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType);
+      
+      let supportiveUrls = [slots.gallery_0, slots.gallery_1, slots.gallery_2].filter(Boolean) as string[];
+
+      await updateListing(listing.id, {
+        name: listingName,
+        type: type,
+        operating_type: operatingType,
+        category: resolvedCategory,
+        description: description,
+        tags: tags,
+        whatsapp: whatsapp || null,
+        instagram: instagram || null,
+        other_handle: otherHandle || null,
+        area: area,
+        lat: listingLat || 0,
+        lng: listingLng || 0,
+        image_url: slots.logo || null,
+        supportive_images: supportiveUrls.length > 0 ? supportiveUrls : null,
+        website: website || null,
+        hide_location: hideLocation
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['listing', id] });
+      queryClient.invalidateQueries({ queryKey: ['listings'] });
+      setShowSuccessPopup(true);
+    },
+    onError: (err: any) => {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await apiDeleteListing(listing.id);
+    },
+    onSuccess: () => {
+       queryClient.invalidateQueries({ queryKey: ['listings'] });
+       toast({ title: 'Deleted', description: 'Listing was deleted.' });
+       navigate('/profile');
+    },
+    onError: (err: any) => {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  });
+
   const handleSaveListing = () => {
-    const resolvedCategory = type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType);
-    
-    updateListing(listing.id, {
-      name: listingName,
-      type: type,
-      operating_type: operatingType,
-      category: resolvedCategory,
-      description: description,
-      tags: tags,
-      whatsapp: whatsapp || null,
-      instagram: instagram || null,
-      other_handle: otherHandle || null,
-      area: area,
-      lat: listingLat || 0,
-      lng: listingLng || 0,
-      image_url: imageUrl || null,
-      supportive_images: supportiveImages,
-      website: website || null,
-      hide_location: hideLocation
-    });
-    
-    setShowSuccessPopup(true);
+    updateMutation.mutate();
   };
 
   const handleDeleteListing = () => {
-    if (deleteConfirmation === listingName) {
-      deleteListing(listing.id);
-      navigate('/profile');
+    if (deleteConfirmation === listing.name) {
+      deleteMutation.mutate();
     }
   };
 
@@ -292,33 +365,33 @@ const EditListing = () => {
           <div>
             <label className="text-sm font-medium text-foreground">Change Appearance Image</label>
             <div className="mt-2 w-full">
-              {imageUrl ? (
+              {slots.logo ? (
                 <div className="flex flex-col gap-3 w-full">
                   <div className="relative w-full h-40 rounded-xl overflow-hidden border border-border">
-                    <img src={imageUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+                    <img src={slots.logo} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
                   </div>
                   <div className="flex items-center justify-end gap-3 mt-1">
-                    <label className="cursor-pointer px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-foreground text-xs font-semibold transition-colors">
-                      Replace
-                      <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setImageUrl(URL.createObjectURL(file));
-                      }} />
-                    </label>
-                    <button type="button" onClick={(e) => { e.preventDefault(); setImageUrl(''); }} className="px-4 py-2 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-lg text-xs font-semibold transition-colors">
+                    <button type="button" onClick={() => clearSlot('logo')} className="px-4 py-2 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-lg text-xs font-semibold transition-colors">
                       Remove
                     </button>
                   </div>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <UploadCloud className="w-8 h-8 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
-                  </div>
-                  <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20 relative">
+                  {uploading.logo ? (
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <span className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-2" />
+                      <p className="text-sm text-muted-foreground">Uploading...</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <UploadCloud className="w-8 h-8 text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
+                    </div>
+                  )}
+                  <input type="file" className="hidden" accept="image/*" disabled={uploading.logo} onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) setImageUrl(URL.createObjectURL(file));
+                    if (file) uploadSlot(file, 'logo');
                   }} />
                 </label>
               )}
@@ -329,29 +402,32 @@ const EditListing = () => {
             <label className="text-sm font-medium text-foreground">Supportive Images (Max 3)</label>
             <div className="mt-2 grid grid-cols-3 gap-2 w-full">
               {[0, 1, 2].map(idx => {
-                const src = supportiveImages[idx];
+                const slotName = `gallery_${idx}` as const;
+                const src = slots[slotName];
+                const isUploading = uploading[slotName];
+                
                 return src ? (
                   <div key={idx} className="relative w-full aspect-square rounded-xl overflow-hidden border border-border">
                     <img src={src} alt={`Supportive ${idx}`} className="absolute inset-0 w-full h-full object-cover" />
-                    <button type="button" onClick={() => {
-                      const newImgs = [...supportiveImages];
-                      newImgs.splice(idx, 1);
-                      setSupportiveImages(newImgs);
-                    }} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 hover:bg-black/70">
+                    <button type="button" onClick={() => clearSlot(slotName)} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 hover:bg-black/70">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
                 ) : (
-                  <label key={idx} className="flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20">
-                    <div className="flex flex-col items-center justify-center text-center p-1">
-                      <UploadCloud className="w-5 h-5 text-muted-foreground mb-1" />
-                      <span className="text-[10px] font-semibold text-primary">Add</span>
-                    </div>
-                    <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                  <label key={idx} className="flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20 relative">
+                    {isUploading ? (
+                      <div className="flex flex-col items-center justify-center text-center p-1">
+                        <span className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-1" />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-center p-1">
+                        <UploadCloud className="w-5 h-5 text-muted-foreground mb-1" />
+                        <span className="text-[10px] font-semibold text-primary">Add</span>
+                      </div>
+                    )}
+                    <input type="file" className="hidden" accept="image/*" disabled={isUploading} onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        setSupportiveImages([...supportiveImages, URL.createObjectURL(file)]);
-                      }
+                      if (file) uploadSlot(file, slotName);
                     }} />
                   </label>
                 );
@@ -419,8 +495,8 @@ const EditListing = () => {
           </div>
         </div>
 
-        <motion.button whileTap={{ scale: 0.96 }} disabled={!isValid} onClick={handleSaveListing} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2 mt-8">
-          <Check className="w-5 h-5" /> Save Changes
+        <motion.button whileTap={{ scale: 0.96 }} disabled={!isValid || updateMutation.isPending} onClick={handleSaveListing} className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2 mt-8">
+          {updateMutation.isPending ? <span className="w-5 h-5 border-2 border-white/50 border-t-white rounded-full animate-spin" /> : <><Check className="w-5 h-5" /> Save Changes</>}
         </motion.button>
 
         <div className="mt-12 pt-8 border-t border-destructive/20 text-center space-y-4">
@@ -470,7 +546,9 @@ const EditListing = () => {
                 
                 <div className="flex gap-3 w-full mt-6">
                   <button onClick={() => { setShowDeleteModal(false); setDeleteConfirmation(''); }} className="flex-1 py-2.5 rounded-xl bg-muted text-foreground text-sm font-semibold hover:bg-muted/80 transition-colors">Cancel</button>
-                  <button disabled={deleteConfirmation !== listing.name} onClick={handleDeleteListing} className="flex-1 py-2.5 rounded-xl bg-destructive text-primary-foreground text-sm font-semibold disabled:opacity-40 transition-colors">Delete</button>
+                  <button disabled={deleteConfirmation !== listing.name || deleteMutation.isPending} onClick={handleDeleteListing} className="flex-1 py-2.5 rounded-xl bg-destructive text-primary-foreground text-sm font-semibold disabled:opacity-40 transition-colors">
+                    {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                  </button>
                 </div>
               </div>
             </motion.div>

@@ -2,72 +2,124 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Share2, MessageCircle, MapPin, Calendar, Eye, Edit2, Settings, ThumbsUp, ThumbsDown, Trash2, Send, Globe, X } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { getDistance } from '@/lib/distance';
 import { useAppStore } from '@/store/app-store';
-
+import { getListingById } from '@/lib/api/listings';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 const ListingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, userLat, userLng, hasLocation, userListings } = useAppStore();
-  const listing = userListings.find((l) => l.slug === id || l.id === id);
+  const queryClient = useQueryClient();
+  const { user, userLat, userLng, hasLocation } = useAppStore();
 
-  // TODO: Fetch from backend
-  const [likes, setLikes] = useState(0);
-  const [dislikes, setDislikes] = useState(0);
-  const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
+  const { data: listing, isLoading: loadingListing } = useQuery({
+    queryKey: ['listing', id],
+    queryFn: () => getListingById(id as string),
+    enabled: !!id,
+  });
 
-  // TODO: Replace with real comments when backend is integrated
-  const [comments, setComments] = useState<Array<{id: string, user: string, text: string, time: string, email: string}>>([]);
+  const { data: voteData } = useQuery({
+    queryKey: ['votes', listing?.id],
+    queryFn: async () => {
+      if (!listing?.id) return { ups: 0, downs: 0, userVote: null };
+      
+      const { data: counts, error: countsError } = await supabase.rpc('get_vote_counts', { p_listing_id: listing.id });
+      let fetchUps = 0; let fetchDowns = 0;
+      if (!countsError && counts?.[0]) {
+        fetchUps = counts[0].ups;
+        fetchDowns = counts[0].downs;
+      }
+
+      let userVoteObj = null;
+      if (user) {
+        const { data: uv } = await supabase.from('votes').select('vote').eq('listing_id', listing.id).eq('user_id', user.id).maybeSingle();
+        if (uv) userVoteObj = uv.vote as 'up' | 'down';
+      }
+
+      return { ups: fetchUps, downs: fetchDowns, userVote: userVoteObj };
+    },
+    enabled: !!listing?.id,
+  });
+
+  const { data: comments = [], refetch: refetchComments } = useQuery({
+    queryKey: ['comments', listing?.id],
+    queryFn: async () => {
+      if (!listing?.id) return [];
+      const { data, error } = await supabase
+        .from('comments')
+        .select('id, text, created_at, user_id, profiles(full_name, avatar_url, phone)')
+        .eq('listing_id', listing.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!listing?.id,
+  });
+
   const [newComment, setNewComment] = useState('');
-  
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const voteMutation = useMutation({
+    mutationFn: async (type: 'up' | 'down') => {
+      if (!listing?.id || !user) return;
+      const currentVote = voteData?.userVote;
+      if (currentVote === type) {
+        // remove vote
+        await supabase.from('votes').delete().eq('listing_id', listing.id).eq('user_id', user.id);
+      } else {
+        // upsert vote
+        // Note: UPSERT logic requires either separate update/insert or a unique constraint trigger.
+        // We know we have a unique constraint on (user_id, listing_id).
+        await supabase.from('votes').upsert({ user_id: user.id, listing_id: listing.id, vote: type }, { onConflict: 'user_id,listing_id' });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['votes', listing?.id] });
+    }
+  });
 
   const handleVote = (type: 'up' | 'down') => {
     if (!user) {
       setShowAuthModal(true);
       return;
     }
-    
-    if (userVote === type) {
-      setUserVote(null);
-      if (type === 'up') setLikes(prev => prev - 1);
-      else setDislikes(prev => prev - 1);
-    } else {
-      if (userVote === 'up') setLikes(prev => prev - 1);
-      if (userVote === 'down') setDislikes(prev => prev - 1);
-      
-      setUserVote(type);
-      if (type === 'up') setLikes(prev => prev + 1);
-      else setDislikes(prev => prev + 1);
-    }
+    voteMutation.mutate(type);
   };
 
-  const handleAddComment = () => {
+  const submitComment = async () => {
     if (!user) {
       setShowAuthModal(true);
       return;
     }
-    if (!newComment.trim()) return;
-    setComments([
-      {
-        id: Date.now().toString(),
-        user: user?.email ? user.email.split('@')[0] : 'Guest User',
-        email: user?.email || '',
-        text: newComment.trim(),
-        time: 'Just now'
-      },
-      ...comments
-    ]);
+    if (!newComment.trim() || !listing?.id) return;
+    
+    await supabase.from('comments').insert({
+      listing_id: listing.id,
+      user_id: user.id,
+      text: newComment.trim()
+    });
     setNewComment('');
+    refetchComments();
   };
 
-  const handleDeleteComment = (commentId: string) => {
-    setComments(comments.filter(c => c.id !== commentId));
-  };
+  const deleteCommentMutation = useMutation({
+    mutationFn: async (commentId: string) => {
+      await supabase.from('comments').delete().eq('id', commentId).eq('user_id', user?.id || '');
+    },
+    onSuccess: () => refetchComments()
+  });
 
-  // Check if current logged-in user owns this listing
-  const isOwner = user?.email && listing?.user_id && user.email === listing.user_id;
+  const isOwner = user?.id && listing?.user_id && user.id === listing.user_id;
+
+  if (loadingListing) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 pt-20 text-center">
+        <p className="text-muted-foreground animate-pulse">Loading listing...</p>
+      </div>
+    );
+  }
 
   if (!listing) {
     return (
@@ -317,21 +369,21 @@ const ListingDetail = () => {
             <button 
               onClick={() => handleVote('up')}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                userVote === 'up' ? 'bg-primary text-primary-foreground' : 'hover:bg-background text-muted-foreground'
+                voteData?.userVote === 'up' ? 'bg-primary text-primary-foreground' : 'hover:bg-background text-muted-foreground'
               }`}
             >
-              <ThumbsUp className={`w-4 h-4 ${userVote === 'up' ? 'fill-current' : ''}`} />
-              {likes}
+              <ThumbsUp className={`w-4 h-4 ${voteData?.userVote === 'up' ? 'fill-current' : ''}`} />
+              {voteData?.ups || 0}
             </button>
             <div className="w-px h-4 bg-border"></div>
             <button 
               onClick={() => handleVote('down')}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                userVote === 'down' ? 'bg-destructive/10 text-destructive' : 'hover:bg-background text-muted-foreground'
+                voteData?.userVote === 'down' ? 'bg-destructive/10 text-destructive' : 'hover:bg-background text-muted-foreground'
               }`}
             >
-              <ThumbsDown className={`w-4 h-4 ${userVote === 'down' ? 'fill-current' : ''}`} />
-              {dislikes}
+              <ThumbsDown className={`w-4 h-4 ${voteData?.userVote === 'down' ? 'fill-current' : ''}`} />
+              {voteData?.downs || 0}
             </button>
           </div>
         </div>
@@ -348,12 +400,12 @@ const ListingDetail = () => {
               type="text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
+              onKeyDown={(e) => e.key === 'Enter' && submitComment()}
               placeholder="Add a public comment..."
               className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
             <button
-              onClick={handleAddComment}
+              onClick={submitComment}
               disabled={!newComment.trim()}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/10 rounded-lg transition-colors"
             >
@@ -364,23 +416,27 @@ const ListingDetail = () => {
 
         {/* Comments List */}
         <div className="space-y-6">
-          {comments.map((comment) => (
+          {comments.map((comment: any) => (
             <div key={comment.id} className="flex gap-3 group">
-              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
-                <span className="text-secondary font-semibold text-sm">
-                  {comment.user[0].toUpperCase()}
-                </span>
+              <div className="w-10 h-10 rounded-full bg-secondary/10 overflow-hidden flex items-center justify-center shrink-0">
+                 {comment.profiles?.avatar_url ? (
+                  <img src={comment.profiles.avatar_url} className="w-full h-full object-cover" />
+                 ): (
+                  <span className="text-secondary font-semibold text-sm">
+                    {comment.profiles?.full_name ? comment.profiles.full_name[0].toUpperCase() : 'U'}
+                  </span>
+                 )}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-sm text-foreground">{comment.user}</span>
-                  <span className="text-xs text-muted-foreground">{comment.time}</span>
+                  <span className="font-semibold text-sm text-foreground">{comment.profiles?.full_name || 'User'}</span>
+                  <span className="text-xs text-muted-foreground">{new Date(comment.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                 </div>
                 <p className="text-sm text-foreground/90">{comment.text}</p>
               </div>
-              {comment.email === user?.email && (
+              {comment.user_id === user?.id && (
                 <button
-                  onClick={() => handleDeleteComment(comment.id)}
+                  onClick={() => deleteCommentMutation.mutate(comment.id)}
                   className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-destructive transition-all"
                   title="Delete comment"
                 >

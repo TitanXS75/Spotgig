@@ -9,6 +9,8 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '@/store/app-store';
 import { DEFAULT_LAT, DEFAULT_LNG, getDistance } from '@/lib/distance';
+import { getListings, getListingsNearby } from '@/lib/api/listings';
+import { useQuery } from '@tanstack/react-query';
 
 // Fix Leaflet default marker icons under Vite bundling.
 // (Without this, markers often render as missing images.)
@@ -45,12 +47,22 @@ const MapPage = () => {
     distanceFilter,
     sortBy,
     setUserLocation,
-    userListings,
   } = useAppStore();
+
+  const { data: fetchedListings = [], isLoading: isFetching } = useQuery({
+    queryKey: ['listings', hasLocation, userLat, userLng],
+    queryFn: () => {
+      if (hasLocation) {
+        return getListingsNearby(userLat, userLng, 50); // 50km radius map load
+      }
+      return getListings({ limit: 100 });
+    },
+    staleTime: 60000,
+  });
 
   const center = useMemo<[number, number]>(() => {
     if (focusListingId) {
-      const focusListing = userListings.find(l => l.id === focusListingId);
+      const focusListing = fetchedListings.find(l => l.id === focusListingId);
       if (focusListing && !focusListing.hide_location && Number.isFinite(focusListing.lat) && Number.isFinite(focusListing.lng)) {
         return [focusListing.lat, focusListing.lng];
       }
@@ -58,10 +70,10 @@ const MapPage = () => {
     if (hasLocation && Number.isFinite(userLat) && Number.isFinite(userLng)) return [userLat, userLng];
     // Default to Center of India
     return [20.5937, 78.9629];
-  }, [userLat, userLng, hasLocation, focusListingId, userListings]);
+  }, [userLat, userLng, hasLocation, focusListingId, fetchedListings]);
 
   const listingsForMap = useMemo(() => {
-    let items = userListings.filter((l) => l.status === 'live' && !l.hide_location);
+    let items = fetchedListings.filter((l) => l.status === 'live' && !l.hide_location);
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -86,16 +98,20 @@ const MapPage = () => {
     }
 
     if (sortBy === 'distance') {
-      items = items
-        .map((l) => ({ listing: l, distance: getDistance(center[0], center[1], l.lat, l.lng) }))
-        .sort((a, b) => a.distance - b.distance)
-        .map((x) => x.listing);
+      if (hasLocation) {
+        items = [...items].sort((a: any, b: any) => (a.distance_km ?? 0) - (b.distance_km ?? 0));
+      } else {
+        items = items
+          .map((l) => ({ listing: l, distance: getDistance(center[0], center[1], l.lat, l.lng) }))
+          .sort((a, b) => a.distance - b.distance)
+          .map((x) => x.listing);
+      }
     } else {
       items = [...items].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
 
     return items;
-  }, [center, distanceFilter, searchQuery, selectedCategory, sortBy, typeFilter]);
+  }, [center, distanceFilter, searchQuery, selectedCategory, sortBy, typeFilter, fetchedListings, hasLocation]);
 
   const requestLocation = () => {
     if (!navigator.geolocation) return;

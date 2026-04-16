@@ -8,7 +8,11 @@ import { useAppStore } from '@/store/app-store';
 import { reverseGeocode } from '@/lib/api/location';
 import { EyeToggleIcon } from '@/components/ui/animated-state-icons';
 import { generateUniqueSlug } from '@/lib/utils';
-
+import { createListing, getMyListings } from '@/lib/api/listings';
+import { useMultiImageUpload } from '@/hooks/use-cloudinary-upload';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
+import { useQuery } from '@tanstack/react-query';
 const STEPS = ['Listing Details', 'Contact & Location', 'Review & Pay'];
 
 const SERVICE_TYPES = ['Software', 'Consulting', 'Design', 'Marketing', 'Writing', 'Teaching', 'Photography', 'Editing', 'Fitness Coaching', 'Music Lessons', 'Home Cleaning', 'Maintenance', 'Beauty', 'Healthcare', 'Other'];
@@ -17,8 +21,16 @@ const EMOJI_OPTIONS = ['🍱', '🎨', '👗', '📱', '📐', '💄', '🔧', '
 
 const SellerOnboarding = () => {
   const navigate = useNavigate();
-  const { user, setUserLocation, addListing, userListings } = useAppStore();
+  const { user, setUserLocation } = useAppStore();
+  const { toast } = useToast();
   const [step, setStep] = useState(0);
+  
+  const { data: userListings = [] } = useQuery({
+    queryKey: ['listings', 'me'],
+    queryFn: getMyListings,
+    enabled: !!user,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Redirect to auth if not logged in
   if (!user) {
@@ -37,9 +49,9 @@ const SellerOnboarding = () => {
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [supportiveImages, setSupportiveImages] = useState<string[]>([]);
   const [emoji, setEmoji] = useState('🏠');
+
+  const { slots, uploading, errors: uploadErrors, uploadSlot, clearSlot } = useMultiImageUpload();
 
   // Step 2
   const [whatsapp, setWhatsapp] = useState('');
@@ -122,92 +134,152 @@ const SellerOnboarding = () => {
     }
   };
 
-  const handleStartFreeTrial = () => {
-    // Calculate free trial expiry date (7 days from now)
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 7);
+  const handleStartFreeTrial = async () => {
+    setIsSubmitting(true);
+    try {
+      // Calculate free trial expiry date (20 days from now)
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 20);
 
-    // Generate unique slug
-    const existingSlugs = userListings.map(l => l.slug || '');
-    const slug = generateUniqueSlug(listingName, existingSlugs);
+      // Generate unique slug
+      const existingSlugs = userListings.map(l => l.slug || '');
+      const slug = generateUniqueSlug(listingName, existingSlugs);
 
-    // Register business with free trial
-    const newListing = {
-      id: Math.random().toString(36).substring(7),
-      slug: slug,
-      user_id: user?.email || 'u99',
-      name: listingName,
-      seller_name: user?.name || 'Local Seller',
-      type: type,
-      operating_type: operatingType,
-      category: type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType),
-      description: description,
-      tags: tags,
-      whatsapp: whatsapp || null,
-      instagram: instagram || null,
-      other_handle: otherHandle || null,
-      area: area,
-      lat: listingLat || 0,
-      lng: listingLng || 0,
-      emoji: emoji,
-      image_url: imageUrl || null,
-      supportive_images: supportiveImages,
-      website: website || null,
-      hide_location: hideLocation,
-      status: 'live' as const,
-      created_at: new Date().toISOString(),
-      plan_expires_at: expiryDate.toISOString(),
-      plan: 'free_trial',
-      views: 0,
-    };
-    
-    addListing(newListing);
-    setUsedFreeTrial(true);
-    navigate('/profile');
+      let supportiveUrls = [slots.gallery_0, slots.gallery_1, slots.gallery_2].filter(Boolean) as string[];
+
+      // Register business with free trial
+      await createListing({
+        slug: slug,
+        name: listingName,
+        seller_name: user?.name || 'Local Seller',
+        type: type,
+        operating_type: operatingType,
+        category: type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType),
+        description: description,
+        tags: tags,
+        whatsapp: whatsapp || null,
+        instagram: instagram || null,
+        other_handle: otherHandle || null,
+        area: area,
+        lat: listingLat || 0,
+        lng: listingLng || 0,
+        hide_location: hideLocation,
+        emoji: emoji,
+        image_url: slots.logo || null,
+        supportive_images: supportiveUrls.length > 0 ? supportiveUrls : null,
+        website: website || null,
+        price: null,
+        price_unit: null,
+        status: 'live',
+        plan: 'free_trial',
+        plan_expires_at: expiryDate.toISOString(),
+      });
+      
+      setUsedFreeTrial(true);
+      toast({ title: 'Success!', description: 'Your business is now live on Aaspass.' });
+      navigate('/profile');
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to create listing.', variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handlePayAndGoLive = () => {
-    // Calculate subscription expiry date based on selected plan
-    const expiryDate = new Date();
-    const daysToAdd = selectedPlan === 'yearly' ? 365 : 30;
-    expiryDate.setDate(expiryDate.getDate() + daysToAdd);
+  const handlePayAndGoLive = async () => {
+    setIsSubmitting(true);
+    try {
+      // Calculate subscription expiry date based on selected plan from the exact moment of payment
+      const expiryDate = new Date();
+      const daysToAdd = selectedPlan === 'yearly' ? 365 : 30;
+      expiryDate.setDate(expiryDate.getDate() + daysToAdd);
 
-    // Generate unique slug
-    const existingSlugs = userListings.map(l => l.slug || '');
-    const slug = generateUniqueSlug(listingName, existingSlugs);
+      // Generate unique slug
+      const existingSlugs = userListings.map(l => l.slug || '');
+      const slug = generateUniqueSlug(listingName, existingSlugs);
 
-    // Register business
-    const newListing = {
-      id: Math.random().toString(36).substring(7),
-      slug: slug,
-      user_id: user?.email || 'u99',
-      name: listingName,
-      seller_name: user?.name || 'Local Seller',
-      type: type,
-      operating_type: operatingType,
-      category: type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType),
-      description: description,
-      tags: tags,
-      whatsapp: whatsapp || null,
-      instagram: instagram || null,
-      other_handle: otherHandle || null,
-      area: area,
-      lat: listingLat || 0,
-      lng: listingLng || 0,
-      emoji: emoji,
-      image_url: imageUrl || null,
-      supportive_images: supportiveImages,
-      website: website || null,
-      hide_location: hideLocation,
-      status: 'live' as const,
-      created_at: new Date().toISOString(),
-      plan_expires_at: expiryDate.toISOString(),
-      plan: selectedPlan as 'monthly' | 'yearly',
-      views: 0,
-    };
-    
-    addListing(newListing);
-    navigate('/profile');
+      let supportiveUrls = [slots.gallery_0, slots.gallery_1, slots.gallery_2].filter(Boolean) as string[];
+
+      // Register business initially as pending
+      const createdListing = await createListing({
+        slug: slug,
+        name: listingName,
+        seller_name: user?.name || 'Local Seller',
+        type: type,
+        operating_type: operatingType,
+        category: type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType),
+        description: description,
+        tags: tags,
+        whatsapp: whatsapp || null,
+        instagram: instagram || null,
+        other_handle: otherHandle || null,
+        area: area,
+        lat: listingLat || 0,
+        lng: listingLng || 0,
+        hide_location: hideLocation,
+        emoji: emoji,
+        image_url: slots.logo || null,
+        supportive_images: supportiveUrls.length > 0 ? supportiveUrls : null,
+        website: website || null,
+        price: null,
+        price_unit: null,
+        status: 'pending', // Pending real payment
+        plan: selectedPlan as 'monthly' | 'yearly',
+        plan_expires_at: expiryDate.toISOString(),
+      });
+      
+      const { data, error: funcError } = await supabase.functions.invoke('create-razorpay-order', {
+        body: { amount: selectedPlan === 'yearly' ? 1200 : 100 }
+      });
+      if (funcError) throw funcError;
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || '', // Needs to be generated and set in .env
+        amount: data.amount,
+        currency: data.currency,
+        name: "Aaspass",
+        description: "Business Listing Subscription",
+        order_id: data.id,
+        handler: async function (response: any) {
+          setIsSubmitting(true);
+          const { error: verifyError } = await supabase.functions.invoke('verify-razorpay-payment', {
+            body: { 
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              listing_id: createdListing.id
+            }
+          });
+          
+          setIsSubmitting(false);
+          
+          if (verifyError) {
+             toast({ title: 'Payment check failed', description: 'Please contact support.', variant: 'destructive' });
+          } else {
+             toast({ title: 'Success!', description: 'Your business is now live on Aaspass.' });
+             navigate('/profile');
+          }
+        },
+        prefill: {
+          name: user?.name || "Local Seller",
+          email: user?.email || "",
+          contact: whatsapp || ""
+        },
+        theme: {
+          color: "#0F52BA"
+        }
+      };
+
+      const rzp1 = new (window as any).Razorpay(options);
+      rzp1.on('payment.failed', function (response: any) {
+         toast({ title: 'Payment Failed', description: response.error.description, variant: 'destructive' });
+         setIsSubmitting(false);
+      });
+      rzp1.open();
+
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to initialize payment.', variant: 'destructive' });
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -345,37 +417,38 @@ const SellerOnboarding = () => {
             <div>
               <label className="text-sm font-medium text-foreground">Add Logo</label>
               <div className="mt-2 w-full">
-                {imageUrl ? (
+                {slots.logo ? (
                   <div className="flex flex-col gap-3 w-full">
                     <div className="relative w-full h-40 rounded-xl overflow-hidden border border-border">
-                      <img src={imageUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+                      <img src={slots.logo} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
                     </div>
                     <div className="flex items-center justify-end gap-3 mt-1">
-                      <label className="cursor-pointer px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-foreground text-xs font-semibold transition-colors">
-                        Replace
-                        <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) setImageUrl(URL.createObjectURL(file));
-                        }} />
-                      </label>
-                      <button type="button" onClick={(e) => { e.preventDefault(); setImageUrl(''); }} className="px-4 py-2 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-lg text-xs font-semibold transition-colors">
+                      <button type="button" onClick={() => clearSlot('logo')} className="px-4 py-2 border border-destructive/30 text-destructive hover:bg-destructive/10 rounded-lg text-xs font-semibold transition-colors">
                         Remove
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <UploadCloud className="w-8 h-8 text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
-                      <p className="text-[10px] text-muted-foreground mt-1">Upload your logo, product image etc.</p>
-                    </div>
-                    <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20 relative">
+                    {uploading.logo ? (
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <span className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-2" />
+                        <p className="text-sm text-muted-foreground">Uploading...</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <UploadCloud className="w-8 h-8 text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground"><span className="font-semibold text-primary">Click to upload</span> or drag and drop</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">Upload your logo, product image etc.</p>
+                      </div>
+                    )}
+                    <input type="file" className="hidden" accept="image/*" disabled={uploading.logo} onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) setImageUrl(URL.createObjectURL(file));
+                      if (file) uploadSlot(file, 'logo');
                     }} />
                   </label>
                 )}
+                {uploadErrors.logo && <p className="text-xs text-destructive mt-1">{uploadErrors.logo}</p>}
               </div>
             </div>
 
@@ -383,29 +456,32 @@ const SellerOnboarding = () => {
               <label className="text-sm font-medium text-foreground">Supportive Images (Max 3)</label>
               <div className="mt-2 grid grid-cols-3 gap-2 w-full">
                 {[0, 1, 2].map(idx => {
-                  const src = supportiveImages[idx];
+                  const slotName = `gallery_${idx}` as const;
+                  const src = slots[slotName];
+                  const isUploading = uploading[slotName];
+                  
                   return src ? (
                     <div key={idx} className="relative w-full aspect-square rounded-xl overflow-hidden border border-border">
-                      <img src={src} alt={`Supportive ${idx}`} className="absolute inset-0 w-full h-full object-cover" />
-                      <button type="button" onClick={() => {
-                        const newImgs = [...supportiveImages];
-                        newImgs.splice(idx, 1);
-                        setSupportiveImages(newImgs);
-                      }} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 hover:bg-black/70">
+                      <img src={src} alt="Supportive" className="absolute inset-0 w-full h-full object-cover" />
+                      <button type="button" onClick={() => clearSlot(slotName)} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 hover:bg-black/70">
                         <X className="w-3 h-3" />
                       </button>
                     </div>
                   ) : (
-                    <label key={idx} className="flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20">
-                      <div className="flex flex-col items-center justify-center text-center p-1">
-                        <UploadCloud className="w-5 h-5 text-muted-foreground mb-1" />
-                        <span className="text-[10px] font-semibold text-primary">Add</span>
-                      </div>
-                      <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                    <label key={idx} className="flex flex-col items-center justify-center w-full aspect-square border-2 border-dashed border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20 relative">
+                      {isUploading ? (
+                        <div className="flex flex-col items-center justify-center text-center p-1">
+                          <span className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-1" />
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-center p-1">
+                          <UploadCloud className="w-5 h-5 text-muted-foreground mb-1" />
+                          <span className="text-[10px] font-semibold text-primary">Add</span>
+                        </div>
+                      )}
+                      <input type="file" className="hidden" accept="image/*" disabled={isUploading} onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file) {
-                          setSupportiveImages([...supportiveImages, URL.createObjectURL(file)]);
-                        }
+                        if (file) uploadSlot(file, slotName);
                       }} />
                     </label>
                   );
@@ -576,7 +652,7 @@ const SellerOnboarding = () => {
             {/* Preview card */}
             <div className="bg-card rounded-2xl shadow-card overflow-hidden">
               <div className="h-28 flex items-center justify-center bg-primary/10 overflow-hidden relative">
-                {imageUrl ? <img src={imageUrl} className="absolute inset-0 w-full h-full object-cover" alt="Banner" /> : <span className="text-5xl">{emoji}</span>}
+                {slots.logo ? <img src={slots.logo} className="absolute inset-0 w-full h-full object-cover" alt="Banner" /> : <span className="text-5xl">{emoji}</span>}
               </div>
               <div className="p-3">
                 <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${type === 'product' ? 'bg-accent text-accent-foreground' : 'bg-secondary text-secondary-foreground'}`}>
@@ -605,9 +681,9 @@ const SellerOnboarding = () => {
             <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl p-5 border border-primary/20">
               <div className="flex items-center justify-between mb-1">
                 <h3 className="font-bold text-foreground text-lg">Go Live on Aaspass</h3>
-                <span className="text-xs font-semibold text-primary bg-primary/20 px-3 py-1 rounded-full">7-Day Trial</span>
+                <span className="text-xs font-semibold text-primary bg-primary/20 px-3 py-1 rounded-full">20-Day Free Trial</span>
               </div>
-              <p className="text-xs text-muted-foreground mb-4">Your subscription will automatically expire after 7 days. Renew anytime to keep your listing active.</p>
+              <p className="text-xs text-muted-foreground mb-4">Your free trial will automatically expire after 20 days. Pay to list or renew anytime to keep your listing active.</p>
               
               <div className="grid grid-cols-2 gap-3 mb-4">
                 {/* Monthly Plan */}
@@ -678,22 +754,23 @@ const SellerOnboarding = () => {
                 {!usedFreeTrial ? (
                   <motion.button 
                     whileTap={{ scale: 0.96 }} 
+                    disabled={isSubmitting}
                     onClick={handleStartFreeTrial}
-                    className="col-span-1 py-3 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/30"
+                    className="col-span-1 py-3 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/30 disabled:opacity-50"
                   >
-                  Start Free Trial
+                  {isSubmitting ? <span className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" /> : 'Start Free Trial'}
                   </motion.button>
                 ) : null}
                 
                 <motion.button 
                   whileTap={{ scale: 0.96 }} 
-                  disabled={!selectedPlan}
+                  disabled={!selectedPlan || isSubmitting}
                   onClick={handlePayAndGoLive}
                   className={`col-span-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary/30 ${
                     usedFreeTrial ? '' : 'opacity-50'
                   }`}
                 >
-                  <CreditCard className="w-4 h-4" /> Pay
+                  {isSubmitting ? <span className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" /> : <><CreditCard className="w-4 h-4" /> Pay</>}
                 </motion.button>
               </div>
             </div>

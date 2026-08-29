@@ -72,7 +72,7 @@ cd Aaspass
 npm install
 ```
 
-### 3. Environment Variables
+### 3. Set Environment Variables
 Copy `.env.example` to `.env.local` and set your credentials:
 ```env
 VITE_SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co

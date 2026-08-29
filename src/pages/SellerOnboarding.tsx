@@ -13,9 +13,9 @@ import { useMultiImageUpload } from '@/hooks/use-cloudinary-upload';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
-const STEPS = ['Listing Details', 'Contact & Location', 'Review & Pay'];
+const STEPS = ['Profile Details', 'Contact & Location', 'Review & Go Live'];
 
-const SERVICE_TYPES = ['Software', 'Consulting', 'Design', 'Marketing', 'Writing', 'Teaching', 'Photography', 'Editing', 'Fitness Coaching', 'Music Lessons', 'Home Cleaning', 'Maintenance', 'Beauty', 'Healthcare', 'Other'];
+const SERVICE_TYPES = ['Web Development', 'App Development', 'UI/UX Design', 'AI / ML', 'Digital Marketing', 'Content Writing', 'Data Analysis', 'Video Editing', 'Graphic Design', 'Cybersecurity', 'QA / Testing', 'IT Support', 'Tutoring / Mentoring', 'Other'];
 
 const EMOJI_OPTIONS = ['🍱', '🎨', '👗', '📱', '📐', '💄', '🔧', '📷', '🧘', '✨', '🏠', '🎂', '🧵', '🌿', '🍳', '📦', '🎁', '🪴', '🧁', '🖼️', '🧴', '🪡', '🎶', '🛠️'];
 
@@ -40,8 +40,8 @@ const SellerOnboarding = () => {
 
   // Step 1
   const [listingName, setListingName] = useState('');
-  const [type, setType] = useState<'product' | 'service'>('product');
-  const [operatingType, setOperatingType] = useState<'shop' | 'home'>('shop');
+  const [type, setType] = useState<'project' | 'freelancer'>('freelancer');
+  const [operatingType, setOperatingType] = useState<'solo' | 'team'>('solo');
   const [category, setCategory] = useState('');
   const [categorySpecification, setCategorySpecification] = useState(''); // For "Other" category
   const [serviceType, setServiceType] = useState(''); // For services
@@ -56,6 +56,7 @@ const SellerOnboarding = () => {
   // Step 2
   const [whatsapp, setWhatsapp] = useState('');
   const [instagram, setInstagram] = useState('');
+  const [linkedin, setLinkedin] = useState('');
   const [website, setWebsite] = useState('');
   const [otherHandle, setOtherHandle] = useState('');
   const [area, setArea] = useState('');
@@ -88,11 +89,11 @@ const SellerOnboarding = () => {
   };
 
   const step1Valid = listingName && 
-    (type === 'product' 
+    (type === 'project' 
       ? (category && (category !== 'Other' || categorySpecification.trim()))
       : (serviceType && (serviceType !== 'Other' || serviceSpecification.trim()))) && 
     description.length > 0;
-  const step2Valid = area && (whatsapp.length === 10 || instagram.length > 0 || otherHandle.trim().length > 0);
+  const step2Valid = area && (whatsapp.length === 10 || linkedin.length > 0 || instagram.length > 0 || otherHandle.trim().length > 0);
 
   const detectListingLocation = async () => {
     if (!navigator.geolocation) return;
@@ -151,14 +152,15 @@ const SellerOnboarding = () => {
       await createListing({
         slug: slug,
         name: listingName,
-        seller_name: user?.name || 'Local Seller',
+        seller_name: user?.name || 'Freelancer',
         type: type,
         operating_type: operatingType,
-        category: type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType),
+        category: type === 'project' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType),
         description: description,
         tags: tags,
         whatsapp: whatsapp || null,
         instagram: instagram || null,
+        linkedin: linkedin || null,
         other_handle: otherHandle || null,
         area: area,
         lat: listingLat || 0,
@@ -176,7 +178,7 @@ const SellerOnboarding = () => {
       });
       
       setUsedFreeTrial(true);
-      toast({ title: 'Success!', description: 'Your business is now live on Aaspass.' });
+      toast({ title: 'Success!', description: 'Your profile is now live on Aaspass.' });
       navigate('/profile');
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Failed to create listing.', variant: 'destructive' });
@@ -517,6 +519,15 @@ const SellerOnboarding = () => {
             </div>
 
             <div>
+              <label className="text-sm font-medium text-foreground flex items-center gap-1.5"><Globe className="w-4 h-4 text-blue-600" /> LinkedIn Profile</label>
+              <div className="flex gap-2 mt-1">
+                <span className="px-3 py-2.5 rounded-xl bg-muted text-sm text-muted-foreground whitespace-nowrap">linkedin.com/in/</span>
+                <input value={linkedin} onChange={(e) => setLinkedin(e.target.value.replace(/\s/g, ''))} placeholder="yourprofile" className="flex-1 px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <span className="text-[11px] text-muted-foreground">Recommended for freelancers — builds client trust</span>
+            </div>
+
+            <div>
               <label className="text-sm font-medium text-foreground flex items-center gap-1.5"><Globe className="w-4 h-4" /> Website</label>
               <div className="flex gap-2 mt-1">
                 <span className="px-3 py-2.5 rounded-xl bg-muted text-sm text-muted-foreground">https://</span>
@@ -532,7 +543,7 @@ const SellerOnboarding = () => {
                 placeholder="e.g. Facebook: mypage, Website: example.com"
                 className="mt-1 w-full px-3 py-2.5 rounded-xl bg-muted text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
-              <span className="text-[11px] text-muted-foreground">Any handle/link buyers can use to reach you.</span>
+              <span className="text-[11px] text-muted-foreground">Any other link clients/freelancers can use to reach you (e.g. GitHub, Behance, Portfolio).</span>
             </div>
 
             <div>

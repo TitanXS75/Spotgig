@@ -42,8 +42,6 @@ const Index = () => {
   });
 
   useEffect(() => {
-    // Get user's real location for distance-based sorting.
-    // We persist the last known location in the store, so this is mostly for first-run / updates.
     navigator.geolocation?.getCurrentPosition(
       (pos) => setUserLocation(pos.coords.latitude, pos.coords.longitude),
       () => { },
@@ -82,7 +80,6 @@ const Index = () => {
         });
       }
 
-      // If they already have distance_km from the RPC, use it, else calculate client side
       items.sort(
         (a: any, b: any) =>
           (a.distance_km ?? 0) - (b.distance_km ?? 0)
@@ -101,15 +98,15 @@ const Index = () => {
         className="pt-6 pb-5"
       >
         <h1 className="text-display text-foreground md:text-5xl">
-          Find Home sellers near you.
+          Find Freelancers near you.
         </h1>
         <p className="text-sm md:text-base text-muted-foreground mt-2">
-          Discover local products &amp; services within walking distance.
+          Discover skilled students &amp; professionals for your project — within walking distance.
         </p>
         {!hasLocation && (
           <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-            Enable location for accuracy
+            Enable location for nearby discovery
           </p>
         )}
       </motion.div>
@@ -151,9 +148,9 @@ const Index = () => {
             className="flex flex-col items-center py-16 text-center"
           >
             <PackageOpen className="w-12 h-12 text-muted-foreground/40 mb-3" />
-            <p className="font-medium text-foreground">No sellers listed currently</p>
+            <p className="font-medium text-foreground">No listings yet in this area</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Be the one to register and start in your local area
+              Be the first to register your skills or post a project nearby!
             </p>
           </motion.div>
         ) : (
@@ -175,7 +172,7 @@ const Index = () => {
           </AnimatePresence>
         )}
 
-        {/* Seller CTA — shown below results */}
+        {/* CTA below results */}
         {!loading && !isFetching && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}

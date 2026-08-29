@@ -3,8 +3,8 @@ import { useAppStore } from '@/store/app-store';
 
 const OPTIONS = [
   { value: 'all' as const, label: 'All' },
-  { value: 'home' as const, label: 'Home' },
-  { value: 'shop' as const, label: 'Shop' },
+  { value: 'solo' as const, label: 'Solo' },
+  { value: 'team' as const, label: 'Team' },
 ];
 
 const OperationToggle = () => {

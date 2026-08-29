@@ -1,0 +1,35 @@
+name: 🚀 Feature Request
+description: Propose a new feature or improvement for Aaspass.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting improvements to make Aaspass better for students and local businesses!
+  - type: input
+    id: title
+    attributes:
+      label: Feature Title
+      description: A concise title for this feature.
+      placeholder: e.g. Add in-app direct messaging between client and freelancer
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement / User Need
+      description: What problem does this solve? Who is this for (Student Freelancer or Client)?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution & User Flow
+      description: How should this feature work in practice?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you've considered.

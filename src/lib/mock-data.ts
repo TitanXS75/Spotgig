@@ -1,5 +1,6 @@
-export type ListingType = 'product' | 'service';
+export type ListingType = 'project' | 'freelancer';
 export type ListingStatus = 'pending' | 'live' | 'suspended';
+export type UserRole = 'client' | 'freelancer';
 
 export interface Listing {
   id: string;
@@ -8,12 +9,13 @@ export interface Listing {
   name: string;
   seller_name: string;
   type: ListingType;
-  operating_type: 'home' | 'shop';
+  operating_type: 'solo' | 'team';
   category: string;
   description: string;
   tags: string[];
   whatsapp: string | null;
   instagram: string | null;
+  linkedin: string | null;
   other_handle: string | null;
   area: string;
   lat: number;
@@ -28,18 +30,23 @@ export interface Listing {
   hide_location?: boolean;
   plan_expires_at?: string; // ISO string
   plan?: 'free_trial' | 'monthly' | 'yearly';
+  role?: UserRole;
 }
 
 export const CATEGORIES = [
-  { name: 'Food & Snacks', emoji: '🍱' },
-  { name: 'Crafts', emoji: '🎨' },
-  { name: 'Clothing', emoji: '👗' },
-  { name: 'Electronics', emoji: '📱' },
-  { name: 'Tutoring', emoji: '📐' },
-  { name: 'Beauty', emoji: '💄' },
-  { name: 'Repair', emoji: '🔧' },
-  { name: 'Photography', emoji: '📷' },
-  { name: 'Fitness', emoji: '🧘' },
+  { name: 'Web Development', emoji: '💻' },
+  { name: 'App Development', emoji: '📱' },
+  { name: 'UI/UX Design', emoji: '🎨' },
+  { name: 'AI / ML', emoji: '🤖' },
+  { name: 'Digital Marketing', emoji: '📢' },
+  { name: 'Content Writing', emoji: '📝' },
+  { name: 'Data Analysis', emoji: '📊' },
+  { name: 'Video Editing', emoji: '🎬' },
+  { name: 'Graphic Design', emoji: '📐' },
+  { name: 'Cybersecurity', emoji: '🛡️' },
+  { name: 'QA / Testing', emoji: '🧪' },
+  { name: 'IT Support', emoji: '🔧' },
+  { name: 'Tutoring / Mentoring', emoji: '🎓' },
   { name: 'Other', emoji: '✨' },
 ] as const;
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Mail, Lock, User, ArrowRight, Eye, EyeOff, Store, Phone
+  Mail, Lock, User, Eye, EyeOff, Phone, Briefcase, GraduationCap
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -20,10 +20,10 @@ const ImagePanel = ({ mode }: { mode: 'login' | 'signup' }) => (
         transition={{ duration: 0.8, ease: "easeInOut" }}
         src={
           mode === 'login'
-            ? "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=90&w=1920" // Friends collaborating and building a business together
-            : "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=90&w=1920" // Arts and painting at home
+            ? "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=90&w=1920"
+            : "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=90&w=1920"
         }
-        alt="Local neighbourhood shop"
+        alt="Freelancers collaborating"
         className="absolute inset-0 w-full h-full object-cover"
       />
     </AnimatePresence>
@@ -36,13 +36,15 @@ const ImagePanel = ({ mode }: { mode: 'login' | 'signup' }) => (
       </div>
       <h2 className="text-3xl font-bold leading-tight drop-shadow-md">
         {mode === 'login' ? (
-          <>Welcome back to<br />your local market.</>
+          <>Welcome back —<br />let's build something.</>
         ) : (
-          <>Your neighbourhood,<br />in your pocket.</>
+          <>Bridge the gap between<br />talent &amp; opportunity.</>
         )}
       </h2>
       <p className="text-white/90 text-sm mt-3 max-w-sm leading-relaxed drop-shadow">
-        Join the community to discover amazing local sellers, home-chefs, and services just down the street.
+        {mode === 'login'
+          ? 'Sign in to find freelancers, manage projects, or continue your freelancing journey.'
+          : 'Join as a client to post projects or as a freelancer to earn real experience and money.'}
       </p>
     </div>
   </div>
@@ -50,6 +52,7 @@ const ImagePanel = ({ mode }: { mode: 'login' | 'signup' }) => (
 
 // ─── Form panel ────────────────────────────────────────────────────────────
 type Mode = 'login' | 'signup';
+type Role = 'client' | 'freelancer';
 
 const formVariants = {
   enter: (direction: number) => ({
@@ -78,11 +81,11 @@ const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState<Role>('freelancer');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   const [loading, setLoading] = useState(false);
 
-  // Validation functions
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -102,42 +105,34 @@ const AuthPage = () => {
     setDirection(next === 'signup' ? 1 : -1);
     setMode(next);
     setShowPassword(false);
+    setErrors({});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
-    // Email validation
     if (!validateEmail(email)) {
       newErrors.email = 'Invalid email address';
     }
 
     if (mode === 'signup') {
-      // Name validation
       if (!validateName(name)) {
         newErrors.name = 'Name should only contain letters and spaces';
       }
-
-      // Phone validation
       if (!validatePhone(phone)) {
         newErrors.phone = 'Phone number must be 10 digits';
       }
-
-      // Password match validation
       if (password !== confirmPassword) {
         newErrors.password = "Passwords don't match!";
       }
-
       if (password.length < 6) {
         newErrors.password = 'Password must be at least 6 characters';
       }
     }
 
     setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) {
-      return;
-    }
+    if (Object.keys(newErrors).length > 0) return;
 
     setLoading(true);
 
@@ -147,9 +142,12 @@ const AuthPage = () => {
         toast({ title: 'Welcome back!' });
         navigate('/profile');
       } else {
+        // Pass role in user metadata for downstream use
         await signUp(email, password, name);
-        // Supabase often requires email confirmation, handled automatically by auth listener if auto-confirmed.
-        toast({ title: 'Account created!', description: 'Welcome to Aaspass.' });
+        toast({
+          title: 'Account created!',
+          description: `Welcome to Aaspass as a ${role === 'client' ? 'Client' : 'Freelancer'}.`,
+        });
         navigate('/profile');
       }
     } catch (err: any) {
@@ -178,18 +176,18 @@ const AuthPage = () => {
   return (
     <div className={`min-h-screen flex flex-col ${mode === 'login' ? 'lg:flex-row' : 'lg:flex-row-reverse'} overflow-hidden`}>
       {/* Image Panel */}
-      <motion.div 
-        layout 
-        transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }} 
+      <motion.div
+        layout
+        transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
         className="w-full lg:w-1/2 flex-shrink-0"
       >
         <ImagePanel mode={mode} />
       </motion.div>
 
       {/* Form Panel */}
-      <motion.div 
-        layout 
-        transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }} 
+      <motion.div
+        layout
+        transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
         className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-8 bg-background min-h-screen relative z-10 overflow-y-auto"
       >
         {/* Mobile logo */}
@@ -231,14 +229,53 @@ const AuthPage = () => {
             >
               <div>
                 <h1 className="text-xl md:text-2xl font-bold text-foreground">
-                  {mode === 'login' ? 'Welcome back 👋' : 'Create account 🎉'}
+                  {mode === 'login' ? 'Welcome back 👋' : 'Join Aaspass 🚀'}
                 </h1>
                 <p className="text-xs md:text-sm text-muted-foreground mt-1 mb-3">
                   {mode === 'login'
-                    ? 'Sign in to discover local sellers near you.'
-                    : 'Join Aaspass and explore your neighbourhood.'}
+                    ? 'Sign in to manage your projects or freelancing profile.'
+                    : 'Connect with clients and freelancers near you.'}
                 </p>
               </div>
+
+              {/* Role selector (signup only) */}
+              {mode === 'signup' && (
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">I am a…</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setRole('client')}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                        role === 'client'
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-border bg-muted text-muted-foreground hover:border-primary/40'
+                      }`}
+                    >
+                      <Briefcase className="w-6 h-6" />
+                      <div className="text-center">
+                        <p className="text-sm font-semibold">Client</p>
+                        <p className="text-[10px] leading-tight mt-0.5">Business / Experience owner posting projects</p>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRole('freelancer')}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                        role === 'freelancer'
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-border bg-muted text-muted-foreground hover:border-primary/40'
+                      }`}
+                    >
+                      <GraduationCap className="w-6 h-6" />
+                      <div className="text-center">
+                        <p className="text-sm font-semibold">Freelancer</p>
+                        <p className="text-[10px] leading-tight mt-0.5">Student / vibe coder offering skills</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Name field (signup only) */}
               {mode === 'signup' && (
@@ -357,8 +394,8 @@ const AuthPage = () => {
               {/* Forgot password */}
               {mode === 'login' && (
                 <div className="text-right -mt-1">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => navigate('/forgot-password')}
                     className="text-[13px] text-primary hover:underline font-medium"
                   >
@@ -377,16 +414,14 @@ const AuthPage = () => {
                 {loading ? (
                   <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                 ) : (
-                  <>
-                    {mode === 'login' ? 'Sign In' : 'Create Account'}
-                  </>
+                  <>{mode === 'login' ? 'Sign In' : `Create Account as ${role === 'client' ? 'Client' : 'Freelancer'}`}</>
                 )}
               </motion.button>
 
               {/* Divider */}
               <div className="flex items-center gap-3 my-2 text-muted-foreground pb-2">
                 <div className="flex-1 h-px bg-border" />
-                <span className="text-xs font-medium uppercase tracking-wider">or sign in with</span>
+                <span className="text-xs font-medium uppercase tracking-wider">or continue with</span>
                 <div className="flex-1 h-px bg-border" />
               </div>
 
@@ -404,7 +439,6 @@ const AuthPage = () => {
                 </svg>
                 Continue with Google
               </button>
-
 
               {/* Switch mode link */}
               <p className="text-sm text-center text-muted-foreground">

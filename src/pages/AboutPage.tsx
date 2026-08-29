@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Users, Target, Heart, Award } from 'lucide-react';
+import { ArrowLeft, Users, Target, Heart, Award, GraduationCap, Briefcase } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const AboutPage = () => {
@@ -15,7 +15,7 @@ const AboutPage = () => {
           </button>
         </div>
         <h1 className="text-subhead text-foreground">About Us</h1>
-        <p className="text-sm text-muted-foreground mt-1">Our mission to connect local communities</p>
+        <p className="text-sm text-muted-foreground mt-1">Our mission to bridge student talent with real-world opportunities</p>
       </motion.div>
 
       {/* Hero Section */}
@@ -26,10 +26,11 @@ const AboutPage = () => {
         className="text-center py-12"
       >
         <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-          Empowering Local Communities
+          Bridging the Gap Between Talent & Opportunity
         </h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Aaspass is more than just a marketplace – we're building stronger, more connected neighborhoods by bringing local sellers and buyers together.
+          Aaspass is a hyperlocal freelancing platform that connects business owners and project clients with 
+          skilled students and freelancers nearby — for real work, real experience, and real pay.
         </p>
       </motion.div>
 
@@ -45,7 +46,9 @@ const AboutPage = () => {
           <h3 className="text-xl font-bold text-foreground">Our Mission</h3>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          To create a sustainable ecosystem where local businesses thrive, customers find authentic products and services, and communities grow stronger through meaningful connections.
+          To eliminate the "no experience, no job — no job, no experience" paradox for students. We give 
+          students access to real client projects nearby while giving businesses affordable, trustworthy 
+          tech talent. Everyone wins.
         </p>
       </motion.div>
 
@@ -59,31 +62,31 @@ const AboutPage = () => {
         <h3 className="text-2xl font-bold text-foreground mb-6">Our Values</h3>
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-muted/30 rounded-xl p-6">
-            <Heart className="w-8 h-8 text-red-500 mb-3" />
-            <h4 className="font-semibold text-foreground mb-2">Support Local</h4>
+            <GraduationCap className="w-8 h-8 text-purple-500 mb-3" />
+            <h4 className="font-semibold text-foreground mb-2">Student-First</h4>
             <p className="text-sm text-muted-foreground">
-              We believe in the power of local businesses to create vibrant, sustainable communities.
+              We believe students deserve real work opportunities — not just mock projects. Aaspass turns learning into earning.
             </p>
           </div>
           <div className="bg-muted/30 rounded-xl p-6">
-            <Users className="w-8 h-8 text-blue-500 mb-3" />
-            <h4 className="font-semibold text-foreground mb-2">Community First</h4>
+            <Briefcase className="w-8 h-8 text-blue-500 mb-3" />
+            <h4 className="font-semibold text-foreground mb-2">Client Trust</h4>
             <p className="text-sm text-muted-foreground">
-              Every decision we make is centered around building stronger neighborhood connections.
+              Clients know exactly who they're hiring — verified profiles, portfolio links, and local proximity for in-person collaboration.
+            </p>
+          </div>
+          <div className="bg-muted/30 rounded-xl p-6">
+            <Heart className="w-8 h-8 text-red-500 mb-3" />
+            <h4 className="font-semibold text-foreground mb-2">Hyperlocal Impact</h4>
+            <p className="text-sm text-muted-foreground">
+              Keeping freelancing local means stronger collaboration, faster turnarounds, and real community-building.
             </p>
           </div>
           <div className="bg-muted/30 rounded-xl p-6">
             <Award className="w-8 h-8 text-green-500 mb-3" />
-            <h4 className="font-semibold text-foreground mb-2">Quality & Trust</h4>
+            <h4 className="font-semibold text-foreground mb-2">Quality & Growth</h4>
             <p className="text-sm text-muted-foreground">
-              We verify sellers and maintain high standards to ensure safe, reliable transactions.
-            </p>
-          </div>
-          <div className="bg-muted/30 rounded-xl p-6">
-            <Target className="w-8 h-8 text-purple-500 mb-3" />
-            <h4 className="font-semibold text-foreground mb-2">Accessibility</h4>
-            <p className="text-sm text-muted-foreground">
-              Making local commerce accessible to everyone, everywhere in the community.
+              We measure success by the number of students who build portfolios, get hired, or launch their own ventures through Aaspass.
             </p>
           </div>
         </div>
@@ -99,13 +102,19 @@ const AboutPage = () => {
         <h3 className="text-2xl font-bold text-foreground mb-4">Our Story</h3>
         <div className="space-y-4 text-muted-foreground">
           <p>
-            Aaspass began with a simple observation: while digital marketplaces were connecting people globally, they were often disconnecting local communities. We noticed talented home cooks, skilled artisans, and dedicated service providers struggling to reach customers just a few streets away.
+            Aaspass started from a simple observation: talented students struggle to get their first client, 
+            while small businesses struggle to find affordable, reliable tech talent. The mismatch was obvious 
+            — yet no platform was solving it at a hyperlocal level.
           </p>
           <p>
-            Founded in 2024, we started with a mission to bridge this gap. Our platform was designed specifically for hyperlocal discovery – helping you find the best homemade food, skilled services, and unique products within walking distance of your home.
+            We built Aaspass in 2024 with one goal: bridge that gap. Our location-based matching means a 
+            business owner in your city can find a B.Tech student three streets away who can build their 
+            website for a fair price — and that student gets real money and a real portfolio project.
           </p>
           <p>
-            Today, we're proud to serve thousands of sellers and buyers across multiple cities, fostering real connections and supporting local economies. Every transaction on Aaspass represents more than just a purchase – it's a step toward stronger, more resilient communities.
+            Today, Aaspass supports thousands of freelancers and clients across multiple cities. Students work 
+            solo or form teams for bigger projects. Business owners get quality work at fair rates. Communities 
+            get stronger — one project at a time.
           </p>
         </div>
       </motion.div>

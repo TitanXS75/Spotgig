@@ -1,0 +1,56 @@
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior in Aaspass.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue! Please provide as much context as possible.
+  - type: input
+    id: summary
+    attributes:
+      label: Bug Summary
+      description: A clear and concise summary of the issue.
+      placeholder: e.g. Nearby listings fail to load when GPS location is denied
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the behavior.
+      placeholder: |
+        1. Go to '/home'
+        2. Click on 'Filter by Distance'
+        3. Adjust slider to 5km
+        4. See error in console
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior / Screenshots
+      description: What actually happened, including error logs or screenshots.
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Device / Browser Environment
+      multiple: true
+      options:
+        - Chrome / Chromium
+        - Firefox
+        - Safari / iOS Safari
+        - Edge
+        - Android Browser / PWA
+        - Windows
+        - macOS
+        - Linux

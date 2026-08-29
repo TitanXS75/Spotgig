@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Compass } from "lucide-react";
+import { Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const squareData = [
@@ -86,14 +86,20 @@ export const ShuffleHero = ({ onGetStarted, onExploreMarketplace }: ShuffleHeroP
   return (
     <section className="w-full px-6 py-12 md:px-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 items-center gap-8 max-w-6xl mx-auto">
       <div className="space-y-4">
-        <span className="block text-xs md:text-sm text-primary font-medium">Aaspass • Marketplace for local services</span>
-        <h3 className="text-4xl md:text-6xl font-bold text-foreground">Discover and support nearby sellers</h3>
-        <p className="text-base md:text-lg text-muted-foreground">Find local homepreneurs, artisans, and service providers with instant connection, reviews and hyperlocal distance filtering. No middlemen, no commissions.</p>
+        <span className="block text-xs md:text-sm text-primary font-semibold tracking-wide uppercase">
+          Aaspass • Hyperlocal Freelancing Platform
+        </span>
+        <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
+          Find skilled student &amp; pro freelancers near you
+        </h1>
+        <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+          Connect businesses, founders, and project leads with talented students and tech freelancers in your neighborhood. Get your website, app, design, or project built with verified local talent.
+        </p>
         <div className="flex flex-wrap gap-3 pt-2">
           <button
             onClick={onGetStarted}
             className={cn(
-              "inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold py-2.5 px-5 rounded-md",
+              "inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-xl shadow-sm",
               "transition-all duration-200 hover:bg-primary/90 active:scale-95",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             )}
@@ -104,13 +110,13 @@ export const ShuffleHero = ({ onGetStarted, onExploreMarketplace }: ShuffleHeroP
           <button
             onClick={onExploreMarketplace}
             className={cn(
-              "inline-flex items-center gap-2 border border-primary text-primary font-semibold py-2.5 px-5 rounded-md bg-background",
-              "transition-all duration-200 hover:bg-primary/10 active:scale-95",
+              "inline-flex items-center gap-2 border border-border hover:border-primary/40 text-foreground font-semibold py-3 px-6 rounded-xl bg-background",
+              "transition-all duration-200 hover:bg-muted active:scale-95",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             )}
           >
-            Explore Marketplace
-            <Compass className="w-4 h-4" />
+            Explore Platform
+            <Compass className="w-4 h-4 text-primary" />
           </button>
         </div>
       </div>

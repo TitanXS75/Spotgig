@@ -3,8 +3,8 @@ import { useAppStore } from '@/store/app-store';
 
 const OPTIONS = [
   { value: 'all' as const, label: 'All' },
-  { value: 'product' as const, label: 'Products' },
-  { value: 'service' as const, label: 'Services' },
+  { value: 'project' as const, label: 'Projects' },
+  { value: 'freelancer' as const, label: 'Freelancers' },
 ];
 
 const TypeToggle = () => {

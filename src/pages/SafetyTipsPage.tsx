@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Shield, Check, X, AlertTriangle, Phone, MapPin, Users, Lock } from 'lucide-react';
+import { ArrowLeft, Shield, Check, X, AlertTriangle, Phone, Lock, Users, Briefcase } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const SafetyTipsPage = () => {
@@ -30,18 +30,22 @@ const SafetyTipsPage = () => {
           <h2 className="text-xl font-bold text-foreground">Your Safety Matters</h2>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          While Aaspass connects you with local sellers, your safety is paramount. Follow these guidelines to ensure secure and positive experiences.
+          Aaspass connects clients and freelancers nearby. While most interactions are genuine, follow these 
+          guidelines to protect yourself during every engagement.
         </p>
       </motion.div>
 
-      {/* For Buyers */}
+      {/* For Clients */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
         className="mb-8"
       >
-        <h2 className="text-2xl font-bold text-foreground mb-4">For Buyers</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <Briefcase className="w-5 h-5 text-primary" />
+          <h2 className="text-2xl font-bold text-foreground">For Clients</h2>
+        </div>
         <div className="space-y-4">
           <div className="bg-green-50 dark:bg-green-950/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
             <div className="flex items-center gap-3 mb-2">
@@ -49,186 +53,116 @@ const SafetyTipsPage = () => {
               <h3 className="font-semibold text-foreground">Do's</h3>
             </div>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Meet in public places for first transactions</li>
-              <li>• Verify the product/service before payment</li>
-              <li>• Bring a friend for high-value purchases</li>
-              <li>• Keep records of conversations and payments</li>
-              <li>• Trust your instincts - if something feels off, it probably is</li>
+              <li>✅ Verify freelancer's LinkedIn and portfolio before hiring</li>
+              <li>✅ Agree on project scope, timeline, and payment terms in writing</li>
+              <li>✅ Use milestone-based payments for larger projects</li>
+              <li>✅ Meet in public or conduct video calls before sharing sensitive materials</li>
+              <li>✅ Check reviews and ratings from other clients</li>
+              <li>✅ Provide a clear brief to avoid scope disputes</li>
             </ul>
           </div>
-
           <div className="bg-red-50 dark:bg-red-950/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
             <div className="flex items-center gap-3 mb-2">
               <X className="w-5 h-5 text-red-600" />
               <h3 className="font-semibold text-foreground">Don'ts</h3>
             </div>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Don't share sensitive financial information</li>
-              <li>• Don't pay in advance without verification</li>
-              <li>• Don't meet in isolated locations</li>
-              <li>• Don't feel pressured to buy immediately</li>
-              <li>• Don't ignore red flags or warning signs</li>
+              <li>❌ Never pay 100% upfront for large or new projects</li>
+              <li>❌ Don't share login credentials or sensitive server access without NDAs</li>
+              <li>❌ Avoid platforms that take over your domain/hosting without a contract</li>
+              <li>❌ Don't ignore red flags — vague communication is a warning sign</li>
             </ul>
           </div>
         </div>
       </motion.div>
 
-      {/* For Sellers */}
+      {/* For Freelancers */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         className="mb-8"
       >
-        <h2 className="text-2xl font-bold text-foreground mb-4">For Sellers</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <Users className="w-5 h-5 text-purple-500" />
+          <h2 className="text-2xl font-bold text-foreground">For Freelancers</h2>
+        </div>
         <div className="space-y-4">
           <div className="bg-green-50 dark:bg-green-950/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
             <div className="flex items-center gap-3 mb-2">
               <Check className="w-5 h-5 text-green-600" />
-              <h3 className="font-semibold text-foreground">Best Practices</h3>
+              <h3 className="font-semibold text-foreground">Do's</h3>
             </div>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Be honest about your products and services</li>
-              <li>• Use clear, recent photos and descriptions</li>
-              <li>• Respond promptly to customer inquiries</li>
-              <li>• Set fair and transparent prices</li>
-              <li>• Choose safe meeting locations for transactions</li>
+              <li>✅ Always get project requirements in writing (even WhatsApp/email)</li>
+              <li>✅ Take an advance payment (30-50%) before starting work</li>
+              <li>✅ Use a simple agreement for projects above ₹5,000</li>
+              <li>✅ Watermark deliverables until full payment is received</li>
+              <li>✅ Keep communication on record (screenshots of agreements)</li>
+              <li>✅ Build your profile with real portfolio links for more trust</li>
             </ul>
           </div>
-
           <div className="bg-red-50 dark:bg-red-950/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
             <div className="flex items-center gap-3 mb-2">
               <X className="w-5 h-5 text-red-600" />
-              <h3 className="font-semibold text-foreground">Avoid These</h3>
+              <h3 className="font-semibold text-foreground">Don'ts</h3>
             </div>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Don't misrepresent your products or services</li>
-              <li>• Don't use stock photos instead of actual product images</li>
-              <li>• Don't pressure customers into quick decisions</li>
-              <li>• Don't share excessive personal information</li>
-              <li>• Don't meet customers at your home address</li>
+              <li>❌ Never deliver final files before receiving full payment</li>
+              <li>❌ Don't work on verbal agreements alone for large projects</li>
+              <li>❌ Avoid sharing your personal bank details publicly</li>
+              <li>❌ Don't ignore scope creep — charge for additions beyond the agreed scope</li>
             </ul>
           </div>
         </div>
       </motion.div>
 
-      {/* Red Flags */}
+      {/* Payment Safety */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
         className="mb-8"
       >
-        <h2 className="text-2xl font-bold text-foreground mb-4">Red Flags to Watch For</h2>
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-amber-50 dark:bg-amber-950/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
-            <div className="flex items-center gap-3 mb-2">
-              <AlertTriangle className="w-5 h-5 text-amber-600" />
-              <h3 className="font-semibold text-foreground">Warning Signs</h3>
-            </div>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Prices that seem too good to be true</li>
-              <li>• Requests for payment in unusual methods</li>
-              <li>• Poor communication or evasive answers</li>
-              <li>• Pressure to act immediately</li>
-              <li>• Refusal to meet in public places</li>
-            </ul>
-          </div>
-
-          <div className="bg-amber-50 dark:bg-amber-950/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
-            <div className="flex items-center gap-3 mb-2">
-              <Lock className="w-5 h-5 text-amber-600" />
-              <h3 className="font-semibold text-foreground">Security Concerns</h3>
-            </div>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>• Requests for excessive personal data</li>
-              <li>• Suspicious payment links or forms</li>
-              <li>• Unprofessional communication</li>
-              <li>• Inconsistent information provided</li>
-              <li>• Refusal to provide basic verification</li>
-            </ul>
-          </div>
+        <div className="flex items-center gap-2 mb-4">
+          <Lock className="w-5 h-5 text-green-500" />
+          <h2 className="text-2xl font-bold text-foreground">Payment Safety</h2>
+        </div>
+        <div className="bg-muted/30 rounded-xl p-6 space-y-3 text-sm text-muted-foreground">
+          <p>💳 Prefer UPI, bank transfer, or well-known payment platforms</p>
+          <p>📝 Always get a digital receipt or payment confirmation</p>
+          <p>🔐 Never share OTPs or card details with anyone</p>
+          <p>⚠️ Report suspicious payment requests to <strong>support@aaspass.com</strong></p>
         </div>
       </motion.div>
 
-      {/* Meeting Safety */}
+      {/* Emergency */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="mb-8"
+        className="bg-red-50 dark:bg-red-950/20 rounded-2xl p-6 border border-red-200 dark:border-red-800"
       >
-        <h2 className="text-2xl font-bold text-foreground mb-4">Meeting Safety</h2>
-        <div className="bg-card rounded-xl p-6 shadow-card">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <MapPin className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold text-foreground mb-2">Choose Public Places</h3>
-              <p className="text-sm text-muted-foreground">
-                Coffee shops, shopping centers, or other busy public areas
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Users className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold text-foreground mb-2">Bring Someone</h3>
-              <p className="text-sm text-muted-foreground">
-                Especially for high-value items or first meetings
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Phone className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="font-semibold text-foreground mb-2">Stay Connected</h3>
-              <p className="text-sm text-muted-foreground">
-                Keep your phone charged and share meeting details with someone
-              </p>
-            </div>
-          </div>
+        <div className="flex items-center gap-3 mb-4">
+          <AlertTriangle className="w-6 h-6 text-red-600" />
+          <h2 className="text-xl font-bold text-foreground">Report a Problem</h2>
         </div>
-      </motion.div>
-
-      {/* What to Do If Something Goes Wrong */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="mb-8"
-      >
-        <h2 className="text-2xl font-bold text-foreground mb-4">What to Do If Something Goes Wrong</h2>
-        <div className="bg-destructive/5 rounded-xl p-6 border border-destructive/20">
-          <h3 className="font-semibold text-foreground mb-4">Immediate Steps:</h3>
-          <ol className="space-y-3 text-sm text-muted-foreground">
-            <li>1. <strong>Stop communication</strong> if you feel unsafe or suspicious</li>
-            <li>2. <strong>Document everything</strong> - screenshots, messages, transaction details</li>
-            <li>3. <strong>Report the user</strong> to Aaspass immediately</li>
-            <li>4. <strong>Contact local authorities</strong> if you've been scammed or feel threatened</li>
-            <li>5. <strong>Notify your bank</strong> if financial information was compromised</li>
-          </ol>
-        </div>
-      </motion.div>
-
-      {/* Report Issues */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-        className="bg-card rounded-xl p-6 shadow-card"
-      >
-        <h3 className="text-xl font-bold text-foreground mb-3">Report Safety Concerns</h3>
         <p className="text-muted-foreground mb-4">
-          If you encounter suspicious activity or feel unsafe, report it immediately:
+          Encountered a fake profile, payment fraud, or any unsafe behaviour? Report immediately.
         </p>
-        <div className="space-y-2 text-sm">
-          <p><strong>Email:</strong> safety@aaspass.com</p>
-          <p><strong>Emergency:</strong> Contact local authorities immediately</p>
-          <p className="text-xs text-muted-foreground mt-3">
-            We take safety reports seriously and will respond within 24 hours.
-          </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={() => navigate('/contact')}
+            className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white font-semibold rounded-xl text-sm hover:bg-red-700 transition"
+          >
+            <Phone className="w-4 h-4" /> Report Now
+          </button>
+          <button
+            onClick={() => window.open('mailto:safety@aaspass.com')}
+            className="flex items-center gap-2 px-5 py-2.5 bg-muted text-foreground font-semibold rounded-xl text-sm hover:bg-muted/80 transition"
+          >
+            safety@aaspass.com
+          </button>
         </div>
       </motion.div>
     </div>

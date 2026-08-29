@@ -1,99 +1,105 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, HelpCircle, User, Store, CreditCard, Shield, MapPin, MessageCircle, Settings } from 'lucide-react';
+import { ArrowLeft, HelpCircle, User, Briefcase, CreditCard, Shield, Settings, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 export const faqs = [
   {
     id: 1,
-    category: 'buyer',
-    question: 'How do I find sellers near me?',
-    answer: 'Simply enable location access when using Aaspass, and the app will automatically show sellers sorted by distance from your current location. You can also search by area name or pincode.'
+    category: 'client',
+    question: 'How do I find freelancers near me?',
+    answer: 'Enable location access and Aaspass will automatically show freelancers sorted by distance from you. You can filter by skill category, solo/team, and radius.'
   },
   {
     id: 2,
-    category: 'buyer',
-    question: 'How do I contact a seller?',
-    answer: 'Each listing shows the seller\'s preferred contact method - usually WhatsApp or Instagram. Simply click on the contact button to reach out directly to the seller.'
+    category: 'client',
+    question: 'How do I post a project?',
+    answer: 'Go to your profile and click "Post a Project". Fill in project details, budget range, timeline, and required skills. Your listing goes live instantly.'
   },
   {
     id: 3,
-    category: 'buyer',
-    question: 'Is it safe to buy from sellers on Aaspass?',
-    answer: 'While we verify sellers, always exercise caution. Meet in public places, verify products before payment, and read our safety tips for more guidelines.'
+    category: 'client',
+    question: 'Can I hire a team of students?',
+    answer: 'Yes! Freelancers can list themselves as "Team" — meaning they have a group ready to tackle larger projects. Simply filter by "Team" when browsing.'
   },
   {
     id: 4,
-    category: 'seller',
-    question: 'How do I start selling on Aaspass?',
-    answer: 'Click "Become a Seller" on the homepage or visit your profile page. Complete the onboarding process, choose your plan, and create your first listing.'
+    category: 'client',
+    question: 'How do I contact a freelancer?',
+    answer: 'Each profile shows the freelancer\'s preferred contact method — usually WhatsApp or LinkedIn. Click the contact button to connect directly. No middleman.'
   },
   {
     id: 5,
-    category: 'seller',
-    question: 'What documents do I need to register?',
-    answer: 'You\'ll need basic information like your name, contact details, and business location. For certain categories, additional verification may be required.'
+    category: 'freelancer',
+    question: 'How do I register as a freelancer?',
+    answer: 'Click "Sign Up" and choose "Freelancer" as your role. Then complete the onboarding wizard to add your skills, tech stack, portfolio links, and location.'
   },
   {
     id: 6,
-    category: 'seller',
-    question: 'How do I manage my listings?',
-    answer: 'Access your seller dashboard from the profile section to add, edit, or deactivate listings, view analytics, and manage customer inquiries.'
+    category: 'freelancer',
+    question: 'Can I work in a team?',
+    answer: 'Absolutely. When creating your profile, select "Team" as your operating type. List your team size and the combined skills your group offers.'
   },
   {
     id: 7,
-    category: 'payment',
-    question: 'What are the subscription plans?',
-    answer: 'We offer Monthly (₹100/month) and Annual (₹1,200/year) plans. The annual plan saves you 20% and includes additional features like priority support and advanced analytics.'
+    category: 'freelancer',
+    question: 'What kind of projects can I find?',
+    answer: 'Web development, app development, UI/UX design, digital marketing, content writing, data analysis, video editing, and much more — posted by local businesses.'
   },
   {
     id: 8,
-    category: 'payment',
-    question: 'How do I pay for my subscription?',
-    answer: 'We accept UPI, credit/debit cards, and net banking. Payment is processed securely through our payment partners.'
+    category: 'freelancer',
+    question: 'How do I manage my listings?',
+    answer: 'Access your profile to add, edit, or deactivate listings, view views count, and manage incoming inquiries.'
   },
   {
     id: 9,
     category: 'payment',
-    question: 'Can I get a refund?',
-    answer: 'Refunds are handled on a case-by-case basis. Please contact our support team within 7 days of payment for refund requests.'
+    question: 'What are the subscription plans?',
+    answer: 'Freelancers pay ₹100/month or ₹1,200/year. Clients pay ₹200/month or ₹2,000/year. All new users get a 7-day free trial — no card required.'
   },
   {
     id: 10,
-    category: 'safety',
-    question: 'How does Aaspass verify sellers?',
-    answer: 'We verify seller identity through phone verification and address confirmation. Additional verification may be required for certain categories.'
+    category: 'payment',
+    question: 'Does Aaspass take a commission from projects?',
+    answer: 'No! We charge a flat subscription fee only. There is zero commission on any project you complete. All project payments happen directly between you and the client.'
   },
   {
     id: 11,
-    category: 'safety',
-    question: 'What should I do if I encounter a fake seller?',
-    answer: 'Report the seller immediately through our app or email safety@aaspass.com. We take such reports seriously and will investigate promptly.'
+    category: 'payment',
+    question: 'Can I get a refund?',
+    answer: 'Refunds are handled on a case-by-case basis. Contact our support within 7 days of payment if you have any issue.'
   },
   {
     id: 12,
     category: 'safety',
-    question: 'Is my personal information safe?',
-    answer: 'Yes, we protect your data with industry-standard security measures. Your exact address is never shared publicly - only your area name is shown.'
+    question: 'How does Aaspass verify freelancers?',
+    answer: 'We verify identity through phone number and email. Freelancers can also link their LinkedIn and GitHub profiles for additional trust signals.'
   },
   {
     id: 13,
-    category: 'technical',
-    question: 'The app is not showing my location correctly',
-    answer: 'Ensure location services are enabled for your browser/app. Try refreshing the page or restarting the app. If issues persist, contact support.'
+    category: 'safety',
+    question: 'What should I do before paying a freelancer?',
+    answer: 'Always agree on a scope and timeline in writing (even WhatsApp). For larger projects, use milestone-based payments. Meet in a public place for in-person handoffs.'
   },
   {
     id: 14,
-    category: 'technical',
-    question: 'How do I report a technical issue?',
-    answer: 'Email support@aaspass.com with details about the issue, including screenshots if possible. We typically respond within 24 hours.'
+    category: 'safety',
+    question: 'Is my personal information safe?',
+    answer: 'Yes. Your exact location is never shared publicly — only your area name. Your contact details are only visible to logged-in users.'
   },
   {
     id: 15,
     category: 'technical',
-    question: 'Can I use Aaspass on my desktop?',
-    answer: 'Yes! Aaspass works on both mobile and desktop devices. You can also install it as a PWA on your phone for app-like experience.'
-  }
+    question: 'The app is not showing my location correctly',
+    answer: 'Ensure location services are enabled for your browser. Try refreshing the page. If the issue persists, manually enter your area in the onboarding form.'
+  },
+  {
+    id: 16,
+    category: 'technical',
+    question: 'Can I use Aaspass on desktop?',
+    answer: 'Yes! Aaspass works on all devices. You can also install it as a PWA on your phone for an app-like experience — no app store needed.'
+  },
 ];
 
 const FAQPage = () => {
@@ -102,15 +108,15 @@ const FAQPage = () => {
 
   const categories = [
     { id: 'all', name: 'All Questions', icon: HelpCircle },
-    { id: 'buyer', name: 'For Buyers', icon: User },
-    { id: 'seller', name: 'For Sellers', icon: Store },
+    { id: 'client', name: 'For Clients', icon: Briefcase },
+    { id: 'freelancer', name: 'For Freelancers', icon: User },
     { id: 'payment', name: 'Payment & Pricing', icon: CreditCard },
     { id: 'safety', name: 'Safety & Security', icon: Shield },
-    { id: 'technical', name: 'Technical Support', icon: Settings }
+    { id: 'technical', name: 'Technical Support', icon: Settings },
   ];
 
-  const filteredFAQs = activeCategory === 'all' 
-    ? faqs 
+  const filteredFAQs = activeCategory === 'all'
+    ? faqs
     : faqs.filter(faq => faq.category === activeCategory);
 
   return (
@@ -123,7 +129,7 @@ const FAQPage = () => {
           </button>
         </div>
         <h1 className="text-subhead text-foreground">Frequently Asked Questions</h1>
-        <p className="text-sm text-muted-foreground mt-1">Find answers to common questions</p>
+        <p className="text-sm text-muted-foreground mt-1">Everything you need to know about Aaspass</p>
       </motion.div>
 
       {/* Categories */}
@@ -166,7 +172,7 @@ const FAQPage = () => {
             key={faq.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + index * 0.05 }}
+            transition={{ delay: 0.3 + index * 0.04 }}
             className="bg-card rounded-xl p-6 shadow-card"
           >
             <h3 className="font-semibold text-foreground mb-3">{faq.question}</h3>

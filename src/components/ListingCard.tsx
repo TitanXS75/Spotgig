@@ -37,7 +37,7 @@ const ListingCard = ({ listing }: ListingCardProps) => {
     enabled: !!user,
   });
 
-  const favorited = favorites.some((f: any) => f.id === listing.id);
+  const favorited = favorites.some((f) => f && 'id' in f && f.id === listing.id);
 
   const toggleMutation = useMutation({
     mutationFn: async () => {
@@ -129,7 +129,7 @@ const ListingCard = ({ listing }: ListingCardProps) => {
         </div>
         <div className="flex items-center gap-1 mt-1 text-muted-foreground">
           {listing.whatsapp && <MessageCircle className="w-3 h-3 text-primary" />}
-          {(listing as any).linkedin && (
+          {(listing as DbListing & { linkedin?: string | null }).linkedin && (
             <LinkedInIcon className="w-3 h-3 text-blue-600" />
           )}
           {listing.instagram && (

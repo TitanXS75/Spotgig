@@ -27,12 +27,12 @@ import TermsPage from "./pages/TermsPage";
 import SafetyTipsPage from "./pages/SafetyTipsPage";
 import PricingPage from "./pages/PricingPage";
 import FAQPage from "./pages/FAQPage";
-import AdminAuth75 from "./pages/adminauth75";
+import AdminAuth from "./pages/adminauth";
 
 const queryClient = new QueryClient();
 
 // Static pages that shouldn't show navigation
-const staticPages = ['/about', '/contact', '/privacy', '/terms', '/safety-tips', '/pricing', '/faq', '/adminauth75'];
+const staticPages = ['/about', '/contact', '/privacy', '/terms', '/safety-tips', '/pricing', '/faq', '/adminauth'];
 
 const AppContent = () => {
   const location = useLocation();
@@ -98,7 +98,7 @@ const AppContent = () => {
           <Route path="/safety-tips" element={<SafetyTipsPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/faq" element={<FAQPage />} />
-          <Route path="/adminauth75" element={<AdminAuth75 />} />
+          <Route path="/adminauth" element={<AdminAuth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

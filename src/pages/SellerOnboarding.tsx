@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, Store, MapPin, CreditCard, Smartphone, Instagram, LocateFixed, UploadCloud, Globe, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -32,12 +32,6 @@ const SellerOnboarding = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect to auth if not logged in
-  if (!user) {
-    navigate('/auth');
-    return null;
-  }
-
   // Step 1
   const [listingName, setListingName] = useState('');
   const [type, setType] = useState<'project' | 'freelancer'>('freelancer');
@@ -70,6 +64,12 @@ const SellerOnboarding = () => {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly' | null>(null);
   const [showRazorpay, setShowRazorpay] = useState(false);
   const [usedFreeTrial, setUsedFreeTrial] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+    }
+  }, [user, navigate]);
 
   const maxDesc = 300;
 
@@ -146,7 +146,7 @@ const SellerOnboarding = () => {
       const existingSlugs = userListings.map(l => l.slug || '');
       const slug = generateUniqueSlug(listingName, existingSlugs);
 
-      let supportiveUrls = [slots.gallery_0, slots.gallery_1, slots.gallery_2].filter(Boolean) as string[];
+      const supportiveUrls = [slots.gallery_0, slots.gallery_1, slots.gallery_2].filter(Boolean) as string[];
 
       // Register business with free trial
       await createListing({
@@ -180,8 +180,9 @@ const SellerOnboarding = () => {
       setUsedFreeTrial(true);
       toast({ title: 'Success!', description: 'Your profile is now live on Aaspass.' });
       navigate('/profile');
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message || 'Failed to create listing.', variant: 'destructive' });
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast({ title: 'Error', description: error.message || 'Failed to create listing.', variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -199,13 +200,13 @@ const SellerOnboarding = () => {
       const existingSlugs = userListings.map(l => l.slug || '');
       const slug = generateUniqueSlug(listingName, existingSlugs);
 
-      let supportiveUrls = [slots.gallery_0, slots.gallery_1, slots.gallery_2].filter(Boolean) as string[];
+      const supportiveUrls = [slots.gallery_0, slots.gallery_1, slots.gallery_2].filter(Boolean) as string[];
 
       // Register business initially as pending
       const createdListing = await createListing({
         slug: slug,
         name: listingName,
-        seller_name: user?.name || 'Local Seller',
+        seller_name: user?.name || 'Freelancer',
         type: type,
         operating_type: operatingType,
         category: type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType),
@@ -239,9 +240,9 @@ const SellerOnboarding = () => {
         amount: data.amount,
         currency: data.currency,
         name: "Aaspass",
-        description: "Business Listing Subscription",
+        description: "Listing Subscription",
         order_id: data.id,
-        handler: async function (response: any) {
+        handler: async function (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
           setIsSubmitting(true);
           const { error: verifyError } = await supabase.functions.invoke('verify-razorpay-payment', {
             body: { 
@@ -257,12 +258,12 @@ const SellerOnboarding = () => {
           if (verifyError) {
              toast({ title: 'Payment check failed', description: 'Please contact support.', variant: 'destructive' });
           } else {
-             toast({ title: 'Success!', description: 'Your business is now live on Aaspass.' });
+             toast({ title: 'Success!', description: 'Your listing is now live on Aaspass.' });
              navigate('/profile');
           }
         },
         prefill: {
-          name: user?.name || "Local Seller",
+          name: user?.name || "Freelancer",
           email: user?.email || "",
           contact: whatsapp || ""
         },
@@ -271,18 +272,29 @@ const SellerOnboarding = () => {
         }
       };
 
-      const rzp1 = new (window as any).Razorpay(options);
-      rzp1.on('payment.failed', function (response: any) {
+      const razorpayWindow = window as unknown as {
+        Razorpay: new (opts: unknown) => {
+          on: (event: string, cb: (res: { error: { description: string } }) => void) => void;
+          open: () => void;
+        };
+      };
+      const rzp1 = new razorpayWindow.Razorpay(options);
+      rzp1.on('payment.failed', function (response: { error: { description: string } }) {
          toast({ title: 'Payment Failed', description: response.error.description, variant: 'destructive' });
          setIsSubmitting(false);
       });
       rzp1.open();
 
-    } catch (err: any) {
-      toast({ title: 'Error', description: err.message || 'Failed to initialize payment.', variant: 'destructive' });
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast({ title: 'Error', description: error.message || 'Failed to initialize payment.', variant: 'destructive' });
       setIsSubmitting(false);
     }
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="max-w-xl mx-auto px-4 md:px-6 pb-24 md:pb-10">

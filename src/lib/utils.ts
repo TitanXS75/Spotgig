@@ -22,7 +22,7 @@ export function generateSlug(name: string): string {
  * Generate a unique slug by appending a number if needed
  */
 export function generateUniqueSlug(name: string, existingSlugs: string[]): string {
-  let baseSlug = generateSlug(name);
+  const baseSlug = generateSlug(name);
   let uniqueSlug = baseSlug;
   let counter = 1;
 

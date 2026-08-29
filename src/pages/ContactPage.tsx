@@ -3,7 +3,7 @@ import { ArrowLeft, Mail, Phone, MapPin, MessageCircle, Send, HelpCircle } from 
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { UniqueAccordion } from '@/components/ui/interactive-accordion';
-import { faqs } from './FAQPage';
+import { faqs } from '@/lib/faq-data';
 
 const ContactPage = () => {
   const navigate = useNavigate();

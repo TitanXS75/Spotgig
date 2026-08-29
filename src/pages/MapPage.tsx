@@ -99,7 +99,7 @@ const MapPage = () => {
 
     if (sortBy === 'distance') {
       if (hasLocation) {
-        items = [...items].sort((a: any, b: any) => (a.distance_km ?? 0) - (b.distance_km ?? 0));
+        items = [...items].sort((a, b) => ((a as { distance_km?: number }).distance_km ?? 0) - ((b as { distance_km?: number }).distance_km ?? 0));
       } else {
         items = items
           .map((l) => ({ listing: l, distance: getDistance(center[0], center[1], l.lat, l.lng) }))

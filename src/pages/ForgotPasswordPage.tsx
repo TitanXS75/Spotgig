@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, ArrowLeft, Store, ArrowRight } from 'lucide-react';
+import { Mail, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -36,27 +36,27 @@ const ForgotPasswordPage = () => {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      {/* Left Panel (Same image as AuthPage) */}
+      {/* Left Panel */}
       <div className="hidden lg:flex flex-col relative bg-muted overflow-hidden min-h-full">
         <motion.img
           initial={{ scale: 1 }}
           animate={{ scale: 1.15 }}
           transition={{ duration: 25, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
-          src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=1200"
-          alt="Local neighbourhood shop"
+          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1200"
+          alt="Students and freelancers collaborating"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10 pointer-events-none" />
         <div className="relative z-10 mt-auto p-12 text-white">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-              <Store className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-lg tracking-tight shadow-sm">Aaspass</span>
+          <div className="mb-3">
+            <img src="/aplg.png" alt="Aaspass" className="h-12 w-auto object-contain brightness-110 drop-shadow" />
           </div>
           <h2 className="text-3xl font-bold leading-tight drop-shadow-md">
             Don't worry, we've got you covered.
           </h2>
+          <p className="text-white/90 text-sm mt-2 max-w-sm leading-relaxed drop-shadow">
+            Recover your password to get back to discovering local student talent and freelance projects.
+          </p>
         </div>
       </div>
 

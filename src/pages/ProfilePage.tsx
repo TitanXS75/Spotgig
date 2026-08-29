@@ -98,7 +98,7 @@ const ProfilePage = () => {
                   <label className="text-xs font-semibold text-muted-foreground uppercase">Gender</label>
                   <select
                     value={editData.gender || ''}
-                    onChange={(e) => setEditData({ ...editData, gender: (e.target.value || null) as any })}
+                    onChange={(e) => setEditData({ ...editData, gender: (e.target.value || null) as 'male' | 'female' | 'other' | null })}
                     className="w-full mt-1 px-3 py-2 bg-background rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                   >
                     <option value="">Prefer not to say</option>
@@ -185,7 +185,7 @@ const ProfilePage = () => {
               transition={{ delay: 0.15 }}
               className="space-y-4"
             >
-              <h3 className="font-semibold text-foreground text-lg">My Businesses</h3>
+              <h3 className="font-semibold text-foreground text-lg">My Listings & Profiles</h3>
               <div className="grid gap-3">
                 {userListings.map(listing => {
                     const daysRemaining = calculateDaysRemaining(listing.plan_expires_at);
@@ -200,9 +200,9 @@ const ProfilePage = () => {
                             <p className="text-sm text-muted-foreground truncate">{listing.category} • {listing.area}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                                daysRemaining > 30 ? 'bg-green-100 text-green-700' :
-                                daysRemaining > 7 ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
+                                daysRemaining > 30 ? 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400' :
+                                daysRemaining > 7 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-400' :
+                                'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400'
                               }`}>
                                 {daysRemaining} days left
                               </span>
@@ -217,7 +217,7 @@ const ProfilePage = () => {
                         </div>
                         {daysRemaining === 0 && (
                           <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-900/30">
-                            <p className="text-xs text-red-600 dark:text-red-400 font-medium">Your services has been paused, renew to get visible again.</p>
+                            <p className="text-xs text-red-600 dark:text-red-400 font-medium">Your listing has expired. Renew your plan to become visible again to clients and freelancers.</p>
                           </div>
                         )}
                       </div>
@@ -227,20 +227,20 @@ const ProfilePage = () => {
             </motion.div>
           )}
 
-          {/* Become a Seller Button (Only if no listings yet, or "Add Another") */}
+          {/* Action Button (Add Another or Get Started) */}
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             whileTap={{ scale: 0.96 }}
             onClick={handleSellerClick}
-            className="w-full bg-primary/5 rounded-2xl p-5 text-left hover:bg-primary/10 transition-colors"
+            className="w-full bg-primary/5 rounded-2xl p-5 text-left hover:bg-primary/10 transition-colors border border-primary/10"
           >
-            <h3 className="font-semibold text-foreground">{userListings.length > 0 ? "Add another business" : "Become a seller"}</h3>
+            <h3 className="font-semibold text-foreground">{userListings.length > 0 ? "Add another skill or project" : "Offer your skills / Post a project"}</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              List your business for just ₹100/month. Go yearly at ₹1,200 and stay live all year!
+              List your freelance services or post a project requirement for local student talent. Start with a free trial!
             </p>
-            <p className="mt-3 text-sm font-semibold text-primary">Register Business</p>
+            <p className="mt-3 text-sm font-semibold text-primary">Get Started →</p>
           </motion.button>
         </div>
       </div>
@@ -256,22 +256,22 @@ const ProfilePage = () => {
         <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-4 text-3xl overflow-hidden ring-4 ring-muted/50">
           <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=300&q=80" alt="Guest" className="w-full h-full object-cover" />
         </div>
-        <h2 className="font-semibold text-foreground">Sign in to Aaspass</h2>
-        <p className="text-sm text-muted-foreground mt-1 max-w-[280px]">
-          Create an account to contact sellers and list your own business.
+        <h2 className="font-semibold text-foreground text-lg">Sign in to Aaspass</h2>
+        <p className="text-sm text-muted-foreground mt-1 max-w-[320px]">
+          Create an account to connect with nearby student talent, hire for projects, or offer your freelance skills.
         </p>
         <div className="flex gap-2 mt-5">
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={() => navigate('/auth')}
-            className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl"
+            className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl shadow-sm hover:bg-primary/90 transition-colors"
           >
             Sign Up Free
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={() => navigate('/auth')}
-            className="px-5 py-2.5 bg-muted text-foreground text-sm font-medium rounded-xl"
+            className="px-5 py-2.5 bg-muted text-foreground text-sm font-medium rounded-xl hover:bg-muted/80 transition-colors"
           >
             Login
           </motion.button>
@@ -284,13 +284,13 @@ const ProfilePage = () => {
         transition={{ delay: 0.1 }}
         whileTap={{ scale: 0.96 }}
         onClick={handleSellerClick}
-        className="w-full bg-primary/5 rounded-2xl p-5 text-left hover:bg-primary/10 transition-colors"
+        className="w-full bg-primary/5 rounded-2xl p-5 text-left hover:bg-primary/10 transition-colors border border-primary/10"
       >
-        <h3 className="font-semibold text-foreground">Are you a local seller?</h3>
+        <h3 className="font-semibold text-foreground">Looking to hire or freelance?</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          List your business for just ₹100/month and reach customers near you. Save with ₹1,200/year plan!
+          Discover verified student developers, designers, and creators nearby — or list your own tech skills and earn with zero platform commission.
         </p>
-        <p className="mt-3 text-sm font-semibold text-primary">Register Now</p>
+        <p className="mt-3 text-sm font-semibold text-primary">Get Started Free →</p>
       </motion.button>
     </div>
   );

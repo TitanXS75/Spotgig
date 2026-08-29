@@ -24,10 +24,10 @@ export function useFavorites() {
       await queryClient.cancelQueries({ queryKey: ['favorites'] });
       const previousFavorites = queryClient.getQueryData(['favorites']);
 
-      queryClient.setQueryData(['favorites'], (old: any) => {
+      queryClient.setQueryData<Array<{ id: string }>>(['favorites'], (old) => {
         if (!old) return old;
-        const isFav = old.some((f: any) => f.id === listingId);
-        return isFav ? old.filter((f: any) => f.id !== listingId) : [...old];
+        const isFav = old.some((f) => f && f.id === listingId);
+        return isFav ? old.filter((f) => f && f.id !== listingId) : [...old];
       });
 
       return { previousFavorites };

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -7,11 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import AnimatedDropdown from '@/components/ui/animated-dropdown';
-import { Trash2, LogOut, Mail, Calendar, Search, Filter, Store, Home, Eye, EyeOff } from 'lucide-react';
+import { Trash2, LogOut, Search, Filter, Store, Home, Eye, EyeOff } from 'lucide-react';
 import { CATEGORIES, type Listing } from '@/lib/mock-data';
-
-// Admin email for display only — actual auth is verified via Supabase + is_admin flag
-const ADMIN_EMAIL = 'sarthak.sontakke05@gmail.com';
 
 interface AdminUser {
   id: string;
@@ -35,7 +32,7 @@ interface CategoryStats {
   revenue: number;
 }
 
-export default function AdminAuth75() {
+export default function AdminAuth() {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
@@ -121,7 +118,7 @@ export default function AdminAuth75() {
       // Transform listings into AdminUser format
       const usersMap: Record<string, AdminUser> = {};
       
-      listings.forEach((listing: any) => {
+      (listings || []).forEach((listing) => {
         const userId = listing.user_id;
         if (!usersMap[userId]) {
           usersMap[userId] = {
@@ -205,8 +202,9 @@ export default function AdminAuth75() {
       setDeleteConfirmOpen(false);
       calculateStats(updatedUsers);
       alert('User suspended successfully!');
-    } catch (err: any) {
-      setDeleteError(err.message || 'Failed to suspend user');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setDeleteError(error.message || 'Failed to suspend user');
       console.error(err);
     }
   };

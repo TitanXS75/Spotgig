@@ -416,7 +416,7 @@ const ListingDetail = () => {
 
         {/* Comments List */}
         <div className="space-y-6">
-          {comments.map((comment: any) => (
+          {comments.map((comment) => (
             <div key={comment.id} className="flex gap-3 group">
               <div className="w-10 h-10 rounded-full bg-secondary/10 overflow-hidden flex items-center justify-center shrink-0">
                  {comment.profiles?.avatar_url ? (

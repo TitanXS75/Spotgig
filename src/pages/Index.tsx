@@ -74,15 +74,15 @@ const Index = () => {
     if (hasLocation) {
       const radiusValue = parseInt(selectedRadius.replace('km', ''));
       if (!isNaN(radiusValue)) {
-        items = items.filter((l: any) => {
-          const dist = l.distance_km ?? 0;
+        items = items.filter((l) => {
+          const dist = (l as { distance_km?: number }).distance_km ?? 0;
           return dist <= radiusValue;
         });
       }
 
       items.sort(
-        (a: any, b: any) =>
-          (a.distance_km ?? 0) - (b.distance_km ?? 0)
+        (a, b) =>
+          ((a as { distance_km?: number }).distance_km ?? 0) - ((b as { distance_km?: number }).distance_km ?? 0)
       );
     }
 
@@ -124,7 +124,7 @@ const Index = () => {
                   items={RADIUS_OPTIONS}
                   selectedId={selectedRadius}
                   text="Distance"
-                  onSelect={(item) => setSelectedRadius(item.id)}
+                  onSelect={(item) => setSelectedRadius(item.id || '20km')}
                   className="w-full text-xs shadow-none border-none bg-transparent hover:bg-muted/50"
                 />
               </div>

@@ -61,19 +61,19 @@ const TermsPage = () => {
         <ul className="space-y-2 text-muted-foreground">
           <li className="flex items-start gap-2">
             <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-            <span>Connecting buyers with local sellers and service providers</span>
+            <span>Connecting clients and businesses with student talent, freelancers, and service providers</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-            <span>Displaying seller listings with contact information</span>
+            <span>Displaying freelancer and project listings with verified direct contact methods</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-            <span>Distance-based discovery and search functionality</span>
+            <span>Distance-based discovery, map navigation, and local talent search</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-            <span>Subscription-based seller services</span>
+            <span>Subscription-based freelancer and client listing services with zero commission</span>
           </li>
         </ul>
       </motion.div>

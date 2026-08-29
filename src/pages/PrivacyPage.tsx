@@ -96,11 +96,11 @@ const PrivacyPage = () => {
         <ul className="space-y-3 text-muted-foreground">
           <li className="flex items-start gap-2">
             <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-            <span>Connect you with local sellers and calculate distances</span>
+            <span>Connect you with nearby freelancers/clients and calculate distances</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-            <span>Process payments and manage seller subscriptions</span>
+            <span>Process payments and manage user listing subscriptions</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>

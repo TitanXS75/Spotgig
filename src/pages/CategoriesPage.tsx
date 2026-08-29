@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ArrowLeft, PackageOpen } from 'lucide-react';
 import { CATEGORIES } from '@/lib/mock-data';
-import ListingCard from '@/components/ListingCard';
+import ListingCard, { type DbListing } from '@/components/ListingCard';
 import { useAppStore } from '@/store/app-store';
 import { getDistance } from '@/lib/distance';
 import { getListings } from '@/lib/api/listings';
@@ -57,9 +57,9 @@ const CategoriesPage = () => {
   const filteredListings = useMemo(() => {
     if (!activeCategory) return [];
 
-    let items: any[] = [];
+    let items: DbListing[] = [];
     if (activeCategory === 'Favourites') {
-      items = [...favoriteListings];
+      items = favoriteListings.filter((f): f is DbListing => f !== null);
     } else {
       items = allListings.filter(
         (l) => l.status === 'live' && l.category === activeCategory

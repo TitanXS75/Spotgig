@@ -107,25 +107,7 @@ const EditListing = () => {
         setServiceSpecification(listing.category);
       }
     }
-  }, [listing]);
-
-  if (loadingListing) {
-    return (
-      <div className="max-w-xl mx-auto px-4 pt-20 text-center">
-        <p className="text-muted-foreground animate-pulse">Loading listing...</p>
-      </div>
-    );
-  }
-
-  // Authorization fallback
-  if (!user || !listing || (user.id !== listing.user_id)) {
-    return (
-      <div className="max-w-xl mx-auto px-4 pt-20 text-center">
-        <p className="text-muted-foreground">You do not have permission to edit this listing.</p>
-        <button onClick={() => navigate(-1)} className="text-primary font-medium mt-4">Go Back</button>
-      </div>
-    );
-  }
+  }, [listing, reset]);
 
   const maxDesc = 300;
 
@@ -192,9 +174,10 @@ const EditListing = () => {
 
   const updateMutation = useMutation({
     mutationFn: async () => {
+      if (!listing) return;
       const resolvedCategory = type === 'product' ? (category === 'Other' ? categorySpecification : category) : (serviceType === 'Other' ? serviceSpecification : serviceType);
       
-      let supportiveUrls = [slots.gallery_0, slots.gallery_1, slots.gallery_2].filter(Boolean) as string[];
+      const supportiveUrls = [slots.gallery_0, slots.gallery_1, slots.gallery_2].filter(Boolean) as string[];
 
       await updateListing(listing.id, {
         name: listingName,
@@ -220,13 +203,14 @@ const EditListing = () => {
       queryClient.invalidateQueries({ queryKey: ['listings'] });
       setShowSuccessPopup(true);
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     }
   });
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
+      if (!listing) return;
       await apiDeleteListing(listing.id);
     },
     onSuccess: () => {
@@ -234,10 +218,28 @@ const EditListing = () => {
        toast({ title: 'Deleted', description: 'Listing was deleted.' });
        navigate('/profile');
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     }
   });
+
+  if (loadingListing) {
+    return (
+      <div className="max-w-xl mx-auto px-4 pt-20 text-center">
+        <p className="text-muted-foreground animate-pulse">Loading listing...</p>
+      </div>
+    );
+  }
+
+  // Authorization fallback
+  if (!user || !listing || (user.id !== listing.user_id)) {
+    return (
+      <div className="max-w-xl mx-auto px-4 pt-20 text-center">
+        <p className="text-muted-foreground">You do not have permission to edit this listing.</p>
+        <button onClick={() => navigate(-1)} className="text-primary font-medium mt-4">Go Back</button>
+      </div>
+    );
+  }
 
   const handleSaveListing = () => {
     updateMutation.mutate();

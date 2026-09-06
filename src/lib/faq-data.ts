@@ -22,13 +22,13 @@ export const faqs: FAQItem[] = [
     id: 3,
     category: 'client',
     question: 'Can I hire a team of students?',
-    answer: 'Yes! Freelancers can list themselves as "Team" — meaning they have a group ready to tackle larger projects. Simply filter by "Team" when browsing.'
+    answer: 'Yes! Freelancers can list themselves as "Team", meaning they have a group ready to tackle larger projects. Simply filter by "Team" when browsing.'
   },
   {
     id: 4,
     category: 'client',
     question: 'How do I contact a freelancer?',
-    answer: 'Each profile shows the freelancer\'s preferred contact method — usually WhatsApp or LinkedIn. Click the contact button to connect directly. No middleman.'
+    answer: 'Each profile shows the freelancer\'s preferred contact method, usually WhatsApp or LinkedIn. Click the contact button to connect directly with no middleman.'
   },
   {
     id: 5,
@@ -46,7 +46,7 @@ export const faqs: FAQItem[] = [
     id: 7,
     category: 'freelancer',
     question: 'What kind of projects can I find?',
-    answer: 'Web development, app development, UI/UX design, digital marketing, content writing, data analysis, video editing, and much more — posted by local businesses.'
+    answer: 'Web development, app development, UI/UX design, digital marketing, content writing, data analysis, video editing, and much more posted by local businesses.'
   },
   {
     id: 8,
@@ -58,7 +58,7 @@ export const faqs: FAQItem[] = [
     id: 9,
     category: 'payment',
     question: 'What are the subscription plans?',
-    answer: 'Freelancers pay ₹100/month or ₹1,200/year. Clients pay ₹200/month or ₹2,000/year. All new users get a 7-day free trial — no card required.'
+    answer: 'Freelancers pay ₹100/month or ₹1,200/year. Clients pay ₹200/month or ₹2,000/year. All new users get a 7-day free trial with no card required.'
   },
   {
     id: 10,
@@ -88,7 +88,7 @@ export const faqs: FAQItem[] = [
     id: 14,
     category: 'safety',
     question: 'Is my personal information safe?',
-    answer: 'Yes. Your exact location is never shared publicly — only your area name. Your contact details are only visible to logged-in users.'
+    answer: 'Yes. Your exact location is never shared publicly, only your area name. Your contact details are only visible to logged-in users.'
   },
   {
     id: 15,
@@ -100,6 +100,6 @@ export const faqs: FAQItem[] = [
     id: 16,
     category: 'technical',
     question: 'Can I use Aaspass on desktop?',
-    answer: 'Yes! Aaspass works on all devices. You can also install it as a PWA on your phone for an app-like experience — no app store needed.'
+    answer: 'Yes! Aaspass works on all devices. You can also install it as a PWA on your phone for an app-like experience with no app store needed.'
   },
 ];

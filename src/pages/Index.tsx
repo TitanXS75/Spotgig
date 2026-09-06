@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SearchBar from '@/components/SearchBar';
-import CategoryPills from '@/components/CategoryPills';
 import TypeToggle from '@/components/TypeToggle';
 import ListingCard from '@/components/ListingCard';
 import ListingCardSkeleton from '@/components/ListingCardSkeleton';
@@ -101,7 +100,7 @@ const Index = () => {
           Find Freelancers near you.
         </h1>
         <p className="text-sm md:text-base text-muted-foreground mt-2">
-          Discover skilled students &amp; professionals for your project — within walking distance.
+          Discover skilled students &amp; professionals for your project within walking distance.
         </p>
         {!hasLocation && (
           <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
@@ -131,7 +130,6 @@ const Index = () => {
             )}
           </div>
           <TypeToggle />
-          <CategoryPills />
         </div>
 
         {/* Grid */}

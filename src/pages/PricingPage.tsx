@@ -99,7 +99,7 @@ const PricingPage = () => {
               {activeTab === 'freelancer' ? <Zap className="w-8 h-8 text-primary" /> : <Users className="w-8 h-8 text-primary" />}
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-2">
-              {activeTab === 'freelancer' ? 'Freelancer' : 'Client'} — {isYearly ? 'Annual' : 'Monthly'}
+              {activeTab === 'freelancer' ? 'Freelancer' : 'Client'} ({isYearly ? 'Annual' : 'Monthly'})
             </h3>
             <div className="text-4xl font-bold text-foreground mb-1">
               ₹{isYearly ? (activeTab === 'freelancer' ? '1,200' : '2,000') : (activeTab === 'freelancer' ? '100' : '200')}
@@ -141,7 +141,7 @@ const PricingPage = () => {
         className="text-center mt-8 text-sm text-muted-foreground"
       >
         <Crown className="w-4 h-4 inline mr-1 text-amber-500" />
-        New users get a <strong>7-day free trial</strong> — no credit card required.
+        New users get a <strong>7-day free trial</strong> with no credit card required.
       </motion.div>
     </div>
   );

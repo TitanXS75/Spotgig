@@ -51,3 +51,8 @@
 - All `VITE_*` vars are PUBLIC — treat them as such.
 - Server-side secrets go in Supabase Edge Function environment.
 - Always validate user input with Zod on the client AND RLS on the server.
+
+## UI Copy & Typography Standards
+- Never use em-dashes (`—`) in user-facing UI text, headings, buttons, or subtitles. Use clean natural punctuation (commas, colons, or streamlined wording).
+- Avoid arrow symbols (`→`, `->`, `ArrowRight`) inside buttons unless explicitly requested.
+- Keep UI text simple, clear, and direct without emojis in headings.

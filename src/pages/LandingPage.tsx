@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  MapPin, Zap, ShieldCheck, Smartphone, Users, TrendingUp, 
-  Briefcase, GraduationCap, Code2, Share2, PlusSquare, MoreVertical, 
-  DownloadCloud, CheckCircle2, ArrowRight
+import {
+  MapPin, Zap, ShieldCheck, Users, TrendingUp,
+  Briefcase, GraduationCap, Code2, Share2, PlusSquare, MoreVertical,
+  DownloadCloud, CheckCircle2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Lenis from '@studio-freight/lenis';
@@ -44,7 +44,7 @@ const FEATURES = [
   {
     icon: <GraduationCap className="text-blue-500 w-6 h-6" />,
     title: 'Real Experience',
-    description: 'Students gain portfolio-worthy work and real income — not just internship certificates.',
+    description: 'Students gain portfolio worthy work and real income, not just internship certificates.',
   },
   {
     icon: <ShieldCheck className="text-green-500 w-6 h-6" />,
@@ -59,15 +59,15 @@ const FEATURES = [
 ];
 
 const CLIENTS_HOW_IT_WORKS = [
-  { step: 1, title: 'Post Your Project', desc: 'Describe your project needs — website, app, design, marketing, or any IT task.' },
-  { step: 2, title: 'Discover Nearby Talent', desc: 'See freelancers sorted by distance, skill, and availability — solo or team.' },
+  { step: 1, title: 'Post Your Project', desc: 'Describe your project needs such as website, app, design, marketing, or any IT task.' },
+  { step: 2, title: 'Discover Nearby Talent', desc: 'See freelancers sorted by distance, skill, and availability for solo or team projects.' },
   { step: 3, title: 'Review Profiles', desc: 'Check portfolios, ratings, LinkedIn profiles, and past project experience.' },
   { step: 4, title: 'Connect & Hire', desc: 'Message on WhatsApp or LinkedIn. No middleman, no commission.' },
 ];
 
 const FREELANCERS_HOW_IT_WORKS = [
   { step: 1, title: 'Create Your Profile', desc: 'Register your skills, tech stack, experience level, and portfolio links.' },
-  { step: 2, title: 'Browse Projects Nearby', desc: 'See client projects sorted by your location — filter by budget or category.' },
+  { step: 2, title: 'Browse Projects Nearby', desc: 'See client projects sorted by your location, filter by budget or category.' },
   { step: 3, title: 'Join Solo or as Team', desc: 'Take on projects alone or invite classmates to form a team for bigger gigs.' },
   { step: 4, title: 'Earn & Build Portfolio', desc: 'Get paid real money and add real client projects to your resume.' },
 ];
@@ -234,7 +234,7 @@ const LandingPage = () => {
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2">Clients &amp; Business Owners</h3>
                 <p className="text-muted-foreground leading-relaxed mb-5">
-                  Need a website, app, or tech project done? Post it here and find talented students nearby. 
+                  Need a website, app, or tech project done? Post it here and find talented students nearby.
                   Affordable rates, real skills, local collaboration.
                 </p>
                 <ul className="space-y-2 text-sm text-muted-foreground mb-6">
@@ -265,7 +265,7 @@ const LandingPage = () => {
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2">Students &amp; Freelancers</h3>
                 <p className="text-muted-foreground leading-relaxed mb-5">
-                  College students, B.Tech engineers, MBA grads, vibe coders — register your skills and 
+                  College students, B.Tech engineers, MBA grads, and vibe coders: register your skills and
                   earn real money from nearby clients. Work solo or team up!
                 </p>
                 <ul className="space-y-2 text-sm text-muted-foreground mb-6">
@@ -286,17 +286,14 @@ const LandingPage = () => {
       </section>
 
       {/* ─── INSTALL PWA ─── */}
-      <section className="py-16 md:py-24 px-6 bg-background relative overflow-hidden">
+      <section className="pt-10 pb-4 md:pt-14 md:pb-6 px-6 bg-background relative overflow-hidden">
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary mb-4 border border-primary/20">
-              <Smartphone className="w-3.5 h-3.5" /> Progressive Web App
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-4">
+          <div className="text-center max-w-3xl mx-auto mb-8 md:mb-10">
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">
               Get the App on Your Phone
             </h2>
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-              Add Aaspass directly to your home screen for fast, one-tap access with zero downloads or app store updates needed.
+              Add Aaspass directly to your home screen for fast, one tap access with zero downloads or app store updates needed.
             </p>
           </div>
 
@@ -307,10 +304,10 @@ const LandingPage = () => {
                 <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/50">
                   <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-2xl bg-muted flex items-center justify-center">
-                      <img 
-                        src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" 
-                        alt="Apple logo" 
-                        className="h-5 w-auto object-contain dark:invert opacity-90" 
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
+                        alt="Apple logo"
+                        className="h-5 w-auto object-contain dark:invert opacity-90"
                       />
                     </div>
                     <div>
@@ -374,10 +371,10 @@ const LandingPage = () => {
                 <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/50">
                   <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-2xl bg-muted flex items-center justify-center">
-                      <img 
-                        src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" 
-                        alt="Android logo" 
-                        className="h-5 w-auto object-contain" 
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg"
+                        alt="Android logo"
+                        className="h-5 w-auto object-contain"
                       />
                     </div>
                     <div>
@@ -431,7 +428,7 @@ const LandingPage = () => {
 
               <div className="mt-6 pt-4 border-t border-border/50 flex items-center gap-2 text-xs text-muted-foreground">
                 <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
-                <span>One-tap access · Fast performance · Real-time updates</span>
+                <span>One tap access · Fast performance · Real time updates</span>
               </div>
             </div>
           </div>
@@ -439,8 +436,8 @@ const LandingPage = () => {
       </section>
 
       {/* ─── ZOOM PARALLAX CTA ─── */}
-      <section className="bg-background pt-8 md:pt-12">
-        <div className="relative flex flex-col items-center justify-center pt-6 pb-4 px-6 text-center">
+      <section className="bg-background pt-2 md:pt-4">
+        <div className="relative flex flex-col items-center justify-center pt-0 pb-4 px-6 text-center">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -462,10 +459,9 @@ const LandingPage = () => {
         <div className="py-12 px-6 flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={() => handleNavigate('/auth', 'signup')}
-            className="bg-primary text-primary-foreground px-6 py-4 rounded-xl font-bold text-base sm:px-10 sm:py-5 sm:text-lg hover:bg-primary/90 transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-95 text-center w-full sm:w-auto flex items-center justify-center gap-2"
+            className="bg-primary text-primary-foreground px-6 py-4 rounded-xl font-bold text-base sm:px-10 sm:py-5 sm:text-lg hover:bg-primary/90 transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-95 text-center w-full sm:w-auto"
           >
-            <span>Join as Freelancer</span>
-            <ArrowRight className="w-5 h-5" />
+            Join as Freelancer
           </button>
           <button
             onClick={() => handleNavigate('/home')}

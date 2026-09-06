@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { LocateFixed, MapPin, Navigation } from 'lucide-react';
+import { LocateFixed, Navigation } from 'lucide-react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -135,18 +135,9 @@ const MapPage = () => {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="pt-4 pb-5"
+        className="pt-4 pb-3"
       >
         <h1 className="text-subhead text-foreground">Map View</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          See sellers near you on a map
-          {!hasLocation && (
-            <span className="ml-2 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-              Using default location
-            </span>
-          )}
-        </p>
       </motion.div>
 
       <motion.div
@@ -157,14 +148,12 @@ const MapPage = () => {
       >
         {/* Toolbar */}
         <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border bg-background/40">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="w-4 h-4" />
-            <span className="tabular-nums">
-              {listingsForMap.length} seller{listingsForMap.length === 1 ? '' : 's'}
-            </span>
-            {distanceFilter > 0 && (
-              <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-semibold bg-primary/10 text-primary rounded-full">
-                Within {distanceFilter}km
+          <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground font-medium">
+            <span>Explore nearby listings on a map</span>
+            {!hasLocation && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
+                Default location
               </span>
             )}
           </div>
@@ -173,7 +162,7 @@ const MapPage = () => {
             type="button"
             onClick={requestLocation}
             disabled={isLocating}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/70 text-foreground disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/70 text-foreground disabled:opacity-60 disabled:cursor-not-allowed shrink-0"
             title="Use my current location"
           >
             {isLocating ? <Navigation className="w-4 h-4 animate-pulse" /> : <LocateFixed className="w-4 h-4" />}

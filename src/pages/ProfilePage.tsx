@@ -288,9 +288,9 @@ const ProfilePage = () => {
       >
         <h3 className="font-semibold text-foreground">Looking to hire or freelance?</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Discover verified student developers, designers, and creators nearby — or list your own tech skills and earn with zero platform commission.
+          Discover verified student developers, designers, and creators nearby or list your own tech skills and earn with zero platform commission.
         </p>
-        <p className="mt-3 text-sm font-semibold text-primary">Get Started Free →</p>
+        <p className="mt-3 text-sm font-semibold text-primary">Get Started Free</p>
       </motion.button>
     </div>
   );

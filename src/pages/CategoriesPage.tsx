@@ -83,7 +83,7 @@ const CategoriesPage = () => {
   }, [listingQuery, activeCategory, userLat, userLng, allListings, favoriteListings]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 pb-24 md:pb-10">
+    <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 md:px-8 xl:px-12 pb-24 md:pb-10">
       <AnimatePresence mode="wait">
         {!activeCategory ? (
           <motion.div

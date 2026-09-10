@@ -22,9 +22,9 @@ Aaspass is a **location-aware freelancing marketplace** that connects:
 | 🚀 [**Deployment Guide**](file:///d:/Projects/Aaspass/docs/DEPLOYMENT.md) | Production setup on Vercel, Supabase, Cloudinary, Razorpay |
 | 🤖 [**Agent Guidelines**](file:///d:/Projects/Aaspass/.agents/AGENTS.md) | Rules and instructions for AI agents and automated coding |
 | 🛠️ [**Agent Skill**](file:///d:/Projects/Aaspass/.agents/SKILL.md) | Technical cheatsheet for agents working on this codebase |
-| 🤝 [**Contributing**](file:///d:/Projects/Aaspass/CONTRIBUTING.md) | Git workflow, commit conventions, PR process |
-| 🔒 [**Security Policy**](file:///d:/Projects/Aaspass/SECURITY.md) | Vulnerability disclosure, boundaries, best practices |
-| 📝 [**Changelog**](file:///d:/Projects/Aaspass/CHANGELOG.md) | Version history & release notes |
+| 🤝 [**Contributing**](file:///d:/Projects/Aaspass/docs/CONTRIBUTING.md) | Git workflow, commit conventions, PR process |
+| 🔒 [**Security Policy**](file:///d:/Projects/Aaspass/docs/SECURITY.md) | Vulnerability disclosure, boundaries, best practices |
+| 📝 [**Changelog**](file:///d:/Projects/Aaspass/docs/CHANGELOG.md) | Version history & release notes |
 
 ---
 

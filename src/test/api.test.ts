@@ -123,4 +123,108 @@ describe('API Structure Tests', () => {
       expect(typeof getMyPayments).toBe('function');
     });
   });
+
+  describe('Projects API (Marketplace)', () => {
+    it('should have required project functions', async () => {
+      const { 
+        fetchProjects, 
+        fetchProjectById, 
+        fetchProjectRequirements,
+        createProject, 
+        getMyProjects, 
+        updateProjectStatus, 
+        deleteProject,
+        getProjectWithRequirements 
+      } = await import('@/lib/api/projects');
+
+      expect(typeof fetchProjects).toBe('function');
+      expect(typeof fetchProjectById).toBe('function');
+      expect(typeof fetchProjectRequirements).toBe('function');
+      expect(typeof createProject).toBe('function');
+      expect(typeof getMyProjects).toBe('function');
+      expect(typeof updateProjectStatus).toBe('function');
+      expect(typeof deleteProject).toBe('function');
+      expect(typeof getProjectWithRequirements).toBe('function');
+    });
+  });
+
+  describe('Profiles API (Developer Profiles)', () => {
+    it('should have required profile management functions', async () => {
+      const { 
+        getMyProfile, 
+        updateMyProfile, 
+        getPublicProfile, 
+        getUserStats 
+      } = await import('@/lib/api/profiles');
+
+      expect(typeof getMyProfile).toBe('function');
+      expect(typeof updateMyProfile).toBe('function');
+      expect(typeof getPublicProfile).toBe('function');
+      expect(typeof getUserStats).toBe('function');
+    });
+  });
+
+  describe('Requests API (Access Control & Evaluation)', () => {
+    it('should have required request & access functions', async () => {
+      const { 
+        submitProjectRequest, 
+        cancelProjectRequest,
+        getMyProjectRequests, 
+        getProjectRequestsForOwner, 
+        respondToProjectRequest, 
+        checkProjectAccess, 
+        getMyRequestStatusForProject 
+      } = await import('@/lib/api/requests');
+
+      expect(typeof submitProjectRequest).toBe('function');
+      expect(typeof cancelProjectRequest).toBe('function');
+      expect(typeof getMyProjectRequests).toBe('function');
+      expect(typeof getProjectRequestsForOwner).toBe('function');
+      expect(typeof respondToProjectRequest).toBe('function');
+      expect(typeof checkProjectAccess).toBe('function');
+      expect(typeof getMyRequestStatusForProject).toBe('function');
+    });
+  });
+
+  describe('Collaboration API (Private Workspace)', () => {
+    it('should have required workspace tasks, messages, and deliverables functions', async () => {
+      const {
+        getProjectTasks,
+        createProjectTask,
+        toggleProjectTask,
+        deleteProjectTask,
+        getProjectMessages,
+        sendProjectMessage,
+        submitProjectDeliverable,
+        getProjectDeliverables,
+        updateDeliverableStatus
+      } = await import('@/lib/api/collaboration');
+
+      expect(typeof getProjectTasks).toBe('function');
+      expect(typeof createProjectTask).toBe('function');
+      expect(typeof toggleProjectTask).toBe('function');
+      expect(typeof deleteProjectTask).toBe('function');
+      expect(typeof getProjectMessages).toBe('function');
+      expect(typeof sendProjectMessage).toBe('function');
+      expect(typeof submitProjectDeliverable).toBe('function');
+      expect(typeof getProjectDeliverables).toBe('function');
+      expect(typeof updateDeliverableStatus).toBe('function');
+    });
+  });
+
+  describe('Project Reviews API (Dual-sided Verified Reputation)', () => {
+    it('should have required reviews and completion functions', async () => {
+      const {
+        submitProjectReview,
+        getProjectReviews,
+        getUserProjectReviews,
+        completeProjectAndSignOff
+      } = await import('@/lib/api/project-reviews');
+
+      expect(typeof submitProjectReview).toBe('function');
+      expect(typeof getProjectReviews).toBe('function');
+      expect(typeof getUserProjectReviews).toBe('function');
+      expect(typeof completeProjectAndSignOff).toBe('function');
+    });
+  });
 });

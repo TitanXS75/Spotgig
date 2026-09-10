@@ -1,14 +1,25 @@
 import { supabase } from '@/lib/supabase';
-import type { Database } from '@/lib/db-types';
+import type { Database, ProjectRole } from '@/lib/db-types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
+type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
-/** Sign up with email + password. A profile row is created via DB trigger. */
-export async function signUp(email: string, password: string, fullName: string) {
+/** Sign up with email + password and role. A profile row is created via DB trigger. */
+export async function signUp(
+  email: string, 
+  password: string, 
+  fullName: string, 
+  role: ProjectRole = 'developer'
+) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: { 
+      data: { 
+        full_name: fullName,
+        role: role,
+      } 
+    },
   });
   if (error) throw error;
   return data;
@@ -56,11 +67,11 @@ export async function getMyProfile(): Promise<Profile | null> {
     .eq('id', user.id)
     .single();
   if (error) throw error;
-  return data;
+  return data as Profile;
 }
 
 /** Update profile fields. */
-export async function updateProfile(updates: Partial<Pick<Profile, 'full_name' | 'avatar_url' | 'phone'>>) {
+export async function updateProfile(updates: ProfileUpdate) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 

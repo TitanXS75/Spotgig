@@ -52,7 +52,7 @@ const ImagePanel = ({ mode }: { mode: 'login' | 'signup' }) => (
 
 // ─── Form panel ────────────────────────────────────────────────────────────
 type Mode = 'login' | 'signup';
-type Role = 'client' | 'freelancer';
+type Role = 'project_owner' | 'developer';
 
 const formVariants = {
   enter: (direction: number) => ({
@@ -81,7 +81,7 @@ const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<Role>('freelancer');
+  const [role, setRole] = useState<Role>('developer');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [loading, setLoading] = useState(false);
@@ -143,10 +143,10 @@ const AuthPage = () => {
         toast({ title: 'Welcome back!' });
         navigate('/profile');
       } else {
-        await signUp(email, password, name);
+        await signUp(email, password, name, role);
         toast({
           title: 'Account created!',
-          description: `Welcome to Aaspass as a ${role === 'client' ? 'Client' : 'Freelancer'}.`,
+          description: `Welcome to Aaspass as a ${role === 'project_owner' ? 'Project Owner' : 'Student / Developer'}.`,
         });
         navigate('/profile');
       }
@@ -247,30 +247,32 @@ const AuthPage = () => {
                 <div className="grid grid-cols-2 gap-2 mb-0.5">
                   <button
                     type="button"
-                    onClick={() => setRole('freelancer')}
-                    className={`flex items-center gap-2 p-2 rounded-lg border transition-all text-left ${role === 'freelancer'
+                    onClick={() => setRole('developer')}
+                    className={`flex items-center gap-2 p-2 rounded-lg border transition-all text-left ${
+                      role === 'developer'
                         ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary'
                         : 'border-border bg-muted/50 text-muted-foreground hover:border-primary/40'
                       }`}
                   >
                     <GraduationCap className="w-4 h-4 shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold leading-tight">Freelancer</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight truncate">Student / Skill Provider</p>
+                      <p className="text-xs font-semibold leading-tight">Student / Dev</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight truncate">Gain Real Experience</p>
                     </div>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setRole('client')}
-                    className={`flex items-center gap-2 p-2 rounded-lg border transition-all text-left ${role === 'client'
+                    onClick={() => setRole('project_owner')}
+                    className={`flex items-center gap-2 p-2 rounded-lg border transition-all text-left ${
+                      role === 'project_owner'
                         ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary'
                         : 'border-border bg-muted/50 text-muted-foreground hover:border-primary/40'
                       }`}
                   >
                     <Briefcase className="w-4 h-4 shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold leading-tight">Client</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight truncate">Business / Hiring</p>
+                      <p className="text-xs font-semibold leading-tight">Project Owner</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight truncate">Post Requirements</p>
                     </div>
                   </button>
                 </div>
@@ -430,7 +432,7 @@ const AuthPage = () => {
                 {loading ? (
                   <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                 ) : (
-                  <>{mode === 'login' ? 'Sign In' : `Create Account as ${role === 'client' ? 'Client' : 'Freelancer'}`}</>
+                  <>{mode === 'login' ? 'Sign In' : `Create Account as ${role === 'project_owner' ? 'Project Owner' : 'Student / Developer'}`}</>
                 )}
               </motion.button>
 

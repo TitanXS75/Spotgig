@@ -90,7 +90,7 @@ const MyRequestsPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-24 md:pb-12">
-      <div className="max-w-5xl mx-auto px-4 py-8 sm:px-6">
+      <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 md:px-8 xl:px-12 py-8">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border/60">
           <div>

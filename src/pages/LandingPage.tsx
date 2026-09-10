@@ -106,7 +106,7 @@ const LandingPage = () => {
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/20">
       {/* ─── NAVBAR ─── */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-        <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
+        <div className="flex items-center justify-between px-6 md:px-12 py-4 max-w-[1720px] mx-auto w-full">
           <div className="flex items-center">
             <img src="/aplg.png" alt="Aaspass" className="w-auto h-10 object-contain transform scale-125" />
           </div>
@@ -130,7 +130,7 @@ const LandingPage = () => {
 
       {/* ─── HOW IT WORKS ─── */}
       <section id="how-it-works" className="pt-16 pb-6 md:pt-20 md:pb-10 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col items-center">
+        <div className="max-w-[1600px] mx-auto flex flex-col items-center">
           <div className="text-center mb-6">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -180,7 +180,7 @@ const LandingPage = () => {
 
       {/* ─── WHY AASPASS ─── */}
       <section id="why-choose-aaspass" className="pt-12 pb-4 md:pt-16 md:pb-8 px-6 bg-background">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[1600px] mx-auto">
           <div className="text-center mb-8">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -206,8 +206,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ─── TWO AUDIENCE CARDS ─── */}
-      <section className="pt-12 pb-8 px-6 bg-muted/20">
+      {/* ─── TARGET AUDIENCE ─── */}
+      <section className="pt-12 pb-14 md:pt-16 md:pb-20 px-6 bg-background">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
             <motion.h2
@@ -286,7 +286,7 @@ const LandingPage = () => {
       </section>
 
       {/* ─── INSTALL PWA ─── */}
-      <section className="pt-10 pb-4 md:pt-14 md:pb-6 px-6 bg-background relative overflow-hidden">
+      <section className="pt-12 pb-16 md:pt-16 md:pb-24 px-6 bg-background relative overflow-hidden">
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-8 md:mb-10">
             <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">
@@ -436,16 +436,8 @@ const LandingPage = () => {
       </section>
 
       {/* ─── ZOOM PARALLAX CTA ─── */}
-      <section className="bg-background pt-2 md:pt-4">
+      <section className="bg-background pt-16 md:pt-28 border-t border-border/40">
         <div className="relative flex flex-col items-center justify-center pt-0 pb-4 px-6 text-center">
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-xs md:text-sm font-semibold tracking-wider uppercase text-primary mb-2"
-          >
-            Hyperlocal Talent Network
-          </motion.span>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tighter text-center">
             Ready to Bridge the Gap?
           </h2>
@@ -474,7 +466,7 @@ const LandingPage = () => {
 
       {/* ─── FOOTER ─── */}
       <footer className="border-t border-border/50 bg-muted/30 py-12 px-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[1720px] mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">

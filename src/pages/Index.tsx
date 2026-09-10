@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Briefcase, Sparkles, Plus, Search, Filter, ShieldCheck, 
+  Briefcase, Sparkles, Plus, Search, Filter, 
   Lock, ArrowRight, FolderKanban, SlidersHorizontal, X 
 } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
@@ -12,6 +12,13 @@ import { fetchProjects } from '@/lib/api/projects';
 import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '@/store/app-store';
 import type { Project, ProjectDifficulty, LocationPreference, CompensationType } from '@/lib/db-types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const INDUSTRIES = [
   'All',
@@ -127,18 +134,14 @@ const Index = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 pb-24 md:pb-12">
+    <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 md:px-8 xl:px-12 pb-24 md:pb-12">
       {/* ─── HERO HEADER ─── */}
       <div className="pt-8 pb-6 md:pt-12 md:pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl space-y-3"
+          className="max-w-3xl space-y-3"
         >
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Trusted Real-World Project Marketplace
-          </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15]">
             Real Projects. Real Experience.{' '}
             <span className="text-primary">Trusted Connections.</span>
@@ -148,29 +151,22 @@ const Index = () => {
           </p>
         </motion.div>
 
-        {/* Post Project CTA Banner */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="shrink-0 flex flex-col sm:flex-row gap-2.5"
-        >
-          <button
-            onClick={() => navigate('/post-project')}
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-primary text-primary-foreground text-xs sm:text-sm font-bold hover:bg-primary/90 transition shadow-md hover:shadow-lg"
+        {/* Project Owner Navigation */}
+        {user?.role === 'project_owner' && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="shrink-0 flex gap-2.5"
           >
-            <Plus className="w-4 h-4" />
-            Post a Project
-          </button>
-          {user?.role === 'project_owner' && (
             <button
               onClick={() => navigate('/my-projects')}
-              className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-border bg-card hover:bg-muted text-xs sm:text-sm font-semibold transition"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-card hover:bg-muted text-xs sm:text-sm font-semibold transition"
             >
               <FolderKanban className="w-4 h-4" />
               My Projects
             </button>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
       </div>
 
       {/* ─── SEARCH & MULTI-FILTER BAR ─── */}
@@ -196,15 +192,18 @@ const Index = () => {
           {/* Left filters: Industry & Difficulty */}
           <div className="flex flex-wrap items-center gap-2">
             {/* Industry Selector */}
-            <select
-              value={selectedIndustry}
-              onChange={(e) => setSelectedIndustry(e.target.value)}
-              className="text-xs px-3 py-1.5 rounded-xl border border-border bg-card text-foreground font-medium focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
-            >
-              {INDUSTRIES.map(ind => (
-                <option key={ind} value={ind}>{ind === 'All' ? 'All Industries' : ind}</option>
-              ))}
-            </select>
+            <Select value={selectedIndustry} onValueChange={(val) => setSelectedIndustry(val)}>
+              <SelectTrigger className="w-[180px] h-8 text-xs rounded-xl border-border bg-card text-foreground font-medium focus:ring-1 focus:ring-primary shadow-2xs">
+                <SelectValue placeholder="Industry" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-border bg-popover text-foreground shadow-lg max-h-64">
+                {INDUSTRIES.map((ind) => (
+                  <SelectItem key={ind} value={ind} className="text-xs rounded-lg cursor-pointer">
+                    {ind === 'All' ? 'All Industries' : ind}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* Difficulty Tabs */}
             <div className="flex items-center p-0.5 rounded-xl bg-muted/60 border border-border/50">
@@ -262,7 +261,7 @@ const Index = () => {
           {activeFilterCount > 0 && (
             <button
               onClick={clearAllFilters}
-              className="text-xs text-primary hover:underline font-semibold flex items-center gap-1"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/80 hover:border-border transition-all shadow-2xs active:scale-95"
             >
               <X className="w-3.5 h-3.5" /> Clear Filters
             </button>
@@ -281,50 +280,62 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-foreground">Filter Projects</span>
                 {activeFilterCount > 0 && (
-                  <button onClick={clearAllFilters} className="text-[11px] text-primary hover:underline">
-                    Reset All
+                  <button 
+                    onClick={clearAllFilters} 
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/80 transition-all active:scale-95"
+                  >
+                    <X className="w-3 h-3" /> Reset All
                   </button>
                 )}
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-[11px] font-semibold text-muted-foreground">Industry</label>
-                <select
-                  value={selectedIndustry}
-                  onChange={(e) => setSelectedIndustry(e.target.value)}
-                  className="w-full text-xs p-2 rounded-lg border border-border bg-background"
-                >
-                  {INDUSTRIES.map(ind => (
-                    <option key={ind} value={ind}>{ind === 'All' ? 'All Industries' : ind}</option>
-                  ))}
-                </select>
+                <Select value={selectedIndustry} onValueChange={(val) => setSelectedIndustry(val)}>
+                  <SelectTrigger className="w-full h-9 text-xs rounded-xl border-border bg-background text-foreground font-medium">
+                    <SelectValue placeholder="Select Industry" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-border bg-popover text-foreground shadow-lg max-h-56">
+                    {INDUSTRIES.map(ind => (
+                      <SelectItem key={ind} value={ind} className="text-xs rounded-lg cursor-pointer">
+                        {ind === 'All' ? 'All Industries' : ind}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-muted-foreground">Difficulty</label>
-                  <select
-                    value={selectedDifficulty}
-                    onChange={(e) => setSelectedDifficulty(e.target.value as 'all' | ProjectDifficulty)}
-                    className="w-full text-xs p-2 rounded-lg border border-border bg-background"
-                  >
-                    {DIFFICULTIES.map(d => (
-                      <option key={d.id} value={d.id}>{d.label}</option>
-                    ))}
-                  </select>
+                  <Select value={selectedDifficulty} onValueChange={(val) => setSelectedDifficulty(val as 'all' | ProjectDifficulty)}>
+                    <SelectTrigger className="w-full h-9 text-xs rounded-xl border-border bg-background text-foreground font-medium">
+                      <SelectValue placeholder="Difficulty" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-border bg-popover text-foreground shadow-lg">
+                      {DIFFICULTIES.map(d => (
+                        <SelectItem key={d.id} value={d.id} className="text-xs rounded-lg cursor-pointer">
+                          {d.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-muted-foreground">Work Mode</label>
-                  <select
-                    value={selectedWorkMode}
-                    onChange={(e) => setSelectedWorkMode(e.target.value as 'all' | LocationPreference)}
-                    className="w-full text-xs p-2 rounded-lg border border-border bg-background"
-                  >
-                    {WORK_MODES.map(m => (
-                      <option key={m.id} value={m.id}>{m.label}</option>
-                    ))}
-                  </select>
+                  <Select value={selectedWorkMode} onValueChange={(val) => setSelectedWorkMode(val as 'all' | LocationPreference)}>
+                    <SelectTrigger className="w-full h-9 text-xs rounded-xl border-border bg-background text-foreground font-medium">
+                      <SelectValue placeholder="Work Mode" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-border bg-popover text-foreground shadow-lg">
+                      {WORK_MODES.map(m => (
+                        <SelectItem key={m.id} value={m.id} className="text-xs rounded-lg cursor-pointer">
+                          {m.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </motion.div>
@@ -334,38 +345,58 @@ const Index = () => {
 
       {/* ─── PROJECT GRID ─── */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+          {Array.from({ length: 8 }).map((_, i) => (
             <ListingCardSkeleton key={i} />
           ))}
         </div>
       ) : filteredProjects.length === 0 ? (
-        <div className="py-16 text-center max-w-md mx-auto p-8 rounded-3xl border border-dashed border-border bg-muted/20">
-          <Briefcase className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-60" />
-          <h3 className="text-base font-bold text-foreground">No Projects Found</h3>
-          <p className="text-xs text-muted-foreground mt-1 mb-5">
-            {searchQuery || activeFilterCount > 0
-              ? 'Try clearing some of your search terms or filters to see more results.'
-              : 'Be the first professional to list a project requirement!'}
-          </p>
-          {searchQuery || activeFilterCount > 0 ? (
+        projects.length === 0 ? (
+          <motion.div 
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="py-16 px-6 text-center max-w-lg mx-auto rounded-3xl border border-dashed border-border/80 bg-muted/20 flex flex-col items-center justify-center"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-muted/80 border border-border flex items-center justify-center mb-4 shadow-xs">
+              <FolderKanban className="w-7 h-7 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-bold text-foreground">No listings or projects yet</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 max-w-sm leading-relaxed">
+              There are currently no active projects or listings available. Check back soon or be the first to publish a project!
+            </p>
+            {user?.role === 'project_owner' && (
+              <button
+                onClick={() => navigate('/post-project')}
+                className="mt-5 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition shadow-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Post a Project
+              </button>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="py-16 text-center max-w-md mx-auto p-8 rounded-3xl border border-dashed border-border bg-muted/20 flex flex-col items-center justify-center"
+          >
+            <div className="w-12 h-12 rounded-xl bg-muted/80 border border-border flex items-center justify-center mb-3">
+              <Briefcase className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-base font-bold text-foreground">No matching projects found</h3>
+            <p className="text-xs text-muted-foreground mt-1 mb-5">
+              Try clearing some of your search terms or filters to see more results.
+            </p>
             <button
               onClick={clearAllFilters}
               className="px-4 py-2 rounded-xl bg-muted hover:bg-muted/80 text-xs font-semibold text-foreground transition"
             >
               Clear All Filters
             </button>
-          ) : (
-            <button
-              onClick={() => navigate('/post-project')}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition shadow-sm"
-            >
-              <Plus className="w-3.5 h-3.5" /> Post a Project
-            </button>
-          )}
-        </div>
+          </motion.div>
+        )
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
           {filteredProjects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}

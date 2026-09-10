@@ -1,6 +1,6 @@
 import { useAppStore } from '@/store/app-store';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Briefcase, FolderKanban, Plus, User, Search, LogIn, Inbox } from 'lucide-react';
+import { Briefcase, FolderKanban, Plus, User, Inbox } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getProjectRequestsForOwner } from '@/lib/api/requests';
 import aplgLogo from '/aplg.png';
@@ -29,7 +29,7 @@ const TopBar = () => {
 
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-xl border-b border-border/60">
-      <div className="max-w-7xl mx-auto flex items-center justify-between h-14 px-4 md:px-6">
+      <div className="w-full max-w-[1720px] mx-auto flex items-center justify-between h-14 px-4 sm:px-6 md:px-8 xl:px-12">
         {/* Logo */}
         <div
           className="flex items-center gap-2 cursor-pointer"
@@ -40,19 +40,6 @@ const TopBar = () => {
 
         {/* Desktop nav links */}
         <nav className="hidden md:flex items-center gap-1.5">
-          <motion.button
-            whileTap={{ scale: 0.96 }}
-            onClick={() => navigate('/home')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              location.pathname === '/home' || location.pathname === '/projects'
-                ? 'text-primary bg-primary/10'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-            }`}
-          >
-            <Search className="w-4 h-4" />
-            Find Projects
-          </motion.button>
-
           {isOwner ? (
             <>
               <motion.button
@@ -125,12 +112,12 @@ const TopBar = () => {
         <div className="flex items-center gap-2.5">
           <ThemeToggle />
 
-          {/* Post a Project button (for owners or guests) */}
-          {(!user || isOwner) && (
+          {/* Post a Project button (for owners or guests, hidden on explore page) */}
+          {(!user || isOwner) && location.pathname !== '/home' && location.pathname !== '/projects' && (
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/post-project')}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 shadow-sm transition"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 shadow-sm transition"
             >
               <Plus className="w-3.5 h-3.5" />
               Post a Project
@@ -141,9 +128,8 @@ const TopBar = () => {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/auth')}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-border text-xs font-medium hover:bg-muted transition"
+              className="h-9 px-4 rounded-xl border border-border/80 bg-muted/60 hover:bg-muted text-xs sm:text-sm font-semibold text-foreground transition-colors flex items-center justify-center shadow-xs"
             >
-              <LogIn className="w-3.5 h-3.5" />
               Sign In
             </motion.button>
           )}

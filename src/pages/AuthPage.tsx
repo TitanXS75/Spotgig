@@ -178,18 +178,18 @@ const AuthPage = () => {
   return (
     <div className="h-screen max-h-screen w-full flex flex-col lg:flex-row overflow-hidden bg-background">
       {/* Form Panel */}
-      <div className="w-full lg:w-1/2 h-full flex flex-col justify-center px-5 sm:px-8 xl:px-12 py-4 lg:py-6 overflow-hidden z-10">
-        <div className="w-full max-w-sm sm:max-w-md mx-auto my-auto flex flex-col justify-center">
+      <div className="w-full lg:w-1/2 h-full flex flex-col justify-center px-6 sm:px-10 xl:px-12 py-4 lg:py-6 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden z-10">
+        <div className="w-full max-w-sm sm:max-w-md mx-auto my-auto flex flex-col justify-center py-2">
 
           {/* Header row with Back button */}
-          <div className="flex items-center mb-3">
+          <div className="flex items-center mb-2">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Back
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+              <span>Back</span>
             </button>
           </div>
 
@@ -208,7 +208,7 @@ const AuthPage = () => {
                 {mode === m && (
                   <motion.div
                     layoutId="auth-tab-indicator"
-                    className="absolute inset-0 bg-background rounded-lg shadow-sm -z-10"
+                    className="absolute inset-0 bg-background rounded-lg shadow-xs -z-10"
                     transition={{ type: "spring", stiffness: 450, damping: 35 }}
                   />
                 )}
@@ -218,11 +218,11 @@ const AuthPage = () => {
           </div>
 
           {/* Title & Subtitle */}
-          <div className="mb-2">
+          <div className="mb-3">
             <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
               {mode === 'login' ? 'Welcome back 👋' : 'Join Aaspass 🚀'}
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 leading-normal">
               {mode === 'login'
                 ? 'Sign in to access projects and nearby talent.'
                 : 'Connect with local clients and student freelancers.'}
@@ -238,41 +238,45 @@ const AuthPage = () => {
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              transition={{ duration: 0.18, ease: 'easeInOut' }}
               onSubmit={handleSubmit}
-              className="flex flex-col gap-2"
+              className="flex flex-col gap-2.5 sm:gap-3"
             >
               {/* Role selector (signup only) */}
               {mode === 'signup' && (
-                <div className="grid grid-cols-2 gap-2 mb-0.5">
+                <div className="grid grid-cols-2 gap-2.5">
                   <button
                     type="button"
                     onClick={() => setRole('developer')}
-                    className={`flex items-center gap-2 p-2 rounded-lg border transition-all text-left ${
+                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all text-left ${
                       role === 'developer'
-                        ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary'
-                        : 'border-border bg-muted/50 text-muted-foreground hover:border-primary/40'
+                        ? 'border-primary bg-primary/10 text-primary ring-1.5 ring-primary/20 shadow-xs'
+                        : 'border-border bg-card/80 text-muted-foreground hover:border-primary/40'
                       }`}
                   >
-                    <GraduationCap className="w-4 h-4 shrink-0" />
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${role === 'developer' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                      <GraduationCap className="w-4 h-4" />
+                    </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold leading-tight">Student / Dev</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight truncate">Gain Real Experience</p>
+                      <p className="text-xs sm:text-sm font-bold leading-tight">Student / Dev</p>
+                      <p className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">Gain Real Experience</p>
                     </div>
                   </button>
                   <button
                     type="button"
                     onClick={() => setRole('project_owner')}
-                    className={`flex items-center gap-2 p-2 rounded-lg border transition-all text-left ${
+                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all text-left ${
                       role === 'project_owner'
-                        ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary'
-                        : 'border-border bg-muted/50 text-muted-foreground hover:border-primary/40'
+                        ? 'border-primary bg-primary/10 text-primary ring-1.5 ring-primary/20 shadow-xs'
+                        : 'border-border bg-card/80 text-muted-foreground hover:border-primary/40'
                       }`}
                   >
-                    <Briefcase className="w-4 h-4 shrink-0" />
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${role === 'project_owner' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                      <Briefcase className="w-4 h-4" />
+                    </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold leading-tight">Project Owner</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight truncate">Post Requirements</p>
+                      <p className="text-xs sm:text-sm font-bold leading-tight">Project Owner</p>
+                      <p className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">Post Requirements</p>
                     </div>
                   </button>
                 </div>
@@ -280,10 +284,10 @@ const AuthPage = () => {
 
               {/* In Signup: Name + Phone row */}
               {mode === 'signup' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input
                         type="text"
                         placeholder="Full Name"
@@ -294,14 +298,14 @@ const AuthPage = () => {
                           if (errors.name) setErrors({ ...errors, name: '' });
                         }}
                         required
-                        className="w-full pl-9 pr-3 py-2 rounded-lg bg-muted text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 transition border border-transparent focus:border-primary/30"
+                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-muted text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition border border-transparent focus:border-primary/40 h-10 sm:h-10.5"
                       />
                     </div>
-                    {errors.name && <p className="text-destructive text-[10px] mt-0.5">{errors.name}</p>}
+                    {errors.name && <p className="text-destructive text-[11px] mt-0.5">{errors.name}</p>}
                   </div>
                   <div>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input
                         type="tel"
                         placeholder="Phone (10 digits)"
@@ -313,10 +317,10 @@ const AuthPage = () => {
                         }}
                         maxLength={10}
                         required
-                        className="w-full pl-9 pr-3 py-2 rounded-lg bg-muted text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 transition border border-transparent focus:border-primary/30"
+                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-muted text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition border border-transparent focus:border-primary/40 h-10 sm:h-10.5"
                       />
                     </div>
-                    {errors.phone && <p className="text-destructive text-[10px] mt-0.5">{errors.phone}</p>}
+                    {errors.phone && <p className="text-destructive text-[11px] mt-0.5">{errors.phone}</p>}
                   </div>
                 </div>
               )}
@@ -324,7 +328,7 @@ const AuthPage = () => {
               {/* Email */}
               <div>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     type="email"
                     placeholder="Email address"
@@ -334,17 +338,17 @@ const AuthPage = () => {
                       if (errors.email) setErrors({ ...errors, email: '' });
                     }}
                     required
-                    className="w-full pl-9 pr-3 py-2 sm:py-2.5 rounded-lg bg-muted text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 transition border border-transparent focus:border-primary/30"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-muted text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition border border-transparent focus:border-primary/40 h-10 sm:h-10.5"
                   />
                 </div>
-                {errors.email && <p className="text-destructive text-[10px] mt-0.5">{errors.email}</p>}
+                {errors.email && <p className="text-destructive text-[11px] mt-0.5">{errors.email}</p>}
               </div>
 
               {/* In Signup: Password + Confirm Password row */}
               {mode === 'signup' ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Password"
@@ -352,19 +356,19 @@ const AuthPage = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={6}
-                      className="w-full pl-9 pr-8 py-2 rounded-lg bg-muted text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 transition border border-transparent focus:border-primary/30"
+                      className="w-full pl-9 pr-9 py-2 rounded-xl bg-muted text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition border border-transparent focus:border-primary/40 h-10 sm:h-10.5"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5"
                     >
-                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                   <div>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm Password"
@@ -375,24 +379,24 @@ const AuthPage = () => {
                         }}
                         required
                         minLength={6}
-                        className="w-full pl-9 pr-8 py-2 rounded-lg bg-muted text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 transition border border-transparent focus:border-primary/30"
+                        className="w-full pl-9 pr-9 py-2 rounded-xl bg-muted text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition border border-transparent focus:border-primary/40 h-10 sm:h-10.5"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5"
                       >
-                        {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                    {errors.password && <p className="text-destructive text-[10px] mt-0.5">{errors.password}</p>}
+                    {errors.password && <p className="text-destructive text-[11px] mt-0.5">{errors.password}</p>}
                   </div>
                 </div>
               ) : (
                 /* In Login: Single password row with forgot password */
                 <div>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Password"
@@ -400,21 +404,21 @@ const AuthPage = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={6}
-                      className="w-full pl-9 pr-8 py-2 sm:py-2.5 rounded-lg bg-muted text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 transition border border-transparent focus:border-primary/30"
+                      className="w-full pl-9 pr-9 py-2 rounded-xl bg-muted text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition border border-transparent focus:border-primary/40 h-10 sm:h-10.5"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0.5"
                     >
-                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
                   <div className="text-right mt-1">
                     <button
                       type="button"
                       onClick={() => navigate('/forgot-password')}
-                      className="text-[11px] sm:text-xs text-primary hover:underline font-medium"
+                      className="text-xs text-primary hover:underline font-medium"
                     >
                       Forgot password?
                     </button>
@@ -427,19 +431,19 @@ const AuthPage = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs sm:text-sm font-semibold disabled:opacity-60 transition-opacity mt-1 shadow-sm hover:bg-primary/90"
+                className="w-full flex items-center justify-center gap-2 h-10 sm:h-10.5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs sm:text-sm font-semibold disabled:opacity-60 transition-opacity mt-1 shadow-xs hover:bg-primary/90"
               >
                 {loading ? (
                   <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                 ) : (
-                  <>{mode === 'login' ? 'Sign In' : `Create Account as ${role === 'project_owner' ? 'Project Owner' : 'Student / Developer'}`}</>
+                  <>{mode === 'login' ? 'Sign In' : `Create Account as ${role === 'project_owner' ? 'Project Owner' : 'Student / Dev'}`}</>
                 )}
               </motion.button>
 
               {/* Divider */}
-              <div className="flex items-center gap-3 my-0.5 text-muted-foreground">
+              <div className="flex items-center gap-2.5 my-0.5 text-muted-foreground">
                 <div className="flex-1 h-px bg-border/60" />
-                <span className="text-[10px] uppercase font-medium tracking-wider">or</span>
+                <span className="text-[11px] uppercase font-semibold tracking-wider">or</span>
                 <div className="flex-1 h-px bg-border/60" />
               </div>
 
@@ -447,7 +451,7 @@ const AuthPage = () => {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-border bg-background hover:bg-muted/70 text-foreground text-xs sm:text-sm font-medium transition-colors"
+                className="w-full flex items-center justify-center gap-2.5 h-10 sm:h-10.5 py-2 rounded-xl border border-border bg-background hover:bg-muted/70 text-foreground text-xs sm:text-sm font-medium transition-colors shadow-xs"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -455,16 +459,16 @@ const AuthPage = () => {
                   <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                 </svg>
-                Continue with Google
+                <span>Continue with Google</span>
               </button>
 
               {/* Switch mode link */}
-              <p className="text-xs text-center text-muted-foreground mt-0.5">
+              <p className="text-xs text-center text-muted-foreground mt-1">
                 {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
                 <button
                   type="button"
                   onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
-                  className="text-primary font-semibold hover:underline"
+                  className="text-primary font-semibold hover:underline ml-1"
                 >
                   {mode === 'login' ? 'Sign Up' : 'Sign In'}
                 </button>

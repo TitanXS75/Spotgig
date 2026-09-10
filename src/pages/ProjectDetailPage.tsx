@@ -106,7 +106,7 @@ const ProjectDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-24 md:pb-12">
-      <div className="max-w-5xl mx-auto px-4 py-6 sm:px-6 space-y-6">
+      <div className="w-full max-w-6xl mx-auto px-4 py-8 sm:px-6 md:px-8 space-y-6">
         {/* Navigation & Share Row */}
         <div className="flex items-center justify-between">
           <button

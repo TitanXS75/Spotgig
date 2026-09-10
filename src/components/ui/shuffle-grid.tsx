@@ -84,7 +84,7 @@ type ShuffleHeroProps = {
 
 export const ShuffleHero = ({ onGetStarted, onExploreMarketplace }: ShuffleHeroProps) => {
   return (
-    <section className="w-full px-6 py-12 md:px-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 items-center gap-8 max-w-6xl mx-auto">
+    <section className="w-full px-6 py-12 md:px-8 xl:px-12 md:py-20 grid grid-cols-1 lg:grid-cols-2 items-center gap-12 max-w-[1680px] mx-auto">
       <div className="space-y-4">
         <span className="block text-xs md:text-sm text-primary font-semibold tracking-wide uppercase">
           Aaspass • Hyperlocal Freelancing Platform

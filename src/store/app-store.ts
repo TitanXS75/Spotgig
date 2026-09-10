@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { DEFAULT_LAT, DEFAULT_LNG } from '@/lib/distance';
-
-import type { Listing } from '@/lib/mock-data';
+import type { ProjectRole, ProjectDifficulty, LocationPreference, CompensationType } from '@/lib/db-types';
 
 export interface User {
   id: string; // Supabase user ID
@@ -10,6 +9,7 @@ export interface User {
   name: string;
   gender: 'male' | 'female' | 'other' | null;
   phone: string | null;
+  role: ProjectRole | null;
 }
 
 interface AppState {
@@ -20,13 +20,18 @@ interface AppState {
   userLng: number;
   hasLocation: boolean;
   userArea: string | null;
-  // Filters & search
+  // Project Filters & search
   searchQuery: string;
   selectedCategory: string | null;
+  industryFilter: string | null;
+  difficultyFilter: 'all' | ProjectDifficulty;
+  locationPreferenceFilter: 'all' | LocationPreference;
+  compensationFilter: 'all' | CompensationType;
+  // Legacy filters (maintained for compatibility)
   typeFilter: 'all' | 'product' | 'service';
   operationTypeFilter: 'all' | 'home' | 'shop';
   distanceFilter: number; // km, 0 = anywhere
-  sortBy: 'distance' | 'newest';
+  sortBy: 'newest' | 'distance';
   // UI State
   isLoading: boolean;
   isSidebarOpen: boolean;
@@ -38,10 +43,14 @@ interface AppState {
   setUserLocation: (lat: number, lng: number, area?: string) => void;
   setSearchQuery: (q: string) => void;
   setSelectedCategory: (c: string | null) => void;
+  setIndustryFilter: (ind: string | null) => void;
+  setDifficultyFilter: (d: 'all' | ProjectDifficulty) => void;
+  setLocationPreferenceFilter: (loc: 'all' | LocationPreference) => void;
+  setCompensationFilter: (comp: 'all' | CompensationType) => void;
   setTypeFilter: (t: 'all' | 'product' | 'service') => void;
   setOperationTypeFilter: (t: 'all' | 'home' | 'shop') => void;
   setDistanceFilter: (d: number) => void;
-  setSortBy: (s: 'distance' | 'newest') => void;
+  setSortBy: (s: 'newest' | 'distance') => void;
   setLoading: (loading: boolean) => void;
   setSidebarOpen: (open: boolean) => void;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
@@ -58,10 +67,14 @@ export const useAppStore = create<AppState>()(
       userArea: null,
       searchQuery: '',
       selectedCategory: null,
+      industryFilter: null,
+      difficultyFilter: 'all',
+      locationPreferenceFilter: 'all',
+      compensationFilter: 'all',
       typeFilter: 'all',
       operationTypeFilter: 'all',
       distanceFilter: 0,
-      sortBy: 'distance',
+      sortBy: 'newest',
       isLoading: false,
       isSidebarOpen: false,
       theme: 'system',
@@ -78,6 +91,10 @@ export const useAppStore = create<AppState>()(
         set({ userLat: lat, userLng: lng, hasLocation: true, userArea: area || null }),
       setSearchQuery: (q) => set({ searchQuery: q }),
       setSelectedCategory: (c) => set({ selectedCategory: c }),
+      setIndustryFilter: (ind) => set({ industryFilter: ind }),
+      setDifficultyFilter: (d) => set({ difficultyFilter: d }),
+      setLocationPreferenceFilter: (loc) => set({ locationPreferenceFilter: loc }),
+      setCompensationFilter: (comp) => set({ compensationFilter: comp }),
       setTypeFilter: (t) => set({ typeFilter: t }),
       setOperationTypeFilter: (t) => set({ operationTypeFilter: t }),
       setDistanceFilter: (d) => set({ distanceFilter: d }),
@@ -90,23 +107,24 @@ export const useAppStore = create<AppState>()(
         set({
           searchQuery: '',
           selectedCategory: null,
+          industryFilter: null,
+          difficultyFilter: 'all',
+          locationPreferenceFilter: 'all',
+          compensationFilter: 'all',
           typeFilter: 'all',
           operationTypeFilter: 'all',
           distanceFilter: 0,
-          sortBy: 'distance',
+          sortBy: 'newest',
         }),
     }),
     {
       name: 'aaspass-store',
-      // Persist last known location so the app stays in the user's region across reloads.
       partialize: (state) => ({
         user: state.user,
         userLat: state.userLat,
         userLng: state.userLng,
         hasLocation: state.hasLocation,
         sortBy: state.sortBy,
-        operationTypeFilter: state.operationTypeFilter,
-        distanceFilter: state.distanceFilter,
         theme: state.theme,
       }),
     }

@@ -1,0 +1,1376 @@
+# Aaspass — Product Direction Update
+## Update Plan: Trusted Real-World Project Marketplace
+
+> This document updates the existing Aaspass concept. The goal is to evolve Aaspass from a hyperlocal freelancing marketplace into a trusted platform where professionals from different fields can submit real software/project requirements and verified students or emerging developers can discover, request access to, and work on those projects.
+
+---
+
+# 1. Updated Product Vision
+
+Aaspass will connect:
+
+- **Professionals / Project Owners** — people from any field who have a real problem that can be solved through software or technology.
+- **Students / Emerging Developers** — learners, college students, beginners, and freshers who want genuine real-world project experience.
+
+The platform acts as a controlled bridge between the two.
+
+The main problem we want to solve is:
+
+**Professionals have real project requirements but may not want to publish their complete idea, business process, or requirements publicly. Students need real projects but usually have difficulty finding legitimate projects and opportunities to gain practical experience.**
+
+Aaspass solves this by allowing projects to be publicly discoverable at a high level while keeping detailed requirements protected until the project owner chooses to share them.
+
+---
+
+# 2. Core Idea
+
+The core idea is:
+
+**Professionals can list real software/project requirements on Aaspass without publicly exposing sensitive project details. Students and emerging developers can discover these projects, review limited information, and send a request to the professional. The professional reviews the developer's profile and decides whether to grant access to the detailed requirements.**
+
+The platform therefore becomes a:
+
+**Trusted Project Discovery + Controlled Access + Collaboration Platform**
+
+The professional always remains in control of sensitive project information.
+
+---
+
+# 3. Important Product Principle
+
+## Public Discovery, Private Requirements
+
+A project should be discoverable without revealing the information that could allow competitors or unrelated users to copy the idea.
+
+### Information visible to everyone
+
+A project card may contain:
+
+- Project title or generic project name
+- Industry/category
+- Project type
+- Required technologies
+- Difficulty level
+- Approximate duration
+- Team size
+- Paid / unpaid / compensation status
+- General non-sensitive summary
+- Required skills
+- Project location or remote status, where relevant
+- Project status
+
+### Information NOT visible publicly
+
+The following should remain protected:
+
+- Complete project description
+- Detailed business requirements
+- Detailed feature list
+- Internal business processes
+- Proprietary workflows
+- Private documents
+- Client/customer information
+- Internal data
+- Sensitive technical details
+- Confidential attachments
+- Other information marked private by the project owner
+
+---
+
+# 4. Target Users
+
+## 4.1 Project Owners / Professionals
+
+The platform should not be limited to software companies.
+
+A project owner can be a:
+
+- Business owner
+- Entrepreneur
+- Doctor
+- Lawyer
+- Accountant / CA
+- Architect
+- Teacher / educator
+- Researcher
+- Restaurant owner
+- Manufacturer
+- Consultant
+- Coach
+- Startup founder
+- Freelancer
+- Other legitimate professional
+
+Their common requirement is:
+
+**They have a real problem that requires software, automation, a website, application, dashboard, data system, AI solution, or another technical solution.**
+
+---
+
+## 4.2 Students / Emerging Developers
+
+The developer side is intended primarily for:
+
+- College students
+- Beginners
+- Freshers
+- Learners
+- Junior developers
+- Emerging developers
+
+The term "Student / Emerging Developer" should be preferred over a strict "Student" classification because a student can already be a capable developer.
+
+They should be able to:
+
+- Build a technical profile
+- Add skills
+- Connect GitHub/portfolio
+- Discover projects
+- Request access
+- Communicate with project owners after approval
+- Work on real projects
+- Build verified experience
+- Receive project reviews
+- Build reputation
+
+---
+
+# 5. New End-to-End Product Flow
+
+The first implementation should focus on building this complete functional pipeline WITHOUT advanced automation.
+
+## Phase A — Project Owner Flow
+
+### Step 1: User creates an account
+
+Project owner signs up/logs in.
+
+### Step 2: Choose account role
+
+User selects:
+
+**Project Owner / Professional**
+
+The account role should be stored and used for authorization.
+
+### Step 3: Create a project
+
+Project owner enters:
+
+- Project title
+- Category
+- Industry
+- Project type
+- Required skills
+- Technologies
+- Difficulty
+- Expected duration
+- Team size
+- Compensation
+- Remote/local preference
+- Public summary
+- Detailed requirements
+- Optional private attachments
+- Any confidentiality notes
+
+### Step 4: Save project
+
+The project is stored in the database.
+
+Initially, project submission can use normal form validation and manual/platform moderation if necessary.
+
+### Step 5: Publish project
+
+Once published:
+
+- Basic project information becomes visible.
+- Detailed requirements remain protected.
+- The project becomes discoverable to eligible users.
+
+---
+
+# 6. Student / Developer Flow
+
+## Step 1: Create account
+
+Student/developer signs up.
+
+## Step 2: Build profile
+
+Profile contains:
+
+- Name
+- Profile photo
+- Short bio
+- Education
+- Skills
+- Technologies
+- Experience level
+- GitHub
+- Portfolio
+- LinkedIn or other professional links
+- Previous projects
+- Availability
+- Preferred project categories
+
+The profile should focus on useful professional information rather than unnecessary personal information.
+
+## Step 3: Browse projects
+
+Developer visits the project feed.
+
+They can:
+
+- Search
+- Filter
+- Sort
+- Browse categories
+- Save/bookmark projects
+
+## Step 4: View public project information
+
+The developer sees only the non-sensitive project information.
+
+The detailed requirements are locked.
+
+Example:
+
+**Inventory Management System**
+
+Industry: Retail  
+Type: Web Application  
+Skills: React, Node.js, PostgreSQL  
+Difficulty: Intermediate  
+Duration: 4–6 weeks  
+Status: Accepting Requests
+
+Detailed requirements:
+
+**🔒 Available after project owner approval**
+
+## Step 5: Send request
+
+If interested, the developer clicks:
+
+**Request Access**
+
+The developer may optionally submit a short message explaining:
+
+- Why they are interested
+- Relevant skills
+- Previous experience
+- Proposed contribution
+
+## Step 6: Professional receives request
+
+The professional sees:
+
+- Developer profile
+- Skills
+- Portfolio
+- GitHub
+- Previous projects
+- Experience
+- Reviews/reputation
+- Request message
+
+## Step 7: Professional decides
+
+Two primary actions:
+
+**Accept Request**
+
+or
+
+**Reject Request**
+
+## Step 8: If accepted
+
+The developer receives permission to view the detailed project requirements.
+
+The system should record the permission.
+
+## Step 9: Developer accesses project
+
+The developer can now view the information permitted by the project owner.
+
+Depending on the project, the owner may provide:
+
+- Detailed requirements
+- Complete feature list
+- Technical expectations
+- Attachments
+- Project documents
+- Additional instructions
+
+## Step 10: Collaboration
+
+After access is granted, the platform can provide a private project workspace.
+
+Possible features:
+
+- Project discussion
+- Messages
+- Task tracking
+- File sharing
+- Status updates
+- Milestones
+- Submission
+- Completion tracking
+
+These can be implemented progressively.
+
+## Step 11: Project completion
+
+When the work is completed:
+
+- Project owner marks the project completed.
+- Developer submits final work.
+- Both sides can provide feedback/reviews.
+
+## Step 12: Reputation
+
+Completed projects contribute to the developer's profile.
+
+Example:
+
+**Projects Completed: 3**
+
+**Technical Quality: 4.8/5**
+
+**Communication: 4.7/5**
+
+**Reliability: 5/5**
+
+This creates a verified real-world experience history.
+
+---
+
+# 7. Access Control Model
+
+The platform should use progressive disclosure.
+
+### Level 1 — Public
+
+Everyone can see basic project information.
+
+### Level 2 — Request Submitted
+
+The professional can review the developer.
+
+No additional confidential information is automatically revealed.
+
+### Level 3 — Request Accepted
+
+Selected information becomes available to the developer.
+
+### Level 4 — Private Collaboration
+
+The project owner can share complete requirements, documents, and other sensitive information with selected developers.
+
+This model should be enforced by backend authorization, not only by hiding UI elements.
+
+---
+
+# 8. Roles and Permissions
+
+The application should clearly separate:
+
+## Project Owner
+
+Can:
+
+- Create projects
+- Edit projects
+- Publish/unpublish projects
+- View requests
+- Review developer profiles
+- Accept/reject requests
+- Grant/revoke project access
+- Manage project members
+- Share private project information
+- Mark projects complete
+- Review developers
+
+## Student / Emerging Developer
+
+Can:
+
+- Create developer profile
+- Browse public projects
+- Save projects
+- Send requests
+- Cancel pending requests
+- View projects they have been approved for
+- Participate in approved projects
+- Submit work
+- Build project history
+
+## Admin
+
+Can:
+
+- Manage users
+- Review reports
+- Moderate projects
+- Suspend accounts
+- Handle disputes
+- Manage categories
+- Review suspicious activity
+- Audit platform activity
+
+---
+
+# 9. UI/UX Direction Update
+
+The existing Aaspass UI should be simplified.
+
+The target audience is broad because project owners may come from almost any professional field.
+
+Therefore, the interface should NOT feel like a complicated developer-only platform.
+
+## UI principles
+
+### Simple
+
+A new user should understand the platform within a few minutes.
+
+### Clear
+
+Use plain language instead of technical terminology wherever possible.
+
+For example:
+
+Instead of:
+
+**"Create Listing"**
+
+Use:
+
+**"Post a Project"**
+
+Instead of:
+
+**"Bid"**
+
+Use:
+
+**"Request Access"**
+
+Instead of:
+
+**"Seller Dashboard"**
+
+Use:
+
+**"My Projects"**
+
+Instead of:
+
+**"Buyer"**
+
+Use:
+
+**"Project Owner"**
+
+### Guided
+
+Project posting should use a step-by-step form.
+
+Example:
+
+**1. About Your Project**
+→ **2. Skills Needed**
+→ **3. Project Details**
+→ **4. Review & Publish**
+
+### Minimal
+
+Avoid unnecessary cards, animations, technical dashboards, and excessive information.
+
+### Accessible
+
+Use:
+
+- Clear typography
+- Strong visual hierarchy
+- Large clickable buttons
+- Clear labels
+- Helpful descriptions
+- Responsive design
+- Mobile-friendly layouts
+- Consistent navigation
+
+---
+
+# 10. Recommended Main Navigation
+
+A simple navigation structure:
+
+**Home | Find Projects | Post a Project | My Projects | Messages | Profile**
+
+Depending on the user's role, the navigation can adapt.
+
+### Student view
+
+- Home
+- Find Projects
+- My Requests
+- My Projects
+- Messages
+- Profile
+
+### Professional view
+
+- Home
+- My Projects
+- Requests
+- Messages
+- Profile
+- Post a Project
+
+### Admin
+
+Separate protected admin interface.
+
+---
+
+# 11. Home Page Direction
+
+The homepage should immediately communicate the concept.
+
+Possible message:
+
+**Real Projects. Real Experience. Trusted Connections.**
+
+Supporting message:
+
+**Professionals post real problems. Students and emerging developers discover opportunities and request access to work on them.**
+
+Primary actions:
+
+**Find Projects**
+
+**Post a Project**
+
+The interface should make the two paths obvious.
+
+---
+
+# 12. Project Card Design
+
+Project cards should be simple and consistent.
+
+Example:
+
+------------------------------------
+**Inventory Management System**
+
+🏢 Retail  
+💻 Web Application  
+🛠 React · Node.js · PostgreSQL  
+📊 Intermediate  
+⏱ 4–6 Weeks  
+💰 Paid
+
+**Detailed requirements are private**
+
+[ View Project ] [ Request Access ]
+------------------------------------
+
+The "Request Access" button should appear when appropriate.
+
+---
+
+# 13. Professional Project Page
+
+Before access is granted:
+
+Show:
+
+- Project title
+- Category
+- Industry
+- Skills
+- Technology
+- Difficulty
+- Duration
+- Compensation
+- General summary
+- Project owner basic profile
+- Request Access button
+
+Hide:
+
+- Full requirements
+- Private documents
+- Confidential information
+
+After approval:
+
+Display the additional protected content.
+
+---
+
+# 14. Existing Aaspass Features
+
+The existing project already contains several useful foundations.
+
+Potentially retain and adapt:
+
+- React + TypeScript
+- Supabase authentication
+- PostgreSQL
+- Row Level Security
+- User profiles
+- Project/listing system
+- Search
+- Categories
+- Bookmarks
+- Reviews
+- Admin moderation
+- Cloudinary
+- Razorpay if monetization remains
+- PWA support
+- Testing infrastructure
+
+However, features should be evaluated based on the new product direction.
+
+---
+
+# 15. Features That May Need Reworking
+
+## Hyperlocal GPS
+
+The original concept strongly emphasized location.
+
+Location should no longer be the primary product identity.
+
+It can remain as an optional feature:
+
+**Nearby projects / nearby professionals**
+
+but the platform should also support:
+
+**Remote projects**
+
+because real-world project collaboration does not always require physical proximity.
+
+## Map
+
+The map can become optional rather than the primary discovery method.
+
+The main project discovery experience should be a clean searchable list/grid.
+
+## Subscription-first model
+
+The existing subscription model should not block the core project discovery experience during the initial MVP.
+
+Monetization can be revisited after the core workflow is validated.
+
+---
+
+# 16. Database Direction
+
+The existing database should be extended rather than completely rebuilt where possible.
+
+Important entities should include:
+
+### users
+
+Core authentication/user information.
+
+### profiles
+
+Role-specific profile information.
+
+Possible roles:
+
+- project_owner
+- developer
+- admin
+
+### projects
+
+Contains:
+
+- id
+- owner_id
+- title
+- category
+- industry
+- project_type
+- public_summary
+- private_requirements
+- required_skills
+- technologies
+- difficulty
+- duration
+- team_size
+- compensation
+- location/remote preference
+- status
+- created_at
+- updated_at
+
+### project_requests
+
+Contains:
+
+- id
+- project_id
+- developer_id
+- message
+- status
+- created_at
+- updated_at
+
+Request statuses:
+
+- pending
+- accepted
+- rejected
+- cancelled
+
+### project_access
+
+Controls which developer can access protected project information.
+
+Contains:
+
+- project_id
+- developer_id
+- access_level
+- granted_by
+- granted_at
+- revoked_at
+
+### project_members
+
+Stores accepted collaborators.
+
+### project_reviews
+
+Stores post-project feedback.
+
+### reports
+
+Stores user/project reports.
+
+### audit_logs
+
+Records important actions such as:
+
+- Project creation
+- Project publication
+- Request submission
+- Request approval
+- Access granted
+- Access revoked
+- Project completion
+- Account suspension
+
+---
+
+# 17. Security Requirement
+
+The private requirements must NEVER rely only on frontend hiding.
+
+Bad implementation:
+
+The frontend receives the complete requirements but simply hides them.
+
+Good implementation:
+
+The backend/database only returns protected requirements when the authenticated user has permission.
+
+Supabase RLS should enforce this.
+
+Example principle:
+
+**Public user → public fields only**
+
+**Approved developer → public fields + permitted private fields**
+
+**Project owner → own project's private information**
+
+This is a critical part of the implementation.
+
+---
+
+# 18. Implementation Strategy
+
+The project should be implemented in stages.
+
+The priority is to first make the complete manual workflow work.
+
+Do NOT start with the automation system.
+
+---
+
+## PHASE 1 — Product Foundation
+
+- Clean existing codebase
+- Review existing authentication
+- Review current database
+- Confirm user roles
+- Simplify navigation
+- Establish new UI design system
+- Remove or hide features that conflict with the new direction
+- Define project and developer data models
+
+---
+
+## PHASE 2 — Project Posting
+
+Build the complete project creation flow.
+
+Features:
+
+- Post Project
+- Multi-step form
+- Public information
+- Private requirements
+- Draft
+- Publish
+- Edit
+- Unpublish
+- Delete
+
+At the end of this phase:
+
+**A professional can successfully create and publish a project.**
+
+---
+
+## PHASE 3 — Project Discovery
+
+Build:
+
+- Project feed
+- Search
+- Filters
+- Categories
+- Project cards
+- Project detail page
+- Bookmark/save
+
+At the end:
+
+**A developer can discover projects without seeing confidential requirements.**
+
+---
+
+## PHASE 4 — Developer Profiles
+
+Build:
+
+- Developer profile
+- Skills
+- Experience
+- GitHub
+- Portfolio
+- Previous projects
+- Education
+- Availability
+
+At the end:
+
+**Professionals can evaluate developers before giving access.**
+
+---
+
+## PHASE 5 — Request System
+
+Build:
+
+- Request Access button
+- Request form
+- Pending requests
+- Professional request dashboard
+- Accept
+- Reject
+- Cancel request
+- Request status
+
+At the end:
+
+**Developer → Request → Professional → Accept/Reject works completely.**
+
+---
+
+## PHASE 6 — Controlled Access
+
+Implement:
+
+- Project access permissions
+- Private requirements
+- Access granted after approval
+- Access revoked
+- Backend authorization
+- Supabase RLS policies
+- Security testing
+
+At the end:
+
+**The core privacy model works.**
+
+---
+
+## PHASE 7 — Collaboration
+
+Build only after the request/access pipeline is stable:
+
+- Private project workspace
+- Messages
+- Tasks
+- Milestones
+- File sharing
+- Progress updates
+- Submission
+- Completion
+
+At the end:
+
+**Approved developers can actually work with the project owner.**
+
+---
+
+## PHASE 8 — Reviews and Reputation
+
+Implement:
+
+- Project completion
+- Developer review
+- Professional review
+- Ratings
+- Project history
+- Reputation
+- Completed project count
+- Verified experience
+
+This creates the long-term value of the platform.
+
+---
+
+# 19. PHASE 9 — MEDIATOR AUTOMATION
+
+## IMPORTANT
+
+Automation should be implemented ONLY after the complete manual pipeline is functional.
+
+The first goal is:
+
+**Post → Discover → Request → Review → Accept → Access → Collaborate → Complete → Review**
+
+Only after this works should automation be introduced.
+
+---
+
+# 20. Automation Architecture
+
+The automation layer will act as a mediator/trust engine.
+
+It should support several independent verification functions rather than one "AI decides everything" system.
+
+---
+
+## 20.1 Project Requirement Validation
+
+When a professional submits a project, automation can evaluate:
+
+- Is the requirement understandable?
+- Is it actually a software/technology project?
+- Is the description sufficiently complete?
+- Is the project suspicious/spam-like?
+- Does it contain prohibited content?
+- Is it asking for something potentially harmful?
+- Are important details missing?
+- Is the project likely feasible at the stated level?
+
+Output example:
+
+**Project Status: Needs Review**
+
+Reasons:
+
+- Missing project scope
+- Missing expected outcome
+- Missing required skills
+
+The professional can then improve the submission.
+
+---
+
+## 20.2 Project Categorization
+
+Automation can classify projects into:
+
+- Web Development
+- Mobile Development
+- AI/ML
+- Data
+- Automation
+- UI/UX
+- E-commerce
+- Education
+- Healthcare
+- Finance
+- Manufacturing
+- etc.
+
+This makes project discovery easier.
+
+---
+
+## 20.3 Sensitive Information Detection
+
+Automation can identify information that should not be included in the public summary.
+
+Examples:
+
+- Personal information
+- Customer information
+- Credentials
+- Private business data
+- Confidential documents
+- Internal identifiers
+- Sensitive technical details
+
+The system can warn the professional before publishing.
+
+---
+
+## 20.4 Duplicate / Similar Project Detection
+
+Automation can detect projects that appear highly similar to existing projects.
+
+This can help identify:
+
+- Spam
+- Duplicate submissions
+- Repeated content
+- Potential copied listings
+
+It should be treated as a signal for moderation, not an absolute proof.
+
+---
+
+# 21. Developer Role Verification
+
+This is one of the most important automation features.
+
+The platform should evaluate whether a user claiming to be a:
+
+**Student / Emerging Developer**
+
+is consistent with their profile and activity.
+
+Possible signals:
+
+- College/university information
+- Institutional email where available
+- GitHub profile
+- Portfolio
+- Technical projects
+- Coding/project history
+- Professional profile links
+- Account history
+- Platform activity
+
+The system can identify suspicious cases such as:
+
+**User claims to be a student but appears to operate a professional business/company account.**
+
+However, automation should NOT make an absolute claim that someone is or is not a student based only on AI.
+
+Instead, it should produce:
+
+- Verified
+- Needs additional verification
+- Suspicious / manual review
+
+This reduces false positives.
+
+---
+
+# 22. Professional Verification
+
+Automation can also evaluate project owners.
+
+Possible signals:
+
+- Profile completeness
+- Organization/business information
+- Account history
+- Project quality
+- Suspicious activity
+- Repeated reports
+- Duplicate project submissions
+- Communication behavior
+
+Again, automation should assist moderation rather than replace every human decision.
+
+---
+
+# 23. Trust and Risk Scoring
+
+Eventually, each account/project can have an internal trust score.
+
+Example:
+
+**Developer Trust**
+- Identity/profile verification
+- Project history
+- Reviews
+- Account age
+- Report history
+- Profile consistency
+
+**Project Trust**
+- Owner verification
+- Requirement quality
+- Account history
+- Reports
+- Project similarity
+- Moderation history
+
+These scores can influence:
+
+- Visibility
+- Verification badges
+- Access limits
+- Manual review requirements
+- Matching recommendations
+
+Internal risk scores should not necessarily be exposed as raw numbers to users.
+
+---
+
+# 24. Automated Project-Developer Matching
+
+Once enough project and developer data exists, automation can recommend projects.
+
+Example:
+
+**92% Match**
+
+Why:
+
+- React ✓
+- Node.js ✓
+- Beginner-friendly ✓
+- Interested in fintech ✓
+- Available for 4 weeks ✓
+
+This should be introduced after the core marketplace works.
+
+---
+
+# 25. Automation Decision Philosophy
+
+Automation should be a:
+
+**Mediator + Assistant + Risk Detector**
+
+not an:
+
+**Absolute Judge**
+
+The platform should provide human override for important decisions.
+
+For example:
+
+**Automation → Flags suspicious account → Admin reviews → Final decision**
+
+This makes the system safer and more realistic.
+
+---
+
+# 26. Final Product Flow
+
+The mature Aaspass workflow should eventually become:
+
+**Professional**
+
+↓
+
+**Create Project**
+
+↓
+
+**Project Verification**
+
+↓
+
+**Publish Limited Public Information**
+
+↓
+
+**Student / Emerging Developer Discovers Project**
+
+↓
+
+**Reviews Public Information**
+
+↓
+
+**Sends Request**
+
+↓
+
+**Professional Reviews Developer Profile**
+
+↓
+
+**Accept / Reject**
+
+↓
+
+**If Accepted → Detailed Requirements Unlocked**
+
+↓
+
+**Private Collaboration**
+
+↓
+
+**Project Completion**
+
+↓
+
+**Reviews + Verified Experience**
+
+↓
+
+**Developer Reputation**
+
+---
+
+# 27. Long-Term Vision
+
+The long-term goal is not simply to become another freelancing marketplace.
+
+Aaspass should become a platform where:
+
+**Real-world problems → Real project opportunities → Emerging talent → Verified experience**
+
+The platform should make it easier for professionals to find capable emerging developers while giving students and freshers a safer and more structured way to gain genuine industry exposure.
+
+---
+
+# 28. MVP Definition
+
+The first MVP should NOT include every planned feature.
+
+The MVP should prove one core loop:
+
+### Professional
+
+**Create → Publish**
+
+### Developer
+
+**Discover → Request**
+
+### Professional
+
+**Review → Accept/Reject**
+
+### Developer
+
+**Access approved requirements**
+
+### Both
+
+**Collaborate → Complete → Review**
+
+If this loop works reliably, the platform has a valid foundation.
+
+Automation should be added after this pipeline is stable.
+
+---
+
+# 29. Priority Order
+
+Implementation priority:
+
+1. Existing codebase cleanup
+2. Simplified UI/UX
+3. Authentication and roles
+4. Professional project creation
+5. Public/private project information
+6. Project discovery
+7. Developer profiles
+8. Request system
+9. Professional request management
+10. Controlled project access
+11. Security/RLS
+12. Private collaboration
+13. Project completion
+14. Reviews/reputation
+15. **Mediator automation**
+16. Automated verification
+17. Trust/risk signals
+18. Automated matching
+19. Advanced analytics
+20. Monetization optimization
+
+---
+
+# 30. Product Identity After This Update
+
+## Short description
+
+**Aaspass is a trusted platform that connects professionals with students and emerging developers through real-world projects, while protecting sensitive project requirements with controlled access.**
+
+## Core promise
+
+**Professionals get trusted access to emerging talent without exposing their complete project publicly.**
+
+**Students get access to genuine real-world projects and verified experience.**
+
+## Core differentiator
+
+**Public project discovery + private project requirements + professional-controlled access + trust verification.**
+
+---
+
+# 31. Important Development Rule
+
+When implementing this update:
+
+**Do not rewrite the entire application unnecessarily.**
+
+First inspect the existing:
+
+- Routes
+- Components
+- Database schema
+- Supabase policies
+- Authentication
+- User roles
+- Listing system
+- Profile system
+- Reviews
+- Admin system
+
+Reuse working functionality wherever it fits.
+
+Refactor only where the existing implementation conflicts with the new product direction.
+
+The goal is to evolve Aaspass, not restart it from zero.
+
+---
+
+# 32. Current Development Objective
+
+The immediate objective is:
+
+> **Build a simple, understandable, secure, end-to-end marketplace pipeline where a professional can post a project, a student/emerging developer can discover it and request access, the professional can review the developer and accept/reject the request, and detailed project information becomes available only after approval.**
+
+Once this complete manual pipeline works:
+
+> **Implement the Mediator Automation layer.**
+
+This keeps development manageable, allows the core product to be tested early, and prevents spending significant development time on AI verification before the underlying marketplace workflow is proven.

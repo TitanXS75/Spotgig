@@ -13,18 +13,14 @@
 
 1. Read `.agents/SKILL.md` for architecture, conventions, and database schema.
 2. Read `.agents/rules/code-style.md` for styling and naming rules.
-3. Check `todo.txt` for current active work items.
-4. Check `docs/PRD.md` for product requirements and roadmap.
-5. Check `docs/ARCHITECTURE.md` for system design decisions.
+3. Read `.agents/rules/prompt-upgrade-and-skills.md` for prompt enhancement & skill selection workflows.
+4. Check `todo.txt` for current active work items.
+5. Check `docs/PRD.md` for product requirements and roadmap.
+6. Check `docs/ARCHITECTURE.md` for system design decisions.
 
-## 🎯 Skill Usage Rule
-- **Use skills ONLY when strictly required for the specific task at hand to avoid unnecessary context expansion and token bloat.**
-- Dedicated skills available under `.agents/skills/`:
-  - `supabase-database`: For DB schema, RLS policies, migrations, and Edge Functions.
-  - `frontend-tailwind-shadcn`: For UI styling, shadcn components, and Framer Motion.
-  - `state-tanstack-zustand`: For query invalidation, caching, and store separation.
-  - `razorpay-payments`: For payment order creation and HMAC verification.
-  - `leaflet-maps`: For interactive map pins, popup previews, and geolocation.
+## 🎯 Prompt Upgrading & Skill Selection
+- **Autonomous Prompt Upgrading**: Elevate every user request into a comprehensive, production-grade technical specification covering edge cases, type safety, UX, performance, and security.
+- **Proactive Skill Activation**: For every task, analyze matching domain skills from workspace (`.agents/skills/`) and global configuration (`C:\Users\Dell\.gemini\config\skills/`), read their `SKILL.md` when needed, and apply expert patterns.
 
 ## Key Decisions Already Made
 

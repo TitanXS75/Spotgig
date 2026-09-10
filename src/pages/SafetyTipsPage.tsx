@@ -70,7 +70,7 @@ const SafetyTipsPage = () => {
               <li>❌ Never pay 100% upfront for large or new projects</li>
               <li>❌ Don't share login credentials or sensitive server access without NDAs</li>
               <li>❌ Avoid platforms that take over your domain/hosting without a contract</li>
-              <li>❌ Don't ignore red flags — vague communication is a warning sign</li>
+              <li>❌ Don't ignore red flags: vague communication is a warning sign</li>
             </ul>
           </div>
         </div>
@@ -111,7 +111,7 @@ const SafetyTipsPage = () => {
               <li>❌ Never deliver final files before receiving full payment</li>
               <li>❌ Don't work on verbal agreements alone for large projects</li>
               <li>❌ Avoid sharing your personal bank details publicly</li>
-              <li>❌ Don't ignore scope creep — charge for additions beyond the agreed scope</li>
+              <li>❌ Don't ignore scope creep: charge for additions beyond the agreed scope</li>
             </ul>
           </div>
         </div>

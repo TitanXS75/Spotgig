@@ -22,11 +22,11 @@ const SellerCTA = () => {
       className="bg-primary/5 rounded-2xl p-5 mt-6 border border-primary/10"
     >
       <h3 className="font-semibold text-foreground text-lg leading-tight">
-        Got a project? Or skills to offer? 💼
+        Got a project?
       </h3>
       <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-        Clients — post your project and find skilled freelancers near you.<br />
-        Freelancers — register your skills and start earning real money.
+        Clients: post your project and find skilled freelancers near you.<br />
+        Freelancers: register your skills and start earning real money.
       </p>
       <div className="flex flex-col sm:flex-row gap-2 mt-3">
         <motion.button

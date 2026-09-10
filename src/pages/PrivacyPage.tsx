@@ -196,7 +196,7 @@ const PrivacyPage = () => {
         <h2 className="text-2xl font-bold text-foreground mb-4">Data Security</h2>
         <div className="bg-primary/5 rounded-xl p-6">
           <p className="text-muted-foreground mb-4">
-            We implement industry-standard security measures to protect your information:
+            We implement industry standard security measures to protect your information:
           </p>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>• SSL encryption for all data transmissions</li>

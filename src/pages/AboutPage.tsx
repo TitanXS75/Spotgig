@@ -30,7 +30,7 @@ const AboutPage = () => {
         </h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Aaspass is a hyperlocal freelancing platform that connects business owners and project clients with 
-          skilled students and freelancers nearby — for real work, real experience, and real pay.
+          skilled students and freelancers nearby for real work, real experience, and real pay.
         </p>
       </motion.div>
 
@@ -46,7 +46,7 @@ const AboutPage = () => {
           <h3 className="text-xl font-bold text-foreground">Our Mission</h3>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          To eliminate the "no experience, no job — no job, no experience" paradox for students. We give 
+          To eliminate the "no experience, no job / no job, no experience" paradox for students. We give 
           students access to real client projects nearby while giving businesses affordable, trustworthy 
           tech talent. Everyone wins.
         </p>
@@ -65,14 +65,14 @@ const AboutPage = () => {
             <GraduationCap className="w-8 h-8 text-purple-500 mb-3" />
             <h4 className="font-semibold text-foreground mb-2">Student-First</h4>
             <p className="text-sm text-muted-foreground">
-              We believe students deserve real work opportunities — not just mock projects. Aaspass turns learning into earning.
+              We believe students deserve real work opportunities instead of just mock projects. Aaspass turns learning into earning.
             </p>
           </div>
           <div className="bg-muted/30 rounded-xl p-6">
             <Briefcase className="w-8 h-8 text-blue-500 mb-3" />
             <h4 className="font-semibold text-foreground mb-2">Client Trust</h4>
             <p className="text-sm text-muted-foreground">
-              Clients know exactly who they're hiring — verified profiles, portfolio links, and local proximity for in-person collaboration.
+              Clients know exactly who they're hiring with verified profiles, portfolio links, and local proximity for in-person collaboration.
             </p>
           </div>
           <div className="bg-muted/30 rounded-xl p-6">
@@ -103,18 +103,18 @@ const AboutPage = () => {
         <div className="space-y-4 text-muted-foreground">
           <p>
             Aaspass started from a simple observation: talented students struggle to get their first client, 
-            while small businesses struggle to find affordable, reliable tech talent. The mismatch was obvious 
-            — yet no platform was solving it at a hyperlocal level.
+            while small businesses struggle to find affordable, reliable tech talent. The mismatch was obvious, 
+            yet no platform was solving it at a hyperlocal level.
           </p>
           <p>
             We built Aaspass in 2024 with one goal: bridge that gap. Our location-based matching means a 
             business owner in your city can find a B.Tech student three streets away who can build their 
-            website for a fair price — and that student gets real money and a real portfolio project.
+            website for a fair price, and that student gets real money and a real portfolio project.
           </p>
           <p>
             Today, Aaspass supports thousands of freelancers and clients across multiple cities. Students work 
             solo or form teams for bigger projects. Business owners get quality work at fair rates. Communities 
-            get stronger — one project at a time.
+            get stronger, one project at a time.
           </p>
         </div>
       </motion.div>

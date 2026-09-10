@@ -47,24 +47,34 @@ export async function fetchProjects(filters?: ProjectFilters): Promise<Project[]
   return (data || []) as Project[];
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * Fetch a single project by ID or unique slug.
  * Increments view counter.
  */
 export async function fetchProjectById(idOrSlug: string): Promise<Project> {
-  const { data, error } = await supabase
+  const isUuid = UUID_REGEX.test(idOrSlug);
+  let query = supabase
     .from('projects')
-    .select('*, profiles!owner_id(full_name, avatar_url, organization, role)')
-    .or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`)
-    .single();
+    .select('*, profiles!owner_id(full_name, avatar_url, organization, role)');
+
+  if (isUuid) {
+    query = query.or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`);
+  } else {
+    query = query.eq('slug', idOrSlug);
+  }
+
+  const { data, error } = await query.single();
 
   if (error) throw error;
 
   // Increment view count in background
   if (data?.id) {
+    const nextViews = ((data as any).views_count ?? (data as any).views ?? 0) + 1;
     supabase
       .from('projects')
-      .update({ views: (data.views ?? 0) + 1 })
+      .update({ views_count: nextViews, views: nextViews })
       .eq('id', data.id)
       .then(() => {});
   }

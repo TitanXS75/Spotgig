@@ -148,6 +148,7 @@ CREATE TABLE IF NOT EXISTS public.projects (
   technologies        TEXT[] DEFAULT '{}',
   status              project_status NOT NULL DEFAULT 'draft',
   views_count         INT NOT NULL DEFAULT 0,
+  views               INT NOT NULL DEFAULT 0,
   requests_count      INT NOT NULL DEFAULT 0,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -167,13 +168,17 @@ CREATE TRIGGER trg_projects_updated_at
 -- ── 5. Project Requirements Table (Protected Private Layer) ───
 
 CREATE TABLE IF NOT EXISTS public.project_requirements (
-  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  project_id          UUID NOT NULL UNIQUE REFERENCES public.projects(id) ON DELETE CASCADE,
-  confidential_specs  TEXT NOT NULL,
-  deliverables        TEXT,
-  credentials         TEXT,
-  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id             UUID NOT NULL UNIQUE REFERENCES public.projects(id) ON DELETE CASCADE,
+  detailed_requirements  TEXT NOT NULL,
+  feature_list           TEXT,
+  confidential_notes     TEXT,
+  attachments            TEXT[] NOT NULL DEFAULT '{}',
+  confidential_specs     TEXT,
+  deliverables           TEXT,
+  credentials            TEXT,
+  created_at             TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at             TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 DROP TRIGGER IF EXISTS trg_project_requirements_updated_at ON public.project_requirements;
@@ -183,9 +188,9 @@ CREATE TRIGGER trg_project_requirements_updated_at
   EXECUTE FUNCTION public.fn_set_updated_at();
 
 
--- ── 6. Project Access Requests Table ──────────────────────────
+-- ── 6. Project Requests Table ─────────────────────────────────
 
-CREATE TABLE IF NOT EXISTS public.project_access_requests (
+CREATE TABLE IF NOT EXISTS public.project_requests (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id   UUID NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
   developer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -196,14 +201,17 @@ CREATE TABLE IF NOT EXISTS public.project_access_requests (
   UNIQUE(project_id, developer_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_requests_project ON public.project_access_requests(project_id);
-CREATE INDEX IF NOT EXISTS idx_requests_developer ON public.project_access_requests(developer_id);
+CREATE INDEX IF NOT EXISTS idx_requests_project ON public.project_requests(project_id);
+CREATE INDEX IF NOT EXISTS idx_requests_developer ON public.project_requests(developer_id);
 
-DROP TRIGGER IF EXISTS trg_project_requests_updated_at ON public.project_access_requests;
+DROP TRIGGER IF EXISTS trg_project_requests_updated_at ON public.project_requests;
 CREATE TRIGGER trg_project_requests_updated_at
-  BEFORE UPDATE ON public.project_access_requests
+  BEFORE UPDATE ON public.project_requests
   FOR EACH ROW
   EXECUTE FUNCTION public.fn_set_updated_at();
+
+-- Backward compatibility view
+CREATE OR REPLACE VIEW public.project_access_requests AS SELECT * FROM public.project_requests;
 
 
 -- ── 7. Project Access Permissions Table ───────────────────────
@@ -212,7 +220,10 @@ CREATE TABLE IF NOT EXISTS public.project_access (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id   UUID NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
   developer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  access_level TEXT NOT NULL DEFAULT 'full',
+  granted_by   UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   granted_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  revoked_at   TIMESTAMPTZ,
   UNIQUE(project_id, developer_id)
 );
 
@@ -226,20 +237,22 @@ SECURITY DEFINER
 AS $$
 BEGIN
   IF NEW.status = 'accepted' AND (OLD.status IS NULL OR OLD.status != 'accepted') THEN
-    INSERT INTO public.project_access (project_id, developer_id)
-    VALUES (NEW.project_id, NEW.developer_id)
-    ON CONFLICT (project_id, developer_id) DO NOTHING;
+    INSERT INTO public.project_access (project_id, developer_id, access_level, granted_at, revoked_at)
+    VALUES (NEW.project_id, NEW.developer_id, 'full', NOW(), NULL)
+    ON CONFLICT (project_id, developer_id) 
+    DO UPDATE SET revoked_at = NULL, access_level = 'full', granted_at = NOW();
   ELSIF NEW.status != 'accepted' AND OLD.status = 'accepted' THEN
-    DELETE FROM public.project_access
+    UPDATE public.project_access
+    SET revoked_at = NOW()
     WHERE project_id = NEW.project_id AND developer_id = NEW.developer_id;
   END IF;
   RETURN NEW;
 END;
 $$;
 
-DROP TRIGGER IF EXISTS trg_auto_grant_access ON public.project_access_requests;
+DROP TRIGGER IF EXISTS trg_auto_grant_access ON public.project_requests;
 CREATE TRIGGER trg_auto_grant_access
-  AFTER INSERT OR UPDATE OF status ON public.project_access_requests
+  AFTER INSERT OR UPDATE OF status ON public.project_requests
   FOR EACH ROW
   EXECUTE FUNCTION public.fn_auto_grant_project_access();
 
@@ -332,7 +345,7 @@ CREATE INDEX IF NOT EXISTS idx_reviews_project ON public.project_reviews(project
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.project_requirements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.project_access_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.project_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.project_access ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.project_tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.project_messages ENABLE ROW LEVEL SECURITY;
@@ -375,6 +388,7 @@ CREATE POLICY "reqs_select_authorized" ON public.project_requirements FOR SELECT
       SELECT 1 FROM public.project_access
       WHERE project_id = public.project_requirements.project_id
         AND developer_id = auth.uid()
+        AND revoked_at IS NULL
     )
   );
 
@@ -391,25 +405,32 @@ CREATE POLICY "reqs_delete_owner" ON public.project_requirements FOR DELETE
   USING (auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id));
 
 -- Project Requests: Developers can view/submit own; owners can view/update
-DROP POLICY IF EXISTS "requests_select" ON public.project_access_requests;
-CREATE POLICY "requests_select" ON public.project_access_requests FOR SELECT
+DROP POLICY IF EXISTS "requests_select" ON public.project_requests;
+CREATE POLICY "requests_select" ON public.project_requests FOR SELECT
   USING (
     auth.uid() = developer_id
     OR auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
   );
 
-DROP POLICY IF EXISTS "requests_insert" ON public.project_access_requests;
-CREATE POLICY "requests_insert" ON public.project_access_requests FOR INSERT
+DROP POLICY IF EXISTS "requests_insert" ON public.project_requests;
+CREATE POLICY "requests_insert" ON public.project_requests FOR INSERT
   WITH CHECK (auth.uid() = developer_id);
 
-DROP POLICY IF EXISTS "requests_update" ON public.project_access_requests;
-CREATE POLICY "requests_update" ON public.project_access_requests FOR UPDATE
+DROP POLICY IF EXISTS "requests_update" ON public.project_requests;
+CREATE POLICY "requests_update" ON public.project_requests FOR UPDATE
   USING (
     auth.uid() = developer_id
     OR auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
   );
 
--- Project Access Table: Read by owner or developer
+DROP POLICY IF EXISTS "requests_delete" ON public.project_requests;
+CREATE POLICY "requests_delete" ON public.project_requests FOR DELETE
+  USING (
+    auth.uid() = developer_id
+    OR auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
+  );
+
+-- Project Access Table: Read by owner or developer; Managed by project owner
 DROP POLICY IF EXISTS "access_select" ON public.project_access;
 CREATE POLICY "access_select" ON public.project_access FOR SELECT
   USING (
@@ -417,26 +438,38 @@ CREATE POLICY "access_select" ON public.project_access FOR SELECT
     OR auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
   );
 
+DROP POLICY IF EXISTS "access_insert_owner" ON public.project_access;
+CREATE POLICY "access_insert_owner" ON public.project_access FOR INSERT
+  WITH CHECK (auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id));
+
+DROP POLICY IF EXISTS "access_update_owner" ON public.project_access;
+CREATE POLICY "access_update_owner" ON public.project_access FOR UPDATE
+  USING (auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id));
+
+DROP POLICY IF EXISTS "access_delete_owner" ON public.project_access;
+CREATE POLICY "access_delete_owner" ON public.project_access FOR DELETE
+  USING (auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id));
+
 -- Workspace Tasks: Owner or approved developers
 DROP POLICY IF EXISTS "tasks_select" ON public.project_tasks;
 CREATE POLICY "tasks_select" ON public.project_tasks FOR SELECT
   USING (
     auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
-    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_tasks.project_id AND developer_id = auth.uid())
+    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_tasks.project_id AND developer_id = auth.uid() AND revoked_at IS NULL)
   );
 
 DROP POLICY IF EXISTS "tasks_insert" ON public.project_tasks;
 CREATE POLICY "tasks_insert" ON public.project_tasks FOR INSERT
   WITH CHECK (
     auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
-    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_tasks.project_id AND developer_id = auth.uid())
+    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_tasks.project_id AND developer_id = auth.uid() AND revoked_at IS NULL)
   );
 
 DROP POLICY IF EXISTS "tasks_update" ON public.project_tasks;
 CREATE POLICY "tasks_update" ON public.project_tasks FOR UPDATE
   USING (
     auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
-    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_tasks.project_id AND developer_id = auth.uid())
+    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_tasks.project_id AND developer_id = auth.uid() AND revoked_at IS NULL)
   );
 
 DROP POLICY IF EXISTS "tasks_delete" ON public.project_tasks;
@@ -448,7 +481,7 @@ DROP POLICY IF EXISTS "messages_select" ON public.project_messages;
 CREATE POLICY "messages_select" ON public.project_messages FOR SELECT
   USING (
     auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
-    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_messages.project_id AND developer_id = auth.uid())
+    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_messages.project_id AND developer_id = auth.uid() AND revoked_at IS NULL)
   );
 
 DROP POLICY IF EXISTS "messages_insert" ON public.project_messages;
@@ -457,7 +490,7 @@ CREATE POLICY "messages_insert" ON public.project_messages FOR INSERT
     auth.uid() = sender_id
     AND (
       auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
-      OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_messages.project_id AND developer_id = auth.uid())
+      OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_messages.project_id AND developer_id = auth.uid() AND revoked_at IS NULL)
     )
   );
 
@@ -466,14 +499,14 @@ DROP POLICY IF EXISTS "deliverables_select" ON public.project_deliverables;
 CREATE POLICY "deliverables_select" ON public.project_deliverables FOR SELECT
   USING (
     auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
-    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_deliverables.project_id AND developer_id = auth.uid())
+    OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_deliverables.project_id AND developer_id = auth.uid() AND revoked_at IS NULL)
   );
 
 DROP POLICY IF EXISTS "deliverables_insert" ON public.project_deliverables;
 CREATE POLICY "deliverables_insert" ON public.project_deliverables FOR INSERT
   WITH CHECK (
     auth.uid() = developer_id
-    AND EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_deliverables.project_id AND developer_id = auth.uid())
+    AND EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_deliverables.project_id AND developer_id = auth.uid() AND revoked_at IS NULL)
   );
 
 DROP POLICY IF EXISTS "deliverables_update" ON public.project_deliverables;
@@ -493,6 +526,6 @@ CREATE POLICY "reviews_insert" ON public.project_reviews FOR INSERT
     auth.uid() = reviewer_id
     AND (
       auth.uid() = (SELECT owner_id FROM public.projects WHERE id = project_id)
-      OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_reviews.project_id AND developer_id = auth.uid())
+      OR EXISTS (SELECT 1 FROM public.project_access WHERE project_id = public.project_reviews.project_id AND developer_id = auth.uid() AND revoked_at IS NULL)
     )
   );

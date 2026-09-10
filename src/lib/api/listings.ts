@@ -45,13 +45,20 @@ export async function getListingsNearby(lat: number, lng: number, radiusKm: numb
   return validData;
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** Fetch a single listing by ID and increment its view count. */
 export async function getListingById(idOrSlug: string) {
-  const { data, error } = await supabase
-    .from('listings')
-    .select('*')
-    .or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`)
-    .single();
+  const isUuid = UUID_REGEX.test(idOrSlug);
+  let query = supabase.from('listings').select('*');
+
+  if (isUuid) {
+    query = query.or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`);
+  } else {
+    query = query.eq('slug', idOrSlug);
+  }
+
+  const { data, error } = await query.single();
   if (error) throw error;
 
   // Increment view count (fire and forget)

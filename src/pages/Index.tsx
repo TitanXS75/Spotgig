@@ -305,7 +305,7 @@ const Index = () => {
                   <label className="text-[11px] font-semibold text-muted-foreground">Difficulty</label>
                   <select
                     value={selectedDifficulty}
-                    onChange={(e) => setSelectedDifficulty(e.target.value as any)}
+                    onChange={(e) => setSelectedDifficulty(e.target.value as 'all' | ProjectDifficulty)}
                     className="w-full text-xs p-2 rounded-lg border border-border bg-background"
                   >
                     {DIFFICULTIES.map(d => (
@@ -318,7 +318,7 @@ const Index = () => {
                   <label className="text-[11px] font-semibold text-muted-foreground">Work Mode</label>
                   <select
                     value={selectedWorkMode}
-                    onChange={(e) => setSelectedWorkMode(e.target.value as any)}
+                    onChange={(e) => setSelectedWorkMode(e.target.value as 'all' | LocationPreference)}
                     className="w-full text-xs p-2 rounded-lg border border-border bg-background"
                   >
                     {WORK_MODES.map(m => (

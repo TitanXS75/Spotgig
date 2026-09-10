@@ -101,10 +101,11 @@ const ProjectReviewModal = ({
       });
       if (onReviewSubmitted) onReviewSubmitted();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       toast({
         title: 'Submission failed',
-        description: err.message,
+        description: error.message || 'An error occurred during submission.',
         variant: 'destructive',
       });
     } finally {

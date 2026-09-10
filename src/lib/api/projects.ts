@@ -71,7 +71,12 @@ export async function fetchProjectById(idOrSlug: string): Promise<Project> {
 
   // Increment view count in background
   if (data?.id) {
-    const nextViews = ((data as any).views_count ?? (data as any).views ?? 0) + 1;
+    const rawData = data as unknown as Record<string, unknown>;
+    const currentViews = typeof rawData.views_count === 'number' 
+      ? rawData.views_count 
+      : (typeof rawData.views === 'number' ? rawData.views : 0);
+    const nextViews = currentViews + 1;
+
     supabase
       .from('projects')
       .update({ views_count: nextViews, views: nextViews })

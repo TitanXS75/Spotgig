@@ -15,9 +15,25 @@ export interface ProjectMatchResult {
   levelCompatibility: boolean;
 }
 
+export interface MatchableProject {
+  difficulty?: string;
+  public_summary?: string;
+  owner_id?: string;
+  required_skills?: string[];
+  technologies?: string[] | null;
+}
+
+export interface MatchableDeveloper {
+  skills?: string[] | null;
+  technologies?: string[] | null;
+  experience_level?: string | null;
+}
+
+export type MatchableInput = MatchableProject | MatchableDeveloper | Record<string, unknown> | null | undefined;
+
 export function calculateProjectMatch(
-  arg1: any,
-  arg2: any
+  arg1: MatchableInput,
+  arg2: MatchableInput
 ): ProjectMatchResult {
   if (!arg1 || !arg2) {
     return {
@@ -32,10 +48,13 @@ export function calculateProjectMatch(
     };
   }
 
+  const obj1 = arg1 as Record<string, unknown>;
+  const obj2 = arg2 as Record<string, unknown>;
+
   // Detect which arg is project and which is developer
-  const isArg1Project = 'difficulty' in arg1 || 'public_summary' in arg1 || 'owner_id' in arg1 || ('required_skills' in arg1 && !('experience_level' in arg1));
-  const project = isArg1Project ? arg1 : arg2;
-  const developer = isArg1Project ? arg2 : arg1;
+  const isArg1Project = 'difficulty' in obj1 || 'public_summary' in obj1 || 'owner_id' in obj1 || ('required_skills' in obj1 && !('experience_level' in obj1));
+  const project = (isArg1Project ? obj1 : obj2) as MatchableProject;
+  const developer = (isArg1Project ? obj2 : obj1) as MatchableDeveloper;
 
   const devSkills = [
     ...(developer.skills || []),

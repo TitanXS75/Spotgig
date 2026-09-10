@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/lib/supabase";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { useAppStore } from "@/store/app-store";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -54,7 +55,7 @@ const AppContent = () => {
 
   // Supabase Auth Listener with profile sync
   useEffect(() => {
-    const syncUser = async (sessionUser: any) => {
+    const syncUser = async (sessionUser: SupabaseUser) => {
       let role = sessionUser.user_metadata?.role || 'developer';
       let name = sessionUser.user_metadata?.full_name || '';
 

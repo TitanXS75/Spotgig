@@ -38,12 +38,12 @@ import AdminAuth from "./pages/adminauth";
 
 const queryClient = new QueryClient();
 
-// Static pages that shouldn't show navigation
-const staticPages = ['/about', '/contact', '/privacy', '/terms', '/safety-tips', '/pricing', '/faq', '/adminauth'];
+// Pages that shouldn't show navigation
+const noNavPages = ['/auth', '/forgot-password', '/about', '/contact', '/privacy', '/terms', '/safety-tips', '/pricing', '/faq', '/adminauth'];
 
 const AppContent = () => {
   const location = useLocation();
-  const isStaticPage = staticPages.some(path => location.pathname.startsWith(path));
+  const isNoNavPage = location.pathname === '/' || noNavPages.some(path => location.pathname.startsWith(path));
 
   const { setUser } = useAppStore();
 
@@ -102,7 +102,7 @@ const AppContent = () => {
 
   return (
     <>
-      {!isStaticPage && <TopBar />}
+      {!isNoNavPage && <TopBar />}
       <main className="min-h-screen">
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -135,7 +135,7 @@ const AppContent = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      {!isStaticPage && <BottomNav />}
+      {!isNoNavPage && <BottomNav />}
     </>
   );
 };

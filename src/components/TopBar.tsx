@@ -12,17 +12,18 @@ const TopBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Hide top bar on landing and auth pages
-  if (location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/forgot-password') return null;
-
+  const isHidden = location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/forgot-password';
   const isOwner = user?.role === 'project_owner';
 
-  // If project owner, fetch pending requests for badge indicator
+  // If project owner, fetch pending requests for badge indicator (must be called before any early return)
   const { data: ownerRequests = [] } = useQuery({
     queryKey: ['owner-requests', user?.id],
     queryFn: () => getProjectRequestsForOwner(),
-    enabled: !!user && isOwner,
+    enabled: !!user && isOwner && !isHidden,
   });
+
+  // Hide top bar on landing and auth pages (placed AFTER all hooks to adhere to React Rules of Hooks)
+  if (isHidden) return null;
 
   const pendingCount = ownerRequests.filter(r => r.status === 'pending').length;
 

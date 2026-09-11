@@ -228,6 +228,7 @@ export type Database = {
           description: string | null;
           is_completed: boolean;
           completed_by: string | null;
+          assigned_to: string | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -239,6 +240,7 @@ export type Database = {
           description?: string | null;
           is_completed?: boolean;
           completed_by?: string | null;
+          assigned_to?: string | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -251,7 +253,7 @@ export type Database = {
           project_id: string;
           sender_id: string;
           message: string;
-          attachments: string[];
+          attachments: string[] | null;
           created_at: string;
         };
         Insert: {
@@ -259,7 +261,7 @@ export type Database = {
           project_id: string;
           sender_id: string;
           message: string;
-          attachments?: string[];
+          attachments?: string[] | null;
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['project_messages']['Insert']>;
@@ -269,25 +271,36 @@ export type Database = {
           id: string;
           project_id: string;
           developer_id: string;
+          title: string | null;
+          github_url: string | null;
           github_repo_url: string | null;
+          demo_url: string | null;
           live_demo_url: string | null;
-          notes: string;
-          status: 'submitted' | 'accepted' | 'revision_requested';
-          submitted_at: string;
-          reviewed_at: string | null;
+          notes: string | null;
+          feedback: string | null;
           reviewer_notes: string | null;
+          reviewed_at: string | null;
+          status: 'submitted' | 'accepted' | 'revision_requested';
+          submitted_at: string | null;
+          created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
           project_id: string;
           developer_id: string;
+          title?: string | null;
+          github_url?: string | null;
           github_repo_url?: string | null;
+          demo_url?: string | null;
           live_demo_url?: string | null;
-          notes: string;
-          status?: 'submitted' | 'accepted' | 'revision_requested';
-          submitted_at?: string;
-          reviewed_at?: string | null;
+          notes?: string | null;
+          feedback?: string | null;
           reviewer_notes?: string | null;
+          reviewed_at?: string | null;
+          status?: 'submitted' | 'accepted' | 'revision_requested';
+          submitted_at?: string | null;
+          created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['project_deliverables']['Insert']>;
       };

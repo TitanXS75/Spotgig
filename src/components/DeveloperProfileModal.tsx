@@ -139,15 +139,15 @@ const DeveloperProfileModal = ({
                 )}
 
                 {/* Trust Badges */}
-                {trust && trust.badges.length > 0 && (
+                {trust && trust.verifiedSignals.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    {trust.badges.map((badge, idx) => (
+                    {trust.verifiedSignals.map((signal, idx) => (
                       <span
                         key={idx}
                         className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-[10px] font-medium text-foreground/80 border border-border/80"
                       >
                         <ShieldCheck className="w-3 h-3 text-primary" />
-                        {badge}
+                        {signal}
                       </span>
                     ))}
                   </div>

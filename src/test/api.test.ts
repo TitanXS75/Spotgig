@@ -197,12 +197,14 @@ describe('API Structure Tests', () => {
         sendProjectMessage,
         submitProjectDeliverable,
         getProjectDeliverables,
-        updateDeliverableStatus
+        updateDeliverableStatus,
+        updateTaskStatus
       } = await import('@/lib/api/collaboration');
 
       expect(typeof getProjectTasks).toBe('function');
       expect(typeof createProjectTask).toBe('function');
       expect(typeof toggleProjectTask).toBe('function');
+      expect(typeof updateTaskStatus).toBe('function');
       expect(typeof deleteProjectTask).toBe('function');
       expect(typeof getProjectMessages).toBe('function');
       expect(typeof sendProjectMessage).toBe('function');

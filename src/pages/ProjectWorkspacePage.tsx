@@ -14,6 +14,7 @@ import { fetchProjectById, fetchProjectRequirements } from '@/lib/api/projects';
 import { checkProjectAccess } from '@/lib/api/requests';
 import {
   getProjectTasks, createProjectTask, updateProjectTask, toggleProjectTask, deleteProjectTask,
+  updateTaskStatus, type TaskStatus,
   getProjectMessages, sendProjectMessage, subscribeToProjectMessages,
   submitProjectDeliverable, getProjectDeliverables, updateDeliverableStatus,
 } from '@/lib/api/collaboration';
@@ -33,6 +34,8 @@ const ProjectWorkspacePage = () => {
 
   const [activeTab, setActiveTab] = useState<WorkspaceTab>('tasks');
   const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus>('todo');
+  const [taskFilter, setTaskFilter] = useState<'all' | 'todo' | 'in_progress' | 'completed'>('all');
   const [taskInputError, setTaskInputError] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTaskTitle, setEditingTaskTitle] = useState('');
@@ -144,10 +147,12 @@ const ProjectWorkspacePage = () => {
   // ── Mutations ─────────────────────────────────────────────
 
   const addTaskMutation = useMutation({
-    mutationFn: (title: string) => createProjectTask(projectId!, title),
+    mutationFn: ({ title, status }: { title: string; status: TaskStatus }) =>
+      createProjectTask(projectId!, title, undefined, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['project-tasks', projectId] });
       setNewTaskTitle('');
+      setNewTaskStatus('todo');
     },
     onError: (err: Error) => toast({ title: 'Could not add task', description: err.message, variant: 'destructive' }),
   });
@@ -160,6 +165,13 @@ const ProjectWorkspacePage = () => {
       setEditingTaskTitle('');
     },
     onError: (err: Error) => toast({ title: 'Could not update task', description: err.message, variant: 'destructive' }),
+  });
+
+  const updateTaskStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: TaskStatus }) =>
+      updateTaskStatus(id, status),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['project-tasks', projectId] }),
+    onError: (err: Error) => toast({ title: 'Could not update task status', description: err.message, variant: 'destructive' }),
   });
 
   const toggleTaskMutation = useMutation({
@@ -301,11 +313,28 @@ const ProjectWorkspacePage = () => {
     );
   }
 
-  // ── Derived State ─────────────────────────────────────────
+  // ── Derived State & Weighted Progress ──────────────────
 
-  const completedTasksCount = tasks.filter(t => t.is_completed).length;
-  const taskProgressPercent = tasks.length > 0 ? Math.round((completedTasksCount / tasks.length) * 100) : 0;
+  const getEffectiveStatus = (task: (typeof tasks)[number]): TaskStatus => {
+    if (task.status === 'in_progress') return 'in_progress';
+    if (task.status === 'completed' || task.is_completed) return 'completed';
+    return 'todo';
+  };
+
+  const completedTasksCount = tasks.filter(t => getEffectiveStatus(t) === 'completed').length;
+  const inProgressTasksCount = tasks.filter(t => getEffectiveStatus(t) === 'in_progress').length;
+  const todoTasksCount = tasks.filter(t => getEffectiveStatus(t) === 'todo').length;
+
+  // Weighted progress calculation:
+  // Completed = 1.0 (100%), In Progress / Half Done = 0.5 (50%), To Do = 0.0 (0%)
+  const taskScore = (completedTasksCount * 1.0) + (inProgressTasksCount * 0.5);
+  const taskProgressPercent = tasks.length > 0 ? Math.round((taskScore / tasks.length) * 100) : 0;
   const isCompleted = project.status === 'completed';
+
+  const filteredTasks = tasks.filter(t => {
+    if (taskFilter === 'all') return true;
+    return getEffectiveStatus(t) === taskFilter;
+  });
 
   const revieweeId = isOwner
     ? (deliverables[0]?.developer_id || project.owner_id)
@@ -376,27 +405,54 @@ const ProjectWorkspacePage = () => {
         </div>
 
         {/* ── Progress Summary Bar ── */}
-        <div className="mt-5 p-4 rounded-2xl bg-card border border-border shadow-sm space-y-2">
+        <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-sm space-y-3">
           <div className="flex items-center justify-between text-xs font-semibold">
             <span className="text-foreground flex items-center gap-1.5">
               <CheckSquare className="w-4 h-4 text-primary" />
               Project Completion Progress
             </span>
-            <span className={`font-bold text-sm ${taskProgressPercent === 100 ? 'text-emerald-500' : 'text-primary'}`}>
-              {taskProgressPercent}%
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={`font-bold text-base sm:text-lg ${taskProgressPercent === 100 ? 'text-emerald-500' : 'text-primary'}`}>
+                {taskProgressPercent}%
+              </span>
+            </div>
           </div>
-          <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden">
+
+          <div className="w-full h-3 bg-muted rounded-full overflow-hidden p-0.5 border border-border/40">
             <motion.div
-              className={`h-full rounded-full transition-all duration-500 ${taskProgressPercent === 100 ? 'bg-emerald-500' : 'bg-primary'}`}
+              className={`h-full rounded-full transition-all duration-500 ${
+                taskProgressPercent === 100
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                  : taskProgressPercent > 0
+                  ? 'bg-gradient-to-r from-primary to-amber-400'
+                  : 'bg-primary'
+              }`}
               initial={{ width: 0 }}
               animate={{ width: `${taskProgressPercent}%` }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
             />
           </div>
-          <div className="text-[11px] text-muted-foreground">
-            {completedTasksCount} of {tasks.length} milestone{tasks.length !== 1 ? 's' : ''} accomplished
-            {tasks.length === 0 && ' — add tasks below to start tracking progress'}
+
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground pt-0.5">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                {completedTasksCount} Completed
+              </span>
+              <span className="inline-flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400">
+                <Clock className="w-3.5 h-3.5" />
+                {inProgressTasksCount} Half Done (50%)
+              </span>
+              <span className="inline-flex items-center gap-1 font-medium text-muted-foreground">
+                <Circle className="w-3.5 h-3.5" />
+                {todoTasksCount} To Do
+              </span>
+            </div>
+            <span className="font-medium">
+              {tasks.length > 0 
+                ? `${taskScore % 1 === 0 ? taskScore : taskScore.toFixed(1)} of ${tasks.length} milestone points`
+                : 'Add tasks below to start tracking progress'}
+            </span>
           </div>
         </div>
 
@@ -449,9 +505,9 @@ const ProjectWorkspacePage = () => {
                   setTimeout(() => setTaskInputError(false), 600);
                   return;
                 }
-                addTaskMutation.mutate(newTaskTitle);
+                addTaskMutation.mutate({ title: newTaskTitle, status: newTaskStatus });
               }}
-              className="flex gap-2"
+              className="flex flex-col sm:flex-row gap-2"
             >
               <input
                 ref={newTaskInputRef}
@@ -466,117 +522,237 @@ const ProjectWorkspacePage = () => {
                   taskInputError ? 'border-destructive ring-2 ring-destructive/30 animate-pulse' : 'border-border'
                 }`}
               />
-              <button
-                type="submit"
-                disabled={addTaskMutation.isPending}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary text-primary-foreground text-xs sm:text-sm font-semibold rounded-xl hover:bg-primary/90 active:scale-95 transition shadow-sm disabled:opacity-70 whitespace-nowrap"
-              >
-                {addTaskMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                Add Task
-              </button>
+              <div className="flex items-center gap-2">
+                <select
+                  value={newTaskStatus}
+                  onChange={(e) => setNewTaskStatus(e.target.value as TaskStatus)}
+                  className="px-3 py-2.5 bg-card border border-border rounded-xl text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-pointer"
+                  title="Initial status"
+                >
+                  <option value="todo">⚪ To Do (0%)</option>
+                  <option value="in_progress">⏳ Half Done (50%)</option>
+                  <option value="completed">✅ Completed (100%)</option>
+                </select>
+                <button
+                  type="submit"
+                  disabled={addTaskMutation.isPending}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary text-primary-foreground text-xs sm:text-sm font-semibold rounded-xl hover:bg-primary/90 active:scale-95 transition shadow-sm disabled:opacity-70 whitespace-nowrap"
+                >
+                  {addTaskMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                  Add Task
+                </button>
+              </div>
             </form>
+
+            {/* Filter chips */}
+            {tasks.length > 0 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                {[
+                  { id: 'all', label: 'All Tasks', count: tasks.length },
+                  { id: 'in_progress', label: '⏳ Half Done (50%)', count: inProgressTasksCount },
+                  { id: 'completed', label: '✅ Done (100%)', count: completedTasksCount },
+                  { id: 'todo', label: '⚪ To Do (0%)', count: todoTasksCount },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setTaskFilter(f.id as any)}
+                    className={`px-3 py-1.5 rounded-xl font-medium transition whitespace-nowrap flex items-center gap-1.5 ${
+                      taskFilter === f.id
+                        ? 'bg-foreground text-background font-bold shadow-xs'
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                    }`}
+                  >
+                    <span>{f.label}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      taskFilter === f.id ? 'bg-background/20 text-background' : 'bg-primary/10 text-primary'
+                    }`}>
+                      {f.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Task List */}
             <div className="space-y-2.5">
               <AnimatePresence initial={false}>
-                {tasks.length === 0 ? (
+                {filteredTasks.length === 0 ? (
                   <div className="py-14 text-center border border-dashed border-border rounded-2xl space-y-2">
                     <CheckSquare className="w-8 h-8 mx-auto text-muted-foreground/40" />
-                    <p className="text-xs font-semibold text-muted-foreground">No tasks yet</p>
-                    <p className="text-[11px] text-muted-foreground">Add milestones above to track your collaboration progress</p>
+                    <p className="text-xs font-semibold text-muted-foreground">
+                      {tasks.length === 0 ? 'No tasks yet' : 'No tasks matching this filter'}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {tasks.length === 0
+                        ? 'Add milestones above to track your collaboration progress'
+                        : 'Switch filter or add new tasks above'}
+                    </p>
                   </div>
                 ) : (
-                  tasks.map((task) => (
-                    <motion.div
-                      key={task.id}
-                      layout
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.97 }}
-                      className={`group flex items-center gap-3 p-4 rounded-xl border transition ${
-                        task.is_completed
-                          ? 'bg-muted/20 border-border/40 text-muted-foreground'
-                          : 'bg-card border-border text-foreground shadow-sm hover:border-primary/30'
-                      }`}
-                    >
-                      {/* Toggle checkbox */}
-                      <button
-                        type="button"
-                        onClick={() => toggleTaskMutation.mutate({ id: task.id, isCompleted: !task.is_completed })}
-                        disabled={toggleTaskMutation.isPending}
-                        className="shrink-0 transition hover:scale-110"
+                  filteredTasks.map((task) => {
+                    const currentStatus = getEffectiveStatus(task);
+                    const nextStatus: TaskStatus =
+                      currentStatus === 'todo' ? 'in_progress' : currentStatus === 'in_progress' ? 'completed' : 'todo';
+
+                    return (
+                      <motion.div
+                        key={task.id}
+                        layout
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.97 }}
+                        className={`group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl border transition ${
+                          currentStatus === 'completed'
+                            ? 'bg-muted/15 border-border/40 text-muted-foreground border-l-4 border-l-emerald-500'
+                            : currentStatus === 'in_progress'
+                            ? 'bg-amber-500/[0.04] border-amber-500/30 text-foreground border-l-4 border-l-amber-500 shadow-xs'
+                            : 'bg-card border-border text-foreground shadow-xs hover:border-primary/30'
+                        }`}
                       >
-                        {task.is_completed ? (
-                          <CheckCircle2 className="w-5 h-5 text-emerald-500 fill-emerald-500/20" />
-                        ) : (
-                          <Circle className="w-5 h-5 text-muted-foreground hover:text-primary transition" />
-                        )}
-                      </button>
-
-                      {/* Task title / inline edit */}
-                      <div className="flex-1 min-w-0">
-                        {editingTaskId === task.id ? (
-                          <div className="flex items-center gap-2">
-                            <input
-                              ref={editInputRef}
-                              type="text"
-                              value={editingTaskTitle}
-                              onChange={(e) => setEditingTaskTitle(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') saveEditTask();
-                                if (e.key === 'Escape') cancelEditTask();
-                              }}
-                              className="flex-1 px-3 py-1.5 bg-background border border-primary/40 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                            />
-                            <button
-                              type="button"
-                              onClick={saveEditTask}
-                              disabled={editTaskMutation.isPending || !editingTaskTitle.trim()}
-                              className="p-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50"
-                            >
-                              {editTaskMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={cancelEditTask}
-                              className="p-1.5 rounded-lg bg-muted hover:bg-muted/80 transition text-muted-foreground"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ) : (
-                          <span className={`text-xs sm:text-sm font-medium truncate block ${task.is_completed ? 'line-through text-muted-foreground' : ''}`}>
-                            {task.title}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Action buttons */}
-                      {editingTaskId !== task.id && (
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
+                        {/* Left: Cycle Status Icon + Title */}
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
                           <button
                             type="button"
-                            onClick={() => startEditTask(task.id, task.title)}
-                            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition"
-                            title="Edit task"
+                            onClick={() => updateTaskStatusMutation.mutate({ id: task.id, status: nextStatus })}
+                            disabled={updateTaskStatusMutation.isPending}
+                            className="shrink-0 transition hover:scale-110 active:scale-95"
+                            title={`Status: ${
+                              currentStatus === 'completed' ? 'Completed (100%)' : currentStatus === 'in_progress' ? 'Half Done / In Progress (50%)' : 'To Do (0%)'
+                            }. Click to cycle!`}
                           >
-                            <Pencil className="w-3.5 h-3.5" />
+                            {currentStatus === 'completed' ? (
+                              <CheckCircle2 className="w-5 h-5 text-emerald-500 fill-emerald-500/20" />
+                            ) : currentStatus === 'in_progress' ? (
+                              <Clock className="w-5 h-5 text-amber-500 fill-amber-500/20" />
+                            ) : (
+                              <Circle className="w-5 h-5 text-muted-foreground hover:text-amber-500 transition" />
+                            )}
                           </button>
-                          {(isOwner || task.created_by === user?.id) && (
+
+                          {/* Task title / inline edit */}
+                          <div className="flex-1 min-w-0">
+                            {editingTaskId === task.id ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  ref={editInputRef}
+                                  type="text"
+                                  value={editingTaskTitle}
+                                  onChange={(e) => setEditingTaskTitle(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') saveEditTask();
+                                    if (e.key === 'Escape') cancelEditTask();
+                                  }}
+                                  className="flex-1 px-3 py-1.5 bg-background border border-primary/40 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={saveEditTask}
+                                  disabled={editTaskMutation.isPending || !editingTaskTitle.trim()}
+                                  className="p-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50"
+                                >
+                                  {editTaskMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelEditTask}
+                                  className="p-1.5 rounded-lg bg-muted hover:bg-muted/80 transition text-muted-foreground"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`text-xs sm:text-sm font-medium truncate block ${
+                                  currentStatus === 'completed' ? 'line-through text-muted-foreground' : ''
+                                }`}>
+                                  {task.title}
+                                </span>
+                                {currentStatus === 'in_progress' && (
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center gap-1">
+                                    <Clock className="w-2.5 h-2.5" /> Half Done (50%)
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Right: Quick Status Buttons + Actions */}
+                        <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                          {/* 3-Way Status Selector */}
+                          <div className="inline-flex items-center bg-muted/60 p-0.5 rounded-xl border border-border/50 text-[11px] font-semibold">
                             <button
                               type="button"
-                              onClick={() => deleteTaskMutation.mutate(task.id)}
-                              disabled={deleteTaskMutation.isPending}
-                              className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition"
-                              title="Delete task"
+                              onClick={() => updateTaskStatusMutation.mutate({ id: task.id, status: 'todo' })}
+                              disabled={updateTaskStatusMutation.isPending}
+                              className={`px-2.5 py-1 rounded-lg transition ${
+                                currentStatus === 'todo'
+                                  ? 'bg-background text-foreground shadow-xs font-bold'
+                                  : 'text-muted-foreground hover:text-foreground'
+                              }`}
+                              title="Mark as To Do (0%)"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              To Do
                             </button>
+                            <button
+                              type="button"
+                              onClick={() => updateTaskStatusMutation.mutate({ id: task.id, status: 'in_progress' })}
+                              disabled={updateTaskStatusMutation.isPending}
+                              className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 ${
+                                currentStatus === 'in_progress'
+                                  ? 'bg-amber-500 text-white shadow-xs font-bold'
+                                  : 'text-muted-foreground hover:text-amber-600 dark:hover:text-amber-400'
+                              }`}
+                              title="Mark as Half Done / In Progress (50%)"
+                            >
+                              <Clock className="w-3 h-3" />
+                              <span>Half Done (50%)</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => updateTaskStatusMutation.mutate({ id: task.id, status: 'completed' })}
+                              disabled={updateTaskStatusMutation.isPending}
+                              className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 ${
+                                currentStatus === 'completed'
+                                  ? 'bg-emerald-500 text-white shadow-xs font-bold'
+                                  : 'text-muted-foreground hover:text-emerald-600 dark:hover:text-emerald-400'
+                              }`}
+                              title="Mark as Completed (100%)"
+                            >
+                              <Check className="w-3 h-3" />
+                              <span>Done</span>
+                            </button>
+                          </div>
+
+                          {/* Action buttons */}
+                          {editingTaskId !== task.id && (
+                            <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => startEditTask(task.id, task.title)}
+                                className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition"
+                                title="Edit task"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              {(isOwner || task.created_by === user?.id) && (
+                                <button
+                                  type="button"
+                                  onClick={() => deleteTaskMutation.mutate(task.id)}
+                                  disabled={deleteTaskMutation.isPending}
+                                  className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition"
+                                  title="Delete task"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
                           )}
                         </div>
-                      )}
-                    </motion.div>
-                  ))
+                      </motion.div>
+                    );
+                  })
                 )}
               </AnimatePresence>
             </div>

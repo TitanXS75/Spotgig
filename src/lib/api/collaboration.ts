@@ -26,6 +26,8 @@ export interface ProjectDeliverableWithDeveloper extends ProjectDeliverable {
 
 // ── 1. Project Tasks & Milestones ─────────────────────────────
 
+export type TaskStatus = 'todo' | 'in_progress' | 'completed';
+
 /**
  * Fetch all tasks and milestones for a project workspace.
  */
@@ -46,10 +48,13 @@ export async function getProjectTasks(projectId: string): Promise<ProjectTask[]>
 export async function createProjectTask(
   projectId: string,
   title: string,
-  description?: string
+  description?: string,
+  status: TaskStatus = 'todo'
 ): Promise<ProjectTask> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
+
+  const isCompleted = status === 'completed';
 
   const { data, error } = await supabase
     .from('project_tasks')
@@ -57,14 +62,32 @@ export async function createProjectTask(
       project_id: projectId,
       title: title.trim(),
       description: description?.trim() || null,
+      status,
+      is_completed: isCompleted,
       created_by: user.id,
-      is_completed: false,
     })
     .select()
     .single();
 
-  if (error) throw error;
-  return data as ProjectTask;
+  if (!error && data) {
+    return data as ProjectTask;
+  }
+
+  // Fallback if status column caused an issue
+  const { data: fallbackData, error: fallbackError } = await supabase
+    .from('project_tasks')
+    .insert({
+      project_id: projectId,
+      title: title.trim(),
+      description: description?.trim() || null,
+      is_completed: isCompleted,
+      created_by: user.id,
+    })
+    .select()
+    .single();
+
+  if (fallbackError) throw fallbackError;
+  return fallbackData as ProjectTask;
 }
 
 /**
@@ -83,17 +106,23 @@ export async function updateProjectTask(taskId: string, title: string): Promise<
 }
 
 /**
- * Toggle milestone completion status.
- * Works with or without the workspace_fixes.sql migration (graceful fallback).
+ * Update milestone task status ('todo' | 'in_progress' | 'completed').
+ * Contributes to workspace progress: todo = 0%, in_progress = 50% (half done), completed = 100%.
  */
-export async function toggleProjectTask(taskId: string, isCompleted: boolean): Promise<ProjectTask> {
+export async function updateTaskStatus(
+  taskId: string,
+  status: TaskStatus
+): Promise<ProjectTask> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  // Try with completed_by first (requires workspace_fixes.sql migration)
+  const isCompleted = status === 'completed';
+
+  // 1. Try updating status, is_completed, and completed_by (with migration)
   const { data, error } = await supabase
     .from('project_tasks')
     .update({
+      status,
       is_completed: isCompleted,
       completed_by: isCompleted ? user.id : null,
       updated_at: new Date().toISOString(),
@@ -102,23 +131,47 @@ export async function toggleProjectTask(taskId: string, isCompleted: boolean): P
     .select()
     .single();
 
-  // If completed_by column doesn't exist yet, retry without it
-  if (error && (error.message?.includes('completed_by') || error.code === 'PGRST204')) {
-    const { data: fallbackData, error: fallbackError } = await supabase
-      .from('project_tasks')
-      .update({
-        is_completed: isCompleted,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', taskId)
-      .select()
-      .single();
-    if (fallbackError) throw fallbackError;
-    return fallbackData as ProjectTask;
+  if (!error && data) {
+    return data as ProjectTask;
   }
 
-  if (error) throw error;
-  return data as ProjectTask;
+  // 2. Try status and is_completed without completed_by
+  const { data: fbData, error: fbError } = await supabase
+    .from('project_tasks')
+    .update({
+      status,
+      is_completed: isCompleted,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', taskId)
+    .select()
+    .single();
+
+  if (!fbError && fbData) {
+    return fbData as ProjectTask;
+  }
+
+  // 3. Fallback: update only is_completed if status column fails
+  const { data: finalData, error: finalError } = await supabase
+    .from('project_tasks')
+    .update({
+      is_completed: isCompleted,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', taskId)
+    .select()
+    .single();
+
+  if (finalError) throw finalError;
+  return finalData as ProjectTask;
+}
+
+/**
+ * Toggle milestone completion status.
+ * Backward-compatible wrapper around updateTaskStatus.
+ */
+export async function toggleProjectTask(taskId: string, isCompleted: boolean): Promise<ProjectTask> {
+  return updateTaskStatus(taskId, isCompleted ? 'completed' : 'todo');
 }
 
 /**

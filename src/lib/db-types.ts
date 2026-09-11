@@ -226,6 +226,7 @@ export type Database = {
           project_id: string;
           title: string;
           description: string | null;
+          status: 'todo' | 'in_progress' | 'completed';
           is_completed: boolean;
           completed_by: string | null;
           assigned_to: string | null;
@@ -238,6 +239,7 @@ export type Database = {
           project_id: string;
           title: string;
           description?: string | null;
+          status?: 'todo' | 'in_progress' | 'completed';
           is_completed?: boolean;
           completed_by?: string | null;
           assigned_to?: string | null;

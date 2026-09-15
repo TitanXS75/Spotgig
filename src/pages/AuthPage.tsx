@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Mail, Lock, User, Eye, EyeOff, Phone, Briefcase, GraduationCap, ArrowLeft
+  Mail, Lock, User, Eye, EyeOff, Phone, Briefcase, GraduationCap
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -176,22 +176,10 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="h-screen max-h-screen w-full flex flex-col lg:flex-row overflow-hidden bg-background">
+    <div className="min-h-screen min-h-[100dvh] lg:h-screen lg:max-h-screen w-full flex flex-col lg:flex-row bg-background overflow-y-auto lg:overflow-hidden">
       {/* Form Panel */}
-      <div className="w-full lg:w-1/2 h-full flex flex-col justify-center px-6 sm:px-10 xl:px-12 py-4 lg:py-6 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden z-10">
+      <div className="w-full lg:w-1/2 min-h-screen min-h-[100dvh] lg:h-full flex flex-col justify-center px-5 sm:px-10 xl:px-12 py-8 lg:py-6 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden z-10">
         <div className="w-full max-w-sm sm:max-w-md mx-auto my-auto flex flex-col justify-center py-2">
-
-          {/* Header row with Back button */}
-          <div className="flex items-center mb-2">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground transition-colors group"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
-              <span>Back</span>
-            </button>
-          </div>
 
           {/* Tab switcher with animated sliding pill */}
           <div className="flex gap-1 p-1 bg-muted rounded-xl mb-3 relative">
@@ -461,18 +449,6 @@ const AuthPage = () => {
                 </svg>
                 <span>Continue with Google</span>
               </button>
-
-              {/* Switch mode link */}
-              <p className="text-xs text-center text-muted-foreground mt-1">
-                {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-                <button
-                  type="button"
-                  onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
-                  className="text-primary font-semibold hover:underline ml-1"
-                >
-                  {mode === 'login' ? 'Sign Up' : 'Sign In'}
-                </button>
-              </p>
             </motion.form>
           </AnimatePresence>
         </div>

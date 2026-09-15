@@ -189,7 +189,7 @@ const Index = () => {
             className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-primary/20 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold transition shrink-0 shadow-sm"
           >
             <Sparkles className="w-4 h-4" />
-            <span>✨ Help Me Find</span>
+            <span>Help Me Find</span>
           </button>
           <button
             onClick={() => setShowMobileFilters(!showMobileFilters)}

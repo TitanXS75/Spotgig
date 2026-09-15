@@ -1,6 +1,5 @@
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, MessageSquare } from 'lucide-react';
 import { useCopilotStore } from '@/store/copilot-store';
 import { useAppStore } from '@/store/app-store';
 
@@ -61,8 +60,6 @@ export const CopilotFloatingButton = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-foreground/40 opacity-75" />
               <span className="relative inline-flex rounded-full h-3 w-3 bg-primary-foreground" />
             </span>
-
-            <Sparkles className="w-4 h-4 transition-transform group-hover:rotate-12 duration-300" />
 
             <span className="text-xs sm:text-sm font-bold tracking-tight">
               {contextualLabel}

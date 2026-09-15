@@ -140,7 +140,7 @@ describe('Aaspass AI Copilot Intelligence Layer', () => {
       // MUST mention actual profile skills
       expect(proposal?.highlightedProfileSkills).toContain('React');
       expect(proposal?.highlightedProfileSkills).toContain('TypeScript');
-      expect(proposal?.proposalText).toContain('Aditya Verma' || 'B.Tech in Computer Science' || 'React');
+      expect(proposal?.proposalText).toMatch(/Aditya Verma|B\.Tech in Computer Science|React/);
     });
   });
 
@@ -173,7 +173,7 @@ describe('Aaspass AI Copilot Intelligence Layer', () => {
       const response = await executeCopilotIntent('GENERATE_PROJECT', restaurantInput, context);
       const draft = response.structuredData?.data;
 
-      expect(draft?.title).toContain('Menu' || 'Restaurant');
+      expect(draft?.title).toMatch(/Menu|Restaurant/);
       expect(draft?.public_features.some(f => f.toLowerCase().includes('qr') || f.toLowerCase().includes('order'))).toBe(true);
       expect(draft?.private_requirements.functional_requirements.length).toBeGreaterThan(0);
     });

@@ -588,16 +588,16 @@ const ProjectWorkspacePage = () => {
             {/* Filter chips */}
             {tasks.length > 0 && (
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                {[
-                  { id: 'all', label: 'All Tasks', count: tasks.length },
-                  { id: 'in_progress', label: '⏳ Half Done (50%)', count: inProgressTasksCount },
-                  { id: 'completed', label: '✅ Done (100%)', count: completedTasksCount },
-                  { id: 'todo', label: '⚪ To Do (0%)', count: todoTasksCount },
-                ].map((f) => (
+                {([
+                  { id: 'all' as const, label: 'All Tasks', count: tasks.length },
+                  { id: 'in_progress' as const, label: '⏳ Half Done (50%)', count: inProgressTasksCount },
+                  { id: 'completed' as const, label: '✅ Done (100%)', count: completedTasksCount },
+                  { id: 'todo' as const, label: '⚪ To Do (0%)', count: todoTasksCount },
+                ]).map((f) => (
                   <button
                     key={f.id}
                     type="button"
-                    onClick={() => setTaskFilter(f.id as any)}
+                    onClick={() => setTaskFilter(f.id)}
                     className={`px-3 py-1.5 rounded-xl font-medium transition whitespace-nowrap flex items-center gap-1.5 ${
                       taskFilter === f.id
                         ? 'bg-foreground text-background font-bold shadow-xs'

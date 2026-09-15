@@ -17,6 +17,9 @@ import type {
   CompensationType, 
   LocationPreference 
 } from '@/lib/db-types';
+import { ProjectIdeaModal } from '@/components/copilot/ProjectIdeaModal';
+import { useCopilotStore } from '@/store/copilot-store';
+import type { GeneratedProjectDraft } from '@/lib/copilot/types';
 
 const STEPS = [
   { id: 1, title: 'About Project', desc: 'Category & Logistics' },
@@ -70,11 +73,37 @@ const PostProject = () => {
   const navigate = useNavigate();
   const { user } = useAppStore();
   const { toast } = useToast();
+  const { openCopilot } = useCopilotStore();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [showIdeaModal, setShowIdeaModal] = useState(false);
 
   // Step 1: About Your Project
   const [title, setTitle] = useState('');
+
+  const handleApplyDraft = (draft: GeneratedProjectDraft) => {
+    if (draft.title) setTitle(draft.title);
+    if (draft.industry && INDUSTRIES.includes(draft.industry)) setIndustry(draft.industry);
+    if (draft.project_type && PROJECT_TYPES.includes(draft.project_type)) setProjectType(draft.project_type);
+    if (draft.difficulty) setDifficulty(draft.difficulty);
+    if (draft.duration && DURATIONS.includes(draft.duration)) setDuration(draft.duration);
+    if (draft.team_size) setTeamSize(draft.team_size);
+    if (draft.location_type) setLocationType(draft.location_type);
+    if (draft.compensation_type) setCompensationType(draft.compensation_type);
+    if (draft.compensation_amount) setCompensationAmount(draft.compensation_amount);
+    if (draft.required_skills?.length) setRequiredSkills(draft.required_skills);
+    if (draft.technologies?.length) setTechnologiesInput(draft.technologies.join(', '));
+    if (draft.public_description || draft.short_summary) {
+      setPublicSummary(draft.public_description || draft.short_summary);
+    }
+    if (draft.private_requirements?.deliverables?.length) {
+      setDetailedRequirements(draft.private_requirements.deliverables.join('\n'));
+    }
+    if (draft.private_requirements?.functional_requirements?.length) {
+      setFeatureList(draft.private_requirements.functional_requirements.join('\n'));
+    }
+    setStep(1);
+  };
   const [industry, setIndustry] = useState(INDUSTRIES[0]);
   const [projectType, setProjectType] = useState(PROJECT_TYPES[0]);
   const [locationType, setLocationType] = useState<LocationPreference>('remote');
@@ -284,6 +313,31 @@ const PostProject = () => {
                 <p className="text-sm text-muted-foreground mt-1">
                   Provide high-level context so students and emerging developers can understand the nature of your project.
                 </p>
+              </div>
+
+              {/* Start with an Idea Banner */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-card border border-primary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-foreground uppercase tracking-wide">
+                      Start with an Idea — Powered by Copilot
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed max-w-xl">
+                    Don't worry about technical terms. Tell Aaspass what you want to build in your own words, and we'll generate structured public & private specifications for you.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowIdeaModal(true)}
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition shadow-sm shrink-0"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>✨ Tell Aaspass</span>
+                </button>
               </div>
 
               {/* Title */}
@@ -835,6 +889,37 @@ const PostProject = () => {
                           </ul>
                         </div>
                       )}
+
+                      <div className="pt-2 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            openCopilot(
+                              {
+                                type: 'post_project',
+                                userRole: 'project_owner',
+                                project: {
+                                  title,
+                                  industry,
+                                  project_type: projectType,
+                                  difficulty,
+                                  required_skills: requiredSkills,
+                                  public_summary: publicSummary,
+                                },
+                                requirements: {
+                                  detailed_requirements: detailedRequirements,
+                                },
+                              },
+                              'Analyze my current project draft and point out missing requirements or improvements.',
+                              true
+                            );
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold transition"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>✨ Improve with Copilot</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -911,6 +996,13 @@ const PostProject = () => {
           </div>
         </div>
       </div>
+
+      <ProjectIdeaModal
+        isOpen={showIdeaModal}
+        onClose={() => setShowIdeaModal(false)}
+        onApplyDraft={handleApplyDraft}
+        userRole="project_owner"
+      />
     </div>
   );
 };

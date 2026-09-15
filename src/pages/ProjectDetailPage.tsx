@@ -12,6 +12,8 @@ import { fetchProjectById, fetchProjectRequirements } from '@/lib/api/projects';
 import { checkProjectAccess, getMyRequestStatusForProject } from '@/lib/api/requests';
 import { RequestAccessModal } from '@/components/RequestAccessModal';
 import { useToast } from '@/hooks/use-toast';
+import { useCopilotStore } from '@/store/copilot-store';
+import { getMyProfile } from '@/lib/api/profiles';
 import type { Project, ProjectRequirements, RequestStatus } from '@/lib/db-types';
 
 const ProjectDetailPage = () => {
@@ -19,7 +21,15 @@ const ProjectDetailPage = () => {
   const navigate = useNavigate();
   const { user } = useAppStore();
   const { toast } = useToast();
+  const { openCopilot } = useCopilotStore();
   const [showRequestModal, setShowRequestModal] = useState(false);
+
+  // Fetch logged-in user profile
+  const { data: profile } = useQuery({
+    queryKey: ['my-profile', user?.id],
+    queryFn: getMyProfile,
+    enabled: !!user,
+  });
 
   // 1. Fetch public project info
   const { data: project, isLoading: loadingProject, error: projectError } = useQuery({
@@ -167,6 +177,71 @@ const ProjectDetailPage = () => {
                 <span className="flex items-center gap-1.5 font-medium">
                   <Eye className="w-4 h-4 text-muted-foreground" /> {project.views} Views
                 </span>
+              </div>
+            </div>
+
+            {/* Copilot Assistant Quick Bar */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-card border border-primary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-foreground">Aaspass Copilot Insights</span>
+                  <p className="text-[11px] text-muted-foreground">Understand scope, evaluate compatibility, and ask questions</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    openCopilot({
+                      type: 'project_detail',
+                      project,
+                      userRole: isOwner ? 'project_owner' : 'developer',
+                      userProfile: profile || null,
+                      hasPrivateAccess: isUnlocked,
+                    }, 'Explain this project in simple words. What will I build and what are the main goals?', true);
+                  }}
+                  className="px-2.5 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition shadow-sm"
+                >
+                  ✨ Explain Project
+                </button>
+                {!isOwner && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        openCopilot({
+                          type: 'project_detail',
+                          project,
+                          userRole: 'developer',
+                          userProfile: profile || null,
+                          hasPrivateAccess: isUnlocked,
+                        }, 'Assess whether this project fits my developer profile and skills.', true);
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition shadow-sm"
+                    >
+                      ✨ Is this for me?
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        openCopilot({
+                          type: 'project_detail',
+                          project,
+                          userRole: 'developer',
+                          userProfile: profile || null,
+                          hasPrivateAccess: isUnlocked,
+                        }, 'What questions should I ask the project owner before requesting access?', true);
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition shadow-sm"
+                    >
+                      ✨ What to clarify?
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 

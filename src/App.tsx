@@ -36,6 +36,8 @@ import SafetyTipsPage from "./pages/SafetyTipsPage";
 import PricingPage from "./pages/PricingPage";
 import FAQPage from "./pages/FAQPage";
 import AdminAuth from "./pages/adminauth";
+import { CopilotFloatingButton } from "@/components/copilot/CopilotFloatingButton";
+import { CopilotDrawer } from "@/components/copilot/CopilotDrawer";
 
 const queryClient = new QueryClient();
 
@@ -137,6 +139,8 @@ const AppContent = () => {
         </Routes>
       </main>
       {!isNoNavPage && <BottomNav />}
+      <CopilotFloatingButton />
+      <CopilotDrawer />
     </>
   );
 };

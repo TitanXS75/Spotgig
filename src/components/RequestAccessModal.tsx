@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Lock, ShieldCheck, Sparkles } from 'lucide-react';
 import { submitProjectRequest } from '@/lib/api/requests';
+import { getMyProfile } from '@/lib/api/profiles';
+import { executeCopilotIntent } from '@/lib/copilot/copilot-engine';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Project } from '@/lib/db-types';
@@ -23,6 +25,36 @@ export const RequestAccessModal = ({
   const queryClient = useQueryClient();
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingProposal, setIsGeneratingProposal] = useState(false);
+
+  const handleImproveProposal = async () => {
+    setIsGeneratingProposal(true);
+    try {
+      const profile = await getMyProfile();
+      const response = await executeCopilotIntent('IMPROVE_PROPOSAL', message, {
+        type: 'request_modal',
+        userRole: 'developer',
+        userProfile: profile,
+        project,
+      });
+
+      if (response.structuredData?.type === 'proposal_draft') {
+        setMessage(response.structuredData.data.proposalText);
+        toast({
+          title: 'Proposal Crafted by Copilot!',
+          description: 'Tailored using your verified skills and credentials. You can edit before submitting.',
+        });
+      }
+    } catch {
+      toast({
+        title: 'Could not generate proposal',
+        description: 'Please write your message manually.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGeneratingProposal(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -101,10 +133,20 @@ export const RequestAccessModal = ({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground flex items-center justify-between">
-                <span>Your Pitch / Introduction *</span>
-                <span className="text-[10px] text-muted-foreground">{message.length}/500</span>
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground">
+                  Your Pitch / Introduction *
+                </label>
+                <button
+                  type="button"
+                  onClick={handleImproveProposal}
+                  disabled={isGeneratingProposal}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline disabled:opacity-50"
+                >
+                  <Sparkles className="w-3 h-3 animate-pulse" />
+                  <span>{isGeneratingProposal ? 'Crafting...' : '✨ Improve with Copilot'}</span>
+                </button>
+              </div>
               <textarea
                 rows={4}
                 maxLength={500}

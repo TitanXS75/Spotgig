@@ -11,6 +11,7 @@ import ListingCardSkeleton from '@/components/ListingCardSkeleton';
 import { fetchProjects } from '@/lib/api/projects';
 import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '@/store/app-store';
+import { useCopilotStore } from '@/store/copilot-store';
 import type { Project, ProjectDifficulty, LocationPreference, CompensationType } from '@/lib/db-types';
 import {
   Select,
@@ -66,6 +67,7 @@ const Index = () => {
     compensationFilter, setCompensationFilter,
     resetFilters
   } = useAppStore();
+  const { openCopilot } = useCopilotStore();
 
   const [selectedIndustry, setSelectedIndustry] = useState<string>('All');
   const [selectedDifficulty, setSelectedDifficulty] = useState<'all' | ProjectDifficulty>('all');
@@ -176,6 +178,19 @@ const Index = () => {
           <div className="flex-1">
             <SearchBar />
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              openCopilot({
+                type: 'discovery',
+                userRole: user?.role === 'project_owner' ? 'project_owner' : 'developer',
+              }, 'Help me find a project that fits my skills and career interests.', true);
+            }}
+            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-primary/20 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold transition shrink-0 shadow-sm"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>✨ Help Me Find</span>
+          </button>
           <button
             onClick={() => setShowMobileFilters(!showMobileFilters)}
             className={`md:hidden inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-semibold transition ${

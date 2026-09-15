@@ -12,6 +12,7 @@ import { useAppStore } from '@/store/app-store';
 import { getMyProfile, getPublicProfile, updateMyProfile, getUserStats, type Profile, type ProfileUpdate } from '@/lib/api/profiles';
 import { getUserProjectReviews } from '@/lib/api/project-reviews';
 import { evaluateDeveloperTrust, evaluateOwnerTrust } from '@/lib/mediator/trust-verifier';
+import { useCopilotStore } from '@/store/copilot-store';
 import { useToast } from '@/hooks/use-toast';
 import type { ProjectDifficulty } from '@/lib/db-types';
 
@@ -27,6 +28,7 @@ const ProfilePage = () => {
   const { user, logout, setUser } = useAppStore();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { openCopilot } = useCopilotStore();
 
   const isOwnProfile = !paramUserId || paramUserId === user?.id;
   const targetUserId = isOwnProfile ? user?.id : paramUserId;
@@ -607,6 +609,29 @@ const ProfilePage = () => {
                       className="text-xs text-primary font-semibold hover:underline inline-flex items-center gap-1 pt-1"
                     >
                       <Edit2 className="w-3 h-3" /> Update Profile to Verify
+                    </button>
+                  </div>
+                )}
+
+                {isOwnProfile && (
+                  <div className="pt-2 border-t border-border flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        openCopilot(
+                          {
+                            type: 'developer_profile',
+                            userRole: user?.role === 'project_owner' ? 'project_owner' : 'developer',
+                            userProfile: profile,
+                          },
+                          'Give me suggestions to make my profile headline, bio, and signals stronger for project owners.',
+                          true
+                        );
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold transition"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>✨ Improve Profile with Copilot</span>
                     </button>
                   </div>
                 )}

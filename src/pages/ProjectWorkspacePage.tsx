@@ -21,6 +21,7 @@ import {
 import type { ProjectMessageWithSender, ProjectDeliverableWithDeveloper } from '@/lib/api/collaboration';
 import { completeProjectAndSignOff, getProjectReviews } from '@/lib/api/project-reviews';
 import ProjectReviewModal from '@/components/ProjectReviewModal';
+import { useCopilotStore } from '@/store/copilot-store';
 import { useToast } from '@/hooks/use-toast';
 
 type WorkspaceTab = 'tasks' | 'discussion' | 'deliverables' | 'specs';
@@ -29,6 +30,7 @@ const ProjectWorkspacePage = () => {
   const { id: idOrSlug } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAppStore();
+  const { openCopilot } = useCopilotStore();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -382,6 +384,22 @@ const ProjectWorkspacePage = () => {
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={() => {
+                openCopilot({
+                  type: 'workspace',
+                  project,
+                  requirements,
+                  userRole: isOwner ? 'project_owner' : 'developer',
+                  hasPrivateAccess: true,
+                });
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-semibold transition shadow-sm"
+              title="Open Workspace Copilot"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>✨ Ask Copilot</span>
+            </button>
             {isOwner && !isCompleted && (
               <button
                 onClick={() => completeProjectMutation.mutate()}
@@ -495,6 +513,29 @@ const ProjectWorkspacePage = () => {
         ════════════════════════════════════════════════════ */}
         {activeTab === 'tasks' && (
           <div className="mt-6 space-y-5">
+            {/* Generate Tasks with Copilot button */}
+            <div className="flex items-center justify-between pb-1">
+              <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <CheckSquare className="w-4 h-4 text-primary" /> Tasks & Milestones
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  openCopilot({
+                    type: 'workspace',
+                    project,
+                    requirements,
+                    userRole: isOwner ? 'project_owner' : 'developer',
+                    hasPrivateAccess: true,
+                  }, 'Break down the project requirements into development tasks.', true);
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-semibold transition shadow-sm"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>✨ Generate Tasks with Copilot</span>
+              </button>
+            </div>
+
             {/* Add Task — visible to both owner and developer */}
             <form
               onSubmit={(e) => {

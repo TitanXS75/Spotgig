@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { resetPasswordForEmail } from '@/lib/api/auth';
 import { useToast } from '@/hooks/use-toast';
 
 const ForgotPasswordPage = () => {
@@ -14,24 +14,33 @@ const ForgotPasswordPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth?reset=true`,
-    });
+    if (!email.trim()) return;
 
-    setLoading(false);
-    
-    if (error) {
+    setLoading(true);
+
+    try {
+      await resetPasswordForEmail(email.trim(), `${window.location.origin}/reset-password`);
+      setSubmitted(true);
+    } catch (err: unknown) {
+      const error = err as Error;
+      let message = error?.message || 'Failed to send reset link. Please try again.';
+
+      if (
+        message.toLowerCase().includes('failed to fetch') ||
+        message.toLowerCase().includes('network') ||
+        message.toLowerCase().includes('connection')
+      ) {
+        message = 'Unable to connect to the authentication server. Please check your internet connection or verify your Supabase project status.';
+      }
+
       toast({
-        title: 'Error',
-        description: error.message,
+        title: 'Reset link failed',
+        description: message,
         variant: 'destructive',
       });
-      return;
+    } finally {
+      setLoading(false);
     }
-    
-    setSubmitted(true);
   };
 
   return (
@@ -120,19 +129,38 @@ const ForgotPasswordPage = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-6"
             >
-              <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-8 h-8 text-green-500" />
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-8 h-8 text-primary" />
               </div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Check your mail</h2>
               <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-                We have sent a password recover instructions to your email.
+                We have sent password recovery instructions to <span className="font-semibold text-foreground">{email}</span>. Please click the link inside the email to set your new password.
               </p>
-              <button
-                onClick={() => navigate('/auth')}
-                className="text-sm font-semibold text-primary hover:underline"
-              >
-                Return to login
-              </button>
+              
+              <div className="flex flex-col gap-2.5">
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="w-full py-2.5 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Resending...' : 'Resend email'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSubmitted(false)}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Use a different email address
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/auth')}
+                  className="text-sm font-semibold text-primary hover:underline mt-3"
+                >
+                  Return to login
+                </button>
+              </div>
             </motion.div>
           )}
         </div>

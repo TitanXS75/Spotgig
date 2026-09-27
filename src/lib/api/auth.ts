@@ -85,5 +85,21 @@ export async function updateProfile(updates: ProfileUpdate) {
   return data as Profile;
 }
 
+/** Update user password (used during password reset flow). */
+export async function updatePassword(password: string) {
+  const { data, error } = await supabase.auth.updateUser({ password });
+  if (error) throw error;
+  return data;
+}
+
+/** Send password reset email with redirect link. */
+export async function resetPasswordForEmail(email: string, redirectTo?: string) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: redirectTo || `${window.location.origin}/reset-password`,
+  });
+  if (error) throw error;
+  return data;
+}
+
 /** Listen to auth state changes (for context providers). */
 export const onAuthStateChange = supabase.auth.onAuthStateChange.bind(supabase.auth);

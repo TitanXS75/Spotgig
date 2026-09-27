@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/lib/supabase";
@@ -28,6 +28,7 @@ import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import PrivacyPage from "./pages/PrivacyPage";
@@ -42,10 +43,11 @@ import { CopilotDrawer } from "@/components/copilot/CopilotDrawer";
 const queryClient = new QueryClient();
 
 // Pages that shouldn't show navigation
-const noNavPages = ['/auth', '/forgot-password', '/about', '/contact', '/privacy', '/terms', '/safety-tips', '/pricing', '/faq', '/adminauth'];
+const noNavPages = ['/auth', '/forgot-password', '/reset-password', '/about', '/contact', '/privacy', '/terms', '/safety-tips', '/pricing', '/faq', '/adminauth'];
 
 const AppContent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isNoNavPage = location.pathname === '/' || noNavPages.some(path => location.pathname.startsWith(path));
 
   const { setUser } = useAppStore();
@@ -54,6 +56,16 @@ const AppContent = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Backward compatibility: /auth?reset=true redirects to /reset-password
+  useEffect(() => {
+    if (location.pathname === '/auth') {
+      const searchParams = new URLSearchParams(location.search);
+      if (searchParams.get('reset') === 'true') {
+        navigate('/reset-password' + location.hash, { replace: true });
+      }
+    }
+  }, [location, navigate]);
 
   // Supabase Auth Listener with profile sync
   useEffect(() => {
@@ -92,7 +104,11 @@ const AppContent = () => {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        navigate('/reset-password');
+        return;
+      }
       if (session?.user) {
         syncUser(session.user);
       } else {
@@ -101,7 +117,7 @@ const AppContent = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [setUser]);
+  }, [setUser, navigate]);
 
   return (
     <>
@@ -118,6 +134,7 @@ const AppContent = () => {
           <Route path="/map" element={<MapPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/my-projects" element={<MyProjectsPage />} />

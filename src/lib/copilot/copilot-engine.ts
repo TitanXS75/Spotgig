@@ -16,12 +16,15 @@ import type {
 import { calculateProjectMatch } from '@/lib/mediator/project-matcher';
 import { scanForSensitiveInfo } from '@/lib/mediator/sensitive-info-detector';
 import { validateProjectRequirements } from '@/lib/mediator/requirement-validator';
+import { buildSystemPromptForIntent } from './prompt-templates';
+import { sanitizeContextForPermission } from './permission-resolver';
 import type { ProjectDifficulty, LocationPreference } from '@/lib/db-types';
 
 /**
  * Main Copilot Engine dispatcher.
- * Attempts server-side Edge Function first; smoothly falls back to local intelligent engine
- * if server keys are absent, network fails, or offline.
+ * 1. Checks security and permission boundaries.
+ * 2. Connects directly to live Gemini 3.7 Flash API when VITE_GEMINI_API_KEY is configured.
+ * 3. Falls back smoothly to Edge Function and local deterministic intelligent engine.
  */
 export async function executeCopilotIntent(
   intent: CopilotIntent,
@@ -50,7 +53,29 @@ export async function executeCopilotIntent(
     };
   }
 
-  // 2. Attempt Edge Function call
+  // 2. Direct Gemini 3.7 Flash Call (when VITE_GEMINI_API_KEY is present and not running in Vitest test runner)
+  const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const isTestMode = import.meta.env.MODE === 'test';
+
+  if (geminiKey && !isTestMode) {
+    try {
+      const geminiResult = await callGeminiDirect(intent, userInput, context, geminiKey);
+      if (geminiResult?.reply) {
+        return {
+          id: messageId,
+          sender: 'assistant',
+          intent,
+          timestamp,
+          content: geminiResult.reply,
+          structuredData: geminiResult.structuredData,
+        };
+      }
+    } catch (err) {
+      console.warn('Gemini 3.7 Flash call failed, falling back to local engine:', err);
+    }
+  }
+
+  // 3. Attempt Edge Function call (if Supabase session and edge function deployed)
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.access_token) {
@@ -69,11 +94,199 @@ export async function executeCopilotIntent(
       }
     }
   } catch {
-    // Edge function failed or unconfigured; proceed directly to local engine
+    // Edge function unavailable; proceed directly to high-fidelity local engine
   }
 
-  // 3. High-fidelity client-side intelligent fallback engine
+  // 4. High-fidelity client-side intelligent fallback engine
   return executeLocalCopilotEngine(intent, userInput, context, messageId, timestamp);
+}
+
+/**
+ * Direct call to Google Gemini 3.7 Flash API
+ */
+async function callGeminiDirect(
+  intent: CopilotIntent,
+  userInput: string,
+  context: CopilotContext,
+  apiKey: string
+): Promise<{ reply: string; structuredData?: CopilotMessage['structuredData'] } | null> {
+  const sanitized = sanitizeContextForPermission(context);
+  const systemPrompt = buildSystemPromptForIntent(intent, sanitized);
+
+  let formattedPrompt = userInput;
+  let expectsJson = false;
+
+  if (intent === 'GENERATE_PROJECT') {
+    expectsJson = true;
+    formattedPrompt = `${userInput}
+
+INSTRUCTION: Respond ONLY with a valid JSON object matching this exact schema (no preamble, no markdown backticks outside):
+{
+  "title": "Clear project title",
+  "short_summary": "1-2 sentence overview of the project",
+  "industry": "e.g. Health & Wellness, E-commerce, Food & Dining, Education, Real Estate, Local Business",
+  "project_type": "Web Application" | "Mobile App" | "Landing Page" | "Full-Stack System",
+  "difficulty": "beginner" | "intermediate" | "advanced",
+  "duration": "e.g. 2-3 Weeks",
+  "team_size": 1,
+  "location_type": "remote" | "hybrid" | "on_premise",
+  "compensation_type": "paid" | "unpaid" | "negotiable",
+  "compensation_amount": "e.g. 10,000",
+  "required_skills": ["Skill1", "Skill2", "Skill3"],
+  "technologies": ["Tech1", "Tech2"],
+  "public_features": ["Feature 1", "Feature 2", "Feature 3"],
+  "public_description": "Clean, comprehensive public description for candidates",
+  "private_requirements": {
+    "objective": "Core business problem and objective",
+    "user_roles": ["Role 1", "Role 2"],
+    "functional_requirements": ["Functional item 1", "Functional item 2", "Functional item 3"],
+    "workflows": ["Step 1", "Step 2"],
+    "deliverables": ["Deliverable 1", "Deliverable 2", "Deliverable 3"],
+    "acceptance_criteria": ["Criteria 1", "Criteria 2"]
+  },
+  "clarifying_questions": ["Question 1", "Question 2"]
+}`;
+  } else if (intent === 'IMPROVE_PROPOSAL') {
+    const verifiedSkills = sanitized.userProfile?.skills?.join(', ') || 'Web Development';
+    formattedPrompt = `Candidate proposal request: "${userInput}".
+Developer's verified profile:
+- Name: ${sanitized.userProfile?.full_name || 'Candidate'}
+- Education: ${sanitized.userProfile?.education || 'Computer Science'}
+- Verified Skills: ${verifiedSkills}
+- Target Project: ${sanitized.project?.title || 'Target Project'}
+
+ANTI-HALLUCINATION ENFORCEMENT:
+Write a concise, professional proposal. You must ONLY mention skills and tools from: [${verifiedSkills}]. Do NOT claim unverified skills or invent past companies.`;
+  }
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${apiKey}`;
+
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `${systemPrompt}\n\nContext Metadata:\n${JSON.stringify({
+                userRole: sanitized.userRole,
+                projectTitle: sanitized.project?.title,
+                projectSummary: sanitized.project?.public_summary,
+                requiredSkills: sanitized.project?.required_skills,
+                matchScore: sanitized.matchScore,
+                hasPrivateAccess: sanitized.hasPrivateAccess,
+                verifiedSkills: sanitized.userProfile?.skills,
+              })}\n\nUser Input:\n${formattedPrompt}`,
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        temperature: intent === 'GENERATE_PROJECT' ? 0.2 : 0.4,
+        maxOutputTokens: 2048,
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Gemini API error ${res.status}: ${res.statusText}`);
+  }
+
+  const data = await res.json();
+  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+  if (!rawText) return null;
+
+  if (expectsJson && intent === 'GENERATE_PROJECT') {
+    try {
+      const cleanJson = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      const parsed = JSON.parse(cleanJson);
+      const fallbackDraft = generateProjectDraftFromIdea(userInput, context);
+
+      const draft: GeneratedProjectDraft = {
+        title: parsed.title || fallbackDraft.title,
+        short_summary: parsed.short_summary || fallbackDraft.short_summary,
+        industry: parsed.industry || fallbackDraft.industry,
+        project_type: parsed.project_type || fallbackDraft.project_type,
+        difficulty: (['beginner', 'intermediate', 'advanced'].includes(parsed.difficulty) ? parsed.difficulty : fallbackDraft.difficulty) as any,
+        duration: parsed.duration || fallbackDraft.duration,
+        team_size: typeof parsed.team_size === 'number' ? parsed.team_size : fallbackDraft.team_size,
+        location_type: (['remote', 'hybrid', 'on_premise'].includes(parsed.location_type) ? parsed.location_type : fallbackDraft.location_type) as any,
+        compensation_type: (['paid', 'unpaid', 'negotiable'].includes(parsed.compensation_type) ? parsed.compensation_type : fallbackDraft.compensation_type) as any,
+        compensation_amount: parsed.compensation_amount || fallbackDraft.compensation_amount,
+        required_skills: Array.isArray(parsed.required_skills) && parsed.required_skills.length > 0 ? parsed.required_skills : fallbackDraft.required_skills,
+        technologies: Array.isArray(parsed.technologies) && parsed.technologies.length > 0 ? parsed.technologies : fallbackDraft.technologies,
+        public_features: Array.isArray(parsed.public_features) && parsed.public_features.length > 0 ? parsed.public_features : fallbackDraft.public_features,
+        public_description: parsed.public_description || fallbackDraft.public_description,
+        private_requirements: {
+          objective: parsed.private_requirements?.objective || fallbackDraft.private_requirements.objective,
+          user_roles: Array.isArray(parsed.private_requirements?.user_roles) ? parsed.private_requirements.user_roles : fallbackDraft.private_requirements.user_roles,
+          functional_requirements: Array.isArray(parsed.private_requirements?.functional_requirements) ? parsed.private_requirements.functional_requirements : fallbackDraft.private_requirements.functional_requirements,
+          workflows: Array.isArray(parsed.private_requirements?.workflows) ? parsed.private_requirements.workflows : fallbackDraft.private_requirements.workflows,
+          deliverables: Array.isArray(parsed.private_requirements?.deliverables) ? parsed.private_requirements.deliverables : fallbackDraft.private_requirements.deliverables,
+          acceptance_criteria: Array.isArray(parsed.private_requirements?.acceptance_criteria) ? parsed.private_requirements.acceptance_criteria : fallbackDraft.private_requirements.acceptance_criteria,
+          constraints: parsed.private_requirements?.constraints || [],
+        },
+        clarifying_questions: Array.isArray(parsed.clarifying_questions) ? parsed.clarifying_questions : fallbackDraft.clarifying_questions,
+        sensitive_warnings: fallbackDraft.sensitive_warnings,
+      };
+
+      const summary = `✨ **I have analyzed your project idea with Gemini 3.7 Flash and created a structured specification.**\n\n` +
+        `**Title:** ${draft.title}\n` +
+        `**Summary:** ${draft.short_summary}\n` +
+        `**Target Skills:** ${draft.required_skills.join(', ')}\n\n` +
+        `I've separated the **Public Discovery** overview from your **Protected Private Requirements**. You can review, edit, or apply these details directly to your project form.`;
+
+      return {
+        reply: summary,
+        structuredData: {
+          type: 'project_draft',
+          data: draft,
+        },
+      };
+    } catch (parseErr) {
+      console.warn('Failed to parse Gemini JSON output, continuing with fallback:', parseErr);
+    }
+  }
+
+  if (intent === 'IMPROVE_PROPOSAL') {
+    const fallbackProposal = generateHonestProposal(userInput, context);
+    return {
+      reply: rawText,
+      structuredData: {
+        type: 'proposal_draft',
+        data: {
+          proposalText: rawText,
+          highlightedProfileSkills: fallbackProposal.highlightedProfileSkills,
+          relevantPortfolioSignals: fallbackProposal.relevantPortfolioSignals,
+          advisoryNotes: [
+            'Generated live with Gemini 3.7 Flash using your verified profile skills.',
+            ...fallbackProposal.advisoryNotes,
+          ],
+        },
+      },
+    };
+  }
+
+  let structuredData: CopilotMessage['structuredData'] = undefined;
+  if (intent === 'EXPLAIN_PROJECT') {
+    structuredData = { type: 'developer_explanation', data: explainProjectForDeveloper(context) };
+  } else if (intent === 'EVALUATE_FIT') {
+    structuredData = { type: 'developer_fit', data: evaluateDeveloperProjectFit(context) };
+  } else if (intent === 'IMPROVE_PROJECT') {
+    structuredData = { type: 'project_improvement', data: analyzeProjectImprovements(context) };
+  } else if (intent === 'SUGGEST_OWNER_QUESTIONS') {
+    structuredData = { type: 'clarification_questions', data: generateClarificationQuestions(context) };
+  } else if (intent === 'IMPROVE_PROFILE') {
+    structuredData = { type: 'profile_improvement', data: generateProfileImprovements(context) };
+  } else if (intent === 'GENERATE_TASKS') {
+    structuredData = { type: 'workspace_tasks', data: generatePhasedTasks(context) };
+  } else if (intent === 'FIND_PROJECTS') {
+    structuredData = { type: 'discovery_results', data: parseDiscoveryIntent(userInput) };
+  }
+
+  return { reply: rawText, structuredData };
 }
 
 /**

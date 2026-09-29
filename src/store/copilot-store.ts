@@ -95,6 +95,8 @@ export const useCopilotStore = create<CopilotStoreState>((set, get) => ({
       timestamp: new Date().toISOString(),
     };
 
+    const isFirstTurn = get().messages.length === 0;
+
     // Append user message immediately
     set((state) => ({
       messages: [...state.messages, userMessage],
@@ -108,26 +110,49 @@ export const useCopilotStore = create<CopilotStoreState>((set, get) => ({
 
     // Determine intent from context if not provided
     const context = get().activeContext;
+    const callContext: CopilotContext = {
+      ...context,
+      metadata: {
+        ...context.metadata,
+        isFirstTurn,
+      },
+    };
     let intent: CopilotIntent = intentOverride || 'GENERAL_ASSIST';
 
     if (!intentOverride) {
-      if (context.type === 'post_project' || context.type === 'edit_project') {
-        intent = context.project?.title ? 'IMPROVE_PROJECT' : 'GENERATE_PROJECT';
-      } else if (context.type === 'project_detail') {
-        intent = 'EXPLAIN_PROJECT';
-      } else if (context.type === 'workspace') {
-        intent = 'GENERATE_TASKS';
-      } else if (context.type === 'developer_profile') {
-        intent = 'IMPROVE_PROFILE';
-      } else if (context.type === 'discovery') {
-        intent = 'FIND_PROJECTS';
-      } else if (context.type === 'request_modal') {
-        intent = 'IMPROVE_PROPOSAL';
+      const lower = trimmed.toLowerCase();
+      const isGreetingOrGeneral =
+        lower.startsWith('hi') ||
+        lower.startsWith('hello') ||
+        lower.startsWith('hey') ||
+        lower.includes('how does') ||
+        lower.includes('what is') ||
+        lower.includes('tell me about') ||
+        lower.includes('help me') ||
+        lower.includes('who are you') ||
+        lower.length < 15;
+
+      if (!isGreetingOrGeneral) {
+        if (context.type === 'post_project' || context.type === 'edit_project') {
+          intent = context.project?.title ? 'IMPROVE_PROJECT' : 'GENERATE_PROJECT';
+        } else if (context.type === 'project_detail') {
+          intent = 'EXPLAIN_PROJECT';
+        } else if (context.type === 'workspace') {
+          intent = 'GENERATE_TASKS';
+        } else if (context.type === 'developer_profile') {
+          intent = 'IMPROVE_PROFILE';
+        } else if (context.type === 'discovery') {
+          intent = 'FIND_PROJECTS';
+        } else if (context.type === 'request_modal') {
+          intent = 'IMPROVE_PROPOSAL';
+        }
+      } else {
+        intent = 'GENERAL_ASSIST';
       }
     }
 
     try {
-      const response = await executeCopilotIntent(intent, trimmed, context);
+      const response = await executeCopilotIntent(intent, trimmed, callContext);
 
       // If response includes a structured project draft, update currentDraft
       if (response.structuredData?.type === 'project_draft') {

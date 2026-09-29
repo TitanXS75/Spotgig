@@ -121,11 +121,43 @@ export async function createProject(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('You must be signed in to post a project.');
 
+  // Normalize location_type enum to strictly 'remote' | 'on_site' | 'hybrid'
+  const locRaw = String(projectData.location_type || '').toLowerCase();
+  let safeLocationType: LocationPreference = 'remote';
+  if (locRaw === 'hybrid') safeLocationType = 'hybrid';
+  else if (locRaw === 'on_site' || locRaw === 'on_premise' || locRaw === 'onsite' || locRaw === 'in_person') safeLocationType = 'on_site';
+
+  // Normalize compensation_type enum to strictly 'paid' | 'stipend' | 'unpaid'
+  const compRaw = String(projectData.compensation_type || '').toLowerCase();
+  let safeCompensationType: CompensationType = 'paid';
+  if (compRaw === 'stipend') safeCompensationType = 'stipend';
+  else if (compRaw === 'unpaid') safeCompensationType = 'unpaid';
+
+  // Normalize difficulty enum to strictly 'beginner' | 'intermediate' | 'advanced'
+  const diffRaw = String(projectData.difficulty || '').toLowerCase();
+  let safeDifficulty: ProjectDifficulty = 'intermediate';
+  if (diffRaw === 'beginner') safeDifficulty = 'beginner';
+  else if (diffRaw === 'advanced') safeDifficulty = 'advanced';
+
+  // Normalize numeric compensation amount
+  let safeAmount: number | null = null;
+  if (safeCompensationType === 'paid' && projectData.compensation_amount != null) {
+    const rawVal = projectData.compensation_amount;
+    const parsed = typeof rawVal === 'number' ? rawVal : parseFloat(String(rawVal).replace(/[^0-9.]/g, ''));
+    if (!isNaN(parsed) && parsed > 0) {
+      safeAmount = parsed;
+    }
+  }
+
   // 1. Insert into projects
   const { data: project, error: projectError } = await supabase
     .from('projects')
     .insert({
       ...projectData,
+      location_type: safeLocationType,
+      compensation_type: safeCompensationType,
+      difficulty: safeDifficulty,
+      compensation_amount: safeAmount,
       owner_id: user.id,
     })
     .select()
@@ -134,13 +166,14 @@ export async function createProject(
   if (projectError) throw projectError;
 
   // 2. Insert into protected project_requirements
+  const reqText = privateRequirements.detailed_requirements?.trim() || 'Detailed project deliverables to be specified by the owner.';
   const { error: reqError } = await supabase
     .from('project_requirements')
     .insert({
       project_id: project.id,
-      detailed_requirements: privateRequirements.detailed_requirements,
-      feature_list: privateRequirements.feature_list || null,
-      confidential_notes: privateRequirements.confidential_notes || null,
+      detailed_requirements: reqText,
+      feature_list: privateRequirements.feature_list?.trim() || null,
+      confidential_notes: privateRequirements.confidential_notes?.trim() || null,
       attachments: privateRequirements.attachments || [],
     });
 

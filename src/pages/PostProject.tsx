@@ -88,9 +88,24 @@ const PostProject = () => {
     if (draft.difficulty) setDifficulty(draft.difficulty);
     if (draft.duration && DURATIONS.includes(draft.duration)) setDuration(draft.duration);
     if (draft.team_size) setTeamSize(draft.team_size);
-    if (draft.location_type) setLocationType(draft.location_type);
-    if (draft.compensation_type) setCompensationType(draft.compensation_type);
-    if (draft.compensation_amount) setCompensationAmount(draft.compensation_amount);
+    if (draft.location_type) {
+      const loc = String(draft.location_type).toLowerCase();
+      if (loc === 'hybrid') setLocationType('hybrid');
+      else if (loc === 'on_site' || loc === 'on_premise' || loc === 'onsite' || loc === 'in_person') setLocationType('on_site');
+      else setLocationType('remote');
+    }
+    if (draft.compensation_type) {
+      const comp = String(draft.compensation_type).toLowerCase();
+      if (comp === 'stipend') setCompensationType('stipend');
+      else if (comp === 'unpaid') setCompensationType('unpaid');
+      else setCompensationType('paid');
+    }
+    if (draft.compensation_amount) {
+      const cleanNum = String(draft.compensation_amount).replace(/[^0-9.]/g, '');
+      if (cleanNum && !isNaN(parseFloat(cleanNum))) {
+        setCompensationAmount(cleanNum);
+      }
+    }
     if (draft.required_skills?.length) setRequiredSkills(draft.required_skills);
     if (draft.technologies?.length) setTechnologiesInput(draft.technologies.join(', '));
     if (draft.public_description || draft.short_summary) {
@@ -205,6 +220,15 @@ const PostProject = () => {
         ? technologiesInput.split(',').map(t => t.trim()).filter(Boolean)
         : requiredSkills;
 
+      // Parse numeric compensation amount cleanly
+      let cleanAmount: number | null = null;
+      if (compensationType === 'paid' && compensationAmount) {
+        const parsed = parseFloat(String(compensationAmount).replace(/[^0-9.]/g, ''));
+        if (!isNaN(parsed) && parsed > 0) {
+          cleanAmount = parsed;
+        }
+      }
+
       const project = await createProject(
         {
           title: title.trim(),
@@ -219,7 +243,7 @@ const PostProject = () => {
           duration,
           team_size: teamSize,
           compensation_type: compensationType,
-          compensation_amount: compensationType === 'paid' && compensationAmount ? parseFloat(compensationAmount) : null,
+          compensation_amount: cleanAmount,
           location_type: locationType,
           area: locationType !== 'remote' ? area.trim() : null,
           status,

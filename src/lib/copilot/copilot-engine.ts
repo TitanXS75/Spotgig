@@ -129,9 +129,9 @@ INSTRUCTION: Respond ONLY with a valid JSON object matching this exact schema (n
   "difficulty": "beginner" | "intermediate" | "advanced",
   "duration": "e.g. 2-3 Weeks",
   "team_size": 1,
-  "location_type": "remote" | "hybrid" | "on_premise",
-  "compensation_type": "paid" | "unpaid" | "negotiable",
-  "compensation_amount": "e.g. 10,000",
+  "location_type": "remote" | "hybrid" | "on_site",
+  "compensation_type": "paid" | "stipend" | "unpaid",
+  "compensation_amount": "5000",
   "required_skills": ["Skill1", "Skill2", "Skill3"],
   "technologies": ["Tech1", "Tech2"],
   "public_features": ["Feature 1", "Feature 2", "Feature 3"],
@@ -159,49 +159,106 @@ ANTI-HALLUCINATION ENFORCEMENT:
 Write a concise, professional proposal. You must ONLY mention skills and tools from: [${verifiedSkills}]. Do NOT claim unverified skills or invent past companies.`;
   }
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${apiKey}`;
+  // Greeting discipline: only greet if user greeted or it's the first turn
+  const lowerInput = userInput.trim().toLowerCase();
+  const userGreeted =
+    lowerInput.startsWith('hi') ||
+    lowerInput.startsWith('hello') ||
+    lowerInput.startsWith('hey') ||
+    lowerInput.startsWith('greetings') ||
+    lowerInput.startsWith('good morning') ||
+    lowerInput.startsWith('good afternoon') ||
+    lowerInput.startsWith('good evening');
 
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            {
-              text: `${systemPrompt}\n\nContext Metadata:\n${JSON.stringify({
-                userRole: sanitized.userRole,
-                projectTitle: sanitized.project?.title,
-                projectSummary: sanitized.project?.public_summary,
-                requiredSkills: sanitized.project?.required_skills,
-                matchScore: sanitized.matchScore,
-                hasPrivateAccess: sanitized.hasPrivateAccess,
-                verifiedSkills: sanitized.userProfile?.skills,
-              })}\n\nUser Input:\n${formattedPrompt}`,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: intent === 'GENERATE_PROJECT' ? 0.2 : 0.4,
-        maxOutputTokens: 2048,
-      },
-    }),
-  });
+  const isFirstTurn = context.metadata?.isFirstTurn === true || (context.metadata?.isFirstTurn === undefined && !context.metadata?.hasPreviousMessages);
+  const allowGreeting = userGreeted || isFirstTurn;
 
-  if (!res.ok) {
-    throw new Error(`Gemini API error ${res.status}: ${res.statusText}`);
+  if (!allowGreeting) {
+    formattedPrompt += `\n\nCONVERSATIONAL RULE: Do NOT include greetings, pleasantries, or self-introductions (such as "Hello! I am Aaspass Copilot..."). Directly answer the user's inquiry immediately.`;
   }
 
-  const data = await res.json();
-  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-  if (!rawText) return null;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${apiKey}`;
+
+  // Multi-model resilience cascade: start with verified active models, falling back if 503/429 occurs
+  const CANDIDATE_MODELS = [
+    'gemini-3.5-flash-lite',
+    'gemini-3-flash-preview',
+    'gemini-3.7-flash',
+    'gemini-3.8-flash',
+  ];
+
+  let rawText = '';
+  let lastError: Error | null = null;
+
+  for (const model of CANDIDATE_MODELS) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(15000),
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                {
+                  text: `${systemPrompt}\n\nContext Metadata:\n${JSON.stringify({
+                    userRole: sanitized.userRole,
+                    projectTitle: sanitized.project?.title,
+                    projectSummary: sanitized.project?.public_summary,
+                    requiredSkills: sanitized.project?.required_skills,
+                    matchScore: sanitized.matchScore,
+                    hasPrivateAccess: sanitized.hasPrivateAccess,
+                    verifiedSkills: sanitized.userProfile?.skills,
+                  })}\n\nUser Input:\n${formattedPrompt}`,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: intent === 'GENERATE_PROJECT' ? 0.2 : 0.5,
+            maxOutputTokens: 2048,
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        console.warn(`[Aaspass Copilot] Model ${model} returned HTTP ${res.status}:`, errText.slice(0, 120));
+        continue;
+      }
+
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+      if (text) {
+        rawText = !allowGreeting ? stripRepetitiveIntro(text) : text;
+        break; // Successfully received response from candidate model
+      }
+    } catch (err: unknown) {
+      lastError = err as Error;
+      console.warn(`[Aaspass Copilot] Model ${model} attempt failed:`, (err as Error).message);
+    }
+  }
+
+  if (!rawText) {
+    throw lastError || new Error('All Gemini candidate models were unavailable or returned empty output.');
+  }
+
+  if (!allowGreeting) {
+    rawText = stripRepetitiveIntro(rawText);
+  }
 
   if (expectsJson && intent === 'GENERATE_PROJECT') {
     try {
-      const cleanJson = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-      const parsed = JSON.parse(cleanJson);
+      const startIdx = rawText.indexOf('{');
+      const endIdx = rawText.lastIndexOf('}');
+      if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
+        throw new Error('No JSON object boundaries found in AI response');
+      }
+
+      const jsonStr = rawText.slice(startIdx, endIdx + 1);
+      const parsed = JSON.parse(jsonStr);
       const fallbackDraft = generateProjectDraftFromIdea(userInput, context);
 
       const draft: GeneratedProjectDraft = {
@@ -212,27 +269,27 @@ Write a concise, professional proposal. You must ONLY mention skills and tools f
         difficulty: (['beginner', 'intermediate', 'advanced'].includes(parsed.difficulty) ? parsed.difficulty : fallbackDraft.difficulty) as any,
         duration: parsed.duration || fallbackDraft.duration,
         team_size: typeof parsed.team_size === 'number' ? parsed.team_size : fallbackDraft.team_size,
-        location_type: (['remote', 'hybrid', 'on_premise'].includes(parsed.location_type) ? parsed.location_type : fallbackDraft.location_type) as any,
-        compensation_type: (['paid', 'unpaid', 'negotiable'].includes(parsed.compensation_type) ? parsed.compensation_type : fallbackDraft.compensation_type) as any,
-        compensation_amount: parsed.compensation_amount || fallbackDraft.compensation_amount,
+        location_type: (parsed.location_type === 'hybrid' ? 'hybrid' : (parsed.location_type === 'on_site' || parsed.location_type === 'on_premise' || parsed.location_type === 'onsite') ? 'on_site' : 'remote') as LocationPreference,
+        compensation_type: (parsed.compensation_type === 'stipend' ? 'stipend' : parsed.compensation_type === 'unpaid' ? 'unpaid' : 'paid') as CompensationType,
+        compensation_amount: parsed.compensation_amount ? String(parsed.compensation_amount).replace(/[^0-9.]/g, '') || fallbackDraft.compensation_amount : fallbackDraft.compensation_amount,
         required_skills: Array.isArray(parsed.required_skills) && parsed.required_skills.length > 0 ? parsed.required_skills : fallbackDraft.required_skills,
         technologies: Array.isArray(parsed.technologies) && parsed.technologies.length > 0 ? parsed.technologies : fallbackDraft.technologies,
         public_features: Array.isArray(parsed.public_features) && parsed.public_features.length > 0 ? parsed.public_features : fallbackDraft.public_features,
         public_description: parsed.public_description || fallbackDraft.public_description,
         private_requirements: {
           objective: parsed.private_requirements?.objective || fallbackDraft.private_requirements.objective,
-          user_roles: Array.isArray(parsed.private_requirements?.user_roles) ? parsed.private_requirements.user_roles : fallbackDraft.private_requirements.user_roles,
-          functional_requirements: Array.isArray(parsed.private_requirements?.functional_requirements) ? parsed.private_requirements.functional_requirements : fallbackDraft.private_requirements.functional_requirements,
-          workflows: Array.isArray(parsed.private_requirements?.workflows) ? parsed.private_requirements.workflows : fallbackDraft.private_requirements.workflows,
-          deliverables: Array.isArray(parsed.private_requirements?.deliverables) ? parsed.private_requirements.deliverables : fallbackDraft.private_requirements.deliverables,
-          acceptance_criteria: Array.isArray(parsed.private_requirements?.acceptance_criteria) ? parsed.private_requirements.acceptance_criteria : fallbackDraft.private_requirements.acceptance_criteria,
+          user_roles: Array.isArray(parsed.private_requirements?.user_roles) && parsed.private_requirements.user_roles.length > 0 ? parsed.private_requirements.user_roles : fallbackDraft.private_requirements.user_roles,
+          functional_requirements: Array.isArray(parsed.private_requirements?.functional_requirements) && parsed.private_requirements.functional_requirements.length > 0 ? parsed.private_requirements.functional_requirements : fallbackDraft.private_requirements.functional_requirements,
+          workflows: Array.isArray(parsed.private_requirements?.workflows) && parsed.private_requirements.workflows.length > 0 ? parsed.private_requirements.workflows : fallbackDraft.private_requirements.workflows,
+          deliverables: Array.isArray(parsed.private_requirements?.deliverables) && parsed.private_requirements.deliverables.length > 0 ? parsed.private_requirements.deliverables : fallbackDraft.private_requirements.deliverables,
+          acceptance_criteria: Array.isArray(parsed.private_requirements?.acceptance_criteria) && parsed.private_requirements.acceptance_criteria.length > 0 ? parsed.private_requirements.acceptance_criteria : fallbackDraft.private_requirements.acceptance_criteria,
           constraints: parsed.private_requirements?.constraints || [],
         },
-        clarifying_questions: Array.isArray(parsed.clarifying_questions) ? parsed.clarifying_questions : fallbackDraft.clarifying_questions,
+        clarifying_questions: Array.isArray(parsed.clarifying_questions) && parsed.clarifying_questions.length > 0 ? parsed.clarifying_questions : fallbackDraft.clarifying_questions,
         sensitive_warnings: fallbackDraft.sensitive_warnings,
       };
 
-      const summary = `✨ **I have analyzed your project idea with Gemini 3.7 Flash and created a structured specification.**\n\n` +
+      const summary = `✨ **I have analyzed your project idea with Gemini AI and created a structured specification.**\n\n` +
         `**Title:** ${draft.title}\n` +
         `**Summary:** ${draft.short_summary}\n` +
         `**Target Skills:** ${draft.required_skills.join(', ')}\n\n` +
@@ -246,7 +303,7 @@ Write a concise, professional proposal. You must ONLY mention skills and tools f
         },
       };
     } catch (parseErr) {
-      console.warn('Failed to parse Gemini JSON output, continuing with fallback:', parseErr);
+      console.warn('[Aaspass Copilot] Failed to parse Gemini JSON output, falling back to local schema parser:', parseErr);
     }
   }
 
@@ -939,10 +996,36 @@ function parseDiscoveryIntent(input: string): DiscoverySearchSuggestion {
   };
 }
 
+/**
+ * Strips repetitive greeting introductions like "Hello! I am Aaspass, your AI Copilot."
+ * when the user has not greeted or it is not the first turn.
+ */
+function stripRepetitiveIntro(text: string): string {
+  return text
+    .replace(/^(?:hello|hi|hey|greetings|welcome)[!.,]?\s*(?:i['\s]m|i am|this is)[^.!\n]+(?:copilot|assistant)[.!]?\s*/i, '')
+    .replace(/^(?:i['\s]m|i am|this is)[^.!\n]+(?:copilot|assistant)[.!]?\s*/i, '')
+    .replace(/^(?:hello|hi|hey|greetings)[!.,]?\s*(?:there|everyone)?[!.,]?\s*/i, '')
+    .trim();
+}
+
 function generateGeneralAssistantReply(input: string, context: CopilotContext): string {
   const role = context.userRole === 'project_owner' ? 'Project Owner' : 'Developer';
+  const lowerInput = input.trim().toLowerCase();
+  const userGreeted =
+    lowerInput.startsWith('hi') ||
+    lowerInput.startsWith('hello') ||
+    lowerInput.startsWith('hey') ||
+    lowerInput.startsWith('greetings') ||
+    lowerInput.startsWith('good morning') ||
+    lowerInput.startsWith('good afternoon') ||
+    lowerInput.startsWith('good evening');
+  const isFirstTurn = context.metadata?.isFirstTurn === true || context.metadata?.isFirstTurn === undefined;
 
-  return `I'm here to assist you as a **${role}** on Aaspass!\n\n` +
+  const intro = (userGreeted || isFirstTurn)
+    ? `Hello! I'm here to assist you as a **${role}** on Aaspass!\n\n`
+    : `Here is how I can assist you with this:\n\n`;
+
+  return intro +
     `You can ask me to:\n` +
     `• Transform project ideas into structured requirements\n` +
     `• Evaluate whether a project matches your skills\n` +

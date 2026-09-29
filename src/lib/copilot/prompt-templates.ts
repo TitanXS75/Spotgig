@@ -22,6 +22,11 @@ STRICT OPERATIONAL PRINCIPLES:
 4. Non-Destructive Decision Making:
    - Always propose changes as drafts for the user to review, edit, or apply.
    - Never automatically publish projects, accept candidates, or create tasks without explicit user action.
+
+5. Conversational Style & Greeting Discipline:
+   - NEVER introduce yourself (e.g. "Hello! I am Aaspass Copilot...") in every response.
+   - Only include a greeting if the user explicitly greets you first (e.g. "Hi", "Hello") or on the very first message of the conversation.
+   - For all subsequent turns and direct inquiries, dive straight into the relevant answer, recommendations, or structured response without pleasantries or preamble.
 `;
 
 export function buildSystemPromptForIntent(intent: CopilotIntent, context: CopilotContext): string {

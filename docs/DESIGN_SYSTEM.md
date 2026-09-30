@@ -6,35 +6,59 @@
 
 ## 1. Color Palette
 
-### Light Theme (Warm Cream & Soft Sand)
+### Named Palette Specification
 
-| Token | HSL | Usage |
-|-------|-----|-------|
-| `--background` | `40 33% 97%` | Page background |
-| `--foreground` | `25 15% 15%` | Primary text |
-| `--primary` | `142 71% 45%` | CTA buttons, active states (green) |
-| `--secondary` | `25 95% 53%` | Accent highlights (warm orange) |
-| `--muted` | `40 20% 93%` | Disabled states, subtle backgrounds |
-| `--destructive` | `0 84% 60%` | Error states, delete actions |
-| `--border` | `38 18% 89%` | Card borders, dividers |
-| `--accent-product` | `25 95% 53%` | Product type badge (orange) |
-| `--accent-service` | `199 89% 48%` | Service type badge (blue) |
+| Token | HSL | Hex |
+|-------|-----|-----|
+| `--dark-amaranth` | `339 54% 28%` | `#6d213c` |
+| `--toffee-brown` | `26 36% 43%` | `#946846` |
+| `--sand` | `49 37% 57%` | `#baab68` |
+| `--metallic-gold` | `42 67% 66%` | `#e3c16f` |
+| `--canary-yellow` | `62 100% 72%` | `#faff70` |
+
+### Light Theme
+
+| Token | HSL | Hex / Color | Usage |
+|-------|-----|-------------|-------|
+| `--background` | `45 30% 98%` | `#fbfbf8` | Warm ivory canvas |
+| `--foreground` | `339 35% 12%` | `#29141b` | Primary text (deep amaranth charcoal, 16.7:1 AAA contrast) |
+| `--card` | `0 0% 100%` | `#ffffff` | Elevated pure white card surfaces |
+| `--primary` | `339 54% 28%` | `#6d213c` | CTA buttons, active states (Dark Amaranth) |
+| `--primary-foreground` | `0 0% 100%` | `#ffffff` | High-contrast white text on primary (10.8:1 AAA contrast) |
+| `--secondary` | `26 36% 43%` | `#946846` | Secondary buttons & product badges (Toffee Brown) |
+| `--secondary-foreground` | `0 0% 100%` | `#ffffff` | High-contrast white text on secondary (AAA compliant) |
+| `--muted` | `45 25% 93%` | `#f2efe9` | Warm sand cream backgrounds |
+| `--muted-foreground` | `26 22% 40%` | `#7c6350` | Secondary text, captions, metadata (5.4:1 AA contrast) |
+| `--accent` | `42 60% 92%` | `#f8eccf` | Soft gold hover & focus wash |
+| `--accent-foreground` | `339 54% 28%` | `#6d213c` | Dark amaranth interactive active text |
+| `--destructive` | `0 84% 60%` | `#ef4444` | Error states, delete actions |
+| `--border` | `45 20% 88%` | `#e5e2db` | Subtle warm sand card borders, dividers |
+| `--accent-product` | `26 36% 43%` | `#946846` | Product type badge (Toffee Brown) |
+| `--accent-service` | `42 67% 45%` | `#c2992d` | Service type badge (Metallic Gold) |
 
 ### Dark Theme
 
-| Token | HSL | Usage |
-|-------|-----|-------|
-| `--background` | `0 0% 8%` | Page background |
-| `--foreground` | `0 0% 98%` | Primary text |
-| `--card` | `0 0% 12%` | Card surfaces |
-| `--muted` | `0 0% 20%` | Subtle backgrounds |
-| `--border` | `0 0% 16%` | Borders |
+| Token | HSL | Hex / Color | Usage |
+|-------|-----|-------------|-------|
+| `--background` | `339 35% 7%` | `#180c10` | Deep velvet amaranth-black (18.4:1 contrast) |
+| `--foreground` | `60 20% 98%` | `#fbfbf9` | Warm ivory typography |
+| `--card` | `339 25% 11%` | `#24141b` | Elevated dark amaranth card surfaces |
+| `--primary` | `42 67% 66%` | `#e3c16f` | CTA buttons, active states (radiant Metallic Gold) |
+| `--primary-foreground` | `339 54% 16%` | `#3f1222` | Deep amaranth text on gold (9.0:1 AAA contrast) |
+| `--secondary` | `49 37% 57%` | `#baab68` | Secondary buttons & product badges (Sand) |
+| `--secondary-foreground` | `339 54% 14%` | `#370e1c` | Deep amaranth text on sand (7.3:1 AAA contrast) |
+| `--muted` | `339 20% 15%` | `#2d2025` | Deep muted amaranth backgrounds |
+| `--muted-foreground` | `49 20% 68%` | `#beb89d` | Soft golden sand text (9.6:1 AAA contrast) |
+| `--accent` | `339 30% 18%` | `#3c202a` | Warm amaranth hover wash |
+| `--accent-foreground` | `42 67% 72%` | `#e8cb80` | Glowing gold hover text |
+| `--border` | `339 18% 18%` | `#36282e` | Subtle amaranth borders |
+| `--accent-product` | `26 50% 60%` | `#ba8f73` | Product type badge (Toffee Gold) |
+| `--accent-service` | `42 67% 66%` | `#e3c16f` | Service type badge (Metallic Gold) |
 
 ### Design Rationale
-The light theme uses warm cream tones (`hsl(40, 33%, 97%)`) instead of pure
-white to reduce eye strain and create a welcoming, editorial aesthetic. The
-green primary (`hsl(142, 71%, 45%)`) conveys growth and trust — appropriate
-for a freelancer marketplace.
+The platform adopts an artisanal, warm, luxurious earth-and-gold aesthetic:
+- **Light mode**: Warm ivory canvas (`#fbfbf8`) anchored with commanding Dark Amaranth (`#6d213c`) CTAs, Toffee Brown (`#946846`) secondary actions, and subtle warm sand dividers.
+- **Dark mode**: An opulent velvet amaranth-black foundation (`#180c10`) where radiant Metallic Gold (`#e3c16f`) and Canary Yellow (`#faff70`) shine with 9:1+ AAA contrast and warm amber rim lighting.
 
 ---
 

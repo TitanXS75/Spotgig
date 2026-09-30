@@ -266,7 +266,7 @@ Write a concise, professional proposal. You must ONLY mention skills and tools f
         short_summary: parsed.short_summary || fallbackDraft.short_summary,
         industry: parsed.industry || fallbackDraft.industry,
         project_type: parsed.project_type || fallbackDraft.project_type,
-        difficulty: (['beginner', 'intermediate', 'advanced'].includes(parsed.difficulty) ? parsed.difficulty : fallbackDraft.difficulty) as any,
+        difficulty: (['beginner', 'intermediate', 'advanced'].includes(parsed.difficulty) ? parsed.difficulty : fallbackDraft.difficulty) as ProjectDifficulty,
         duration: parsed.duration || fallbackDraft.duration,
         team_size: typeof parsed.team_size === 'number' ? parsed.team_size : fallbackDraft.team_size,
         location_type: (parsed.location_type === 'hybrid' ? 'hybrid' : (parsed.location_type === 'on_site' || parsed.location_type === 'on_premise' || parsed.location_type === 'onsite') ? 'on_site' : 'remote') as LocationPreference,

@@ -50,6 +50,8 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
           product: "hsl(var(--accent-product))",
           service: "hsl(var(--accent-service))",
+          brand: "hsl(var(--brand-accent))",
+          "brand-foreground": "hsl(var(--brand-accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -69,6 +71,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        'dark-amaranth': "hsl(var(--dark-amaranth))",
+        'toffee-brown': "hsl(var(--toffee-brown))",
+        'sand': "hsl(var(--sand))",
+        'metallic-gold': "hsl(var(--metallic-gold))",
+        'canary-yellow': "hsl(var(--canary-yellow))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -78,9 +85,9 @@ export default {
         '3xl': '1.5rem',
       },
       boxShadow: {
-        'card': '0 0 0 1px rgba(0,0,0,.04), 0 2px 4px rgba(0,0,0,.02), 0 8px 16px -4px rgba(0,0,0,.04)',
-        'card-hover': '0 0 0 1px rgba(0,0,0,.04), 0 4px 8px rgba(0,0,0,.04), 0 16px 24px -4px rgba(0,0,0,.06)',
-        'nav': '0 -1px 0 0 rgba(0,0,0,0.05)',
+        'card': 'var(--shadow-card)',
+        'card-hover': '0 0 0 1px hsl(var(--primary) / 0.2), 0 4px 12px -2px hsl(var(--primary) / 0.1), 0 16px 28px -4px rgba(0,0,0,0.1)',
+        'nav': '0 -1px 0 0 hsl(var(--border))',
       },
       keyframes: {
         "accordion-down": {

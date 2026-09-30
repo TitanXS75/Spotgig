@@ -394,13 +394,13 @@ export default function AdminAuth() {
               ) : categoryStats.length > 0 ? (
                 (() => {
                   const colorPalette = [
-                    'from-[hsl(25,95%,53%)] to-orange-500',      // Orange
-                    'from-[hsl(199,89%,48%)] to-blue-400',       // Service Blue (theme color)
+                    'from-primary to-primary/80',                // Primary
+                    'from-secondary to-secondary/80',            // Secondary
+                    'from-accent-service to-accent-service/80',  // Service / Accent
                     'from-pink-500 to-pink-400',                 // Pink
                     'from-purple-500 to-purple-400',             // Purple
                     'from-cyan-500 to-cyan-400',                 // Cyan
                     'from-red-500 to-red-400',                   // Red
-                    'from-green-500 to-green-400',               // Green
                     'from-amber-500 to-amber-400',               // Amber
                     'from-indigo-500 to-indigo-400',             // Indigo
                     'from-emerald-500 to-emerald-400',           // Emerald
@@ -499,13 +499,13 @@ export default function AdminAuth() {
                   const maxRevenue = Math.max(...filteredStats.map((s) => s.revenue), 1);
                   
                   const colorPalette = [
-                    'from-[hsl(25,95%,53%)] to-orange-500',      // Orange
-                    'from-[hsl(199,89%,48%)] to-blue-400',       // Service Blue (theme color)
+                    'from-primary to-primary/80',                // Primary
+                    'from-secondary to-secondary/80',            // Secondary
+                    'from-accent-service to-accent-service/80',  // Service / Accent
                     'from-pink-500 to-pink-400',                 // Pink
                     'from-purple-500 to-purple-400',             // Purple
                     'from-cyan-500 to-cyan-400',                 // Cyan
                     'from-red-500 to-red-400',                   // Red
-                    'from-green-500 to-green-400',               // Green
                     'from-amber-500 to-amber-400',               // Amber
                     'from-indigo-500 to-indigo-400',             // Indigo
                     'from-emerald-500 to-emerald-400',           // Emerald

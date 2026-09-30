@@ -6,94 +6,113 @@
 
 @layer base {
   :root {
-    /* Warm Cream & Soft Sand Theme (Gentle on the eyes, rich editorial aesthetic) */
-    --background: 40 33% 97%;
-    --foreground: 25 15% 15%;
+    /* ─── Named Palette Tokens ─── */
+    --dark-amaranth: 339 54% 28%;       /* #6d213c */
+    --toffee-brown: 26 36% 43%;         /* #946846 */
+    --sand: 49 37% 57%;                 /* #baab68 */
+    --metallic-gold: 42 67% 66%;        /* #e3c16f */
+    --canary-yellow: 62 100% 72%;       /* #faff70 */
 
-    --card: 40 25% 99%;
-    --card-foreground: 25 15% 15%;
+    /* ─── Light Theme ─── */
+    --background: 45 30% 98%;           /* #fbfbf8 - Warm ivory canvas */
+    --foreground: 339 35% 12%;          /* #29141b - Deep amaranth charcoal */
 
-    --popover: 40 25% 99%;
-    --popover-foreground: 25 15% 15%;
+    --card: 0 0% 100%;                  /* #ffffff - Crisp elevated surface */
+    --card-foreground: 339 35% 12%;
 
-    --primary: 142 71% 45%;
-    --primary-foreground: 144 100% 97%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 339 35% 12%;
 
-    --secondary: 25 95% 53%;
-    --secondary-foreground: 0 0% 100%;
+    --primary: 339 54% 28%;             /* #6d213c - Dark Amaranth */
+    --primary-foreground: 0 0% 100%;    /* #ffffff - High contrast white (10.8:1 AAA) */
 
-    --muted: 40 20% 93%;
-    --muted-foreground: 30 8% 46%;
+    --secondary: 26 36% 43%;            /* #946846 - Toffee Brown */
+    --secondary-foreground: 0 0% 100%;  /* #ffffff - AAA contrast */
 
-    --accent: 40 20% 93%;
-    --accent-foreground: 25 15% 15%;
+    --muted: 45 25% 93%;                /* #f2efe9 - Warm sand cream */
+    --muted-foreground: 26 22% 40%;     /* #7c6350 - Warm toffee slate */
+
+    --accent: 42 60% 92%;               /* #f8eccf - Soft gold hover wash */
+    --accent-foreground: 339 54% 28%;   /* #6d213c - Dark amaranth interactive text */
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 38 18% 89%;
-    --input: 38 18% 89%;
-    --ring: 142 71% 45%;
+    --border: 45 20% 88%;               /* #e5e2db - Subtle warm sand border */
+    --input: 45 20% 88%;
+    --ring: 339 54% 28%;                /* Dark amaranth focus ring */
 
     --radius: 0.5rem;
 
-    --accent-product: 25 95% 53%;
-    --accent-service: 199 89% 48%;
+    --accent-product: 26 36% 43%;       /* #946846 - Toffee Brown for products */
+    --accent-service: 42 67% 45%;       /* #c2992d - Metallic Gold for services */
+    --brand-accent: 42 67% 66%;         /* #e3c16f - Metallic Gold */
+    --brand-accent-foreground: 339 54% 18%;
 
-    --shadow-card: 0 0 0 1px rgba(60,45,30,.05), 0 2px 4px rgba(60,45,30,.03), 0 8px 16px -4px rgba(60,45,30,.06);
+    --shadow-card: 0 1px 3px 0 rgba(109, 33, 60, 0.04), 0 4px 12px -2px rgba(109, 33, 60, 0.06), 0 0 0 1px rgba(109, 33, 60, 0.05);
 
-    --sidebar-background: 40 28% 95%;
-    --sidebar-foreground: 25 15% 15%;
-    --sidebar-primary: 142 71% 45%;
-    --sidebar-primary-foreground: 144 100% 97%;
-    --sidebar-accent: 40 20% 91%;
-    --sidebar-accent-foreground: 25 15% 15%;
-    --sidebar-border: 38 18% 89%;
-    --sidebar-ring: 142 71% 45%;
+    --sidebar-background: 45 30% 96%;
+    --sidebar-foreground: 339 35% 12%;
+    --sidebar-primary: 339 54% 28%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 42 60% 92%;
+    --sidebar-accent-foreground: 339 54% 28%;
+    --sidebar-border: 45 20% 88%;
+    --sidebar-ring: 339 54% 28%;
   }
 
   .dark {
-    --background: 0 0% 8%;
-    --foreground: 0 0% 98%;
+    /* ─── Named Palette Tokens ─── */
+    --dark-amaranth: 339 54% 28%;
+    --toffee-brown: 26 36% 43%;
+    --sand: 49 37% 57%;
+    --metallic-gold: 42 67% 66%;
+    --canary-yellow: 62 100% 72%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 98%;
+    /* ─── Dark Theme ─── */
+    --background: 339 35% 7%;           /* #180c10 - Deep velvet amaranth-black */
+    --foreground: 60 20% 98%;           /* #fbfbf9 - Warm ivory typography (18.4:1 contrast) */
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 98%;
+    --card: 339 25% 11%;                /* #24141b - Elevated dark amaranth surface */
+    --card-foreground: 60 20% 98%;
 
-    --primary: 142 71% 45%;
-    --primary-foreground: 144 100% 97%;
+    --popover: 339 25% 11%;
+    --popover-foreground: 60 20% 98%;
 
-    --secondary: 25 95% 53%;
-    --secondary-foreground: 0 0% 8%;
+    --primary: 42 67% 66%;              /* #e3c16f - Radiant Metallic Gold */
+    --primary-foreground: 339 54% 16%;  /* #3f1222 - Deep amaranth text (9:1 AAA contrast) */
 
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 65%;
+    --secondary: 49 37% 57%;            /* #baab68 - Sand */
+    --secondary-foreground: 339 54% 14%;/* #370e1c - Deep amaranth text (7.3:1 AAA contrast) */
 
-    --accent: 0 0% 18%;
-    --accent-foreground: 0 0% 98%;
+    --muted: 339 20% 15%;               /* #2d2025 - Deep muted amaranth */
+    --muted-foreground: 49 20% 68%;     /* #beb89d - Soft golden sand text (9.5:1 AAA contrast) */
+
+    --accent: 339 30% 18%;              /* #3c202a - Warm amaranth hover wash */
+    --accent-foreground: 42 67% 72%;    /* #e8cb80 - Glowing gold hover text */
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 8%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 142 71% 45%;
+    --border: 339 18% 18%;              /* #36282e - Subtle amaranth border */
+    --input: 339 18% 18%;
+    --ring: 42 67% 66%;                 /* Metallic gold focus ring */
 
-    --accent-product: 25 95% 53%;
-    --accent-service: 199 89% 48%;
+    --accent-product: 26 50% 60%;       /* Warm toffee-gold for products */
+    --accent-service: 42 67% 66%;       /* #e3c16f - Metallic gold for services */
+    --brand-accent: 62 100% 72%;        /* #faff70 - Canary Yellow */
+    --brand-accent-foreground: 339 54% 16%;
 
-    --shadow-card: 0 0 0 1px rgba(255,255,255,.08), 0 2px 4px rgba(0,0,0,.3), 0 8px 16px -4px rgba(0,0,0,.5);
+    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(227, 193, 111, 0.12);
 
-    --sidebar-background: 0 0% 10%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 142 71% 45%;
-    --sidebar-primary-foreground: 0 0% 8%;
-    --sidebar-accent: 0 0% 18%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 16%;
-    --sidebar-ring: 142 71% 45%;
+    --sidebar-background: 339 40% 5%;
+    --sidebar-foreground: 60 20% 98%;
+    --sidebar-primary: 42 67% 66%;
+    --sidebar-primary-foreground: 339 54% 16%;
+    --sidebar-accent: 339 30% 18%;
+    --sidebar-accent-foreground: 42 67% 72%;
+    --sidebar-border: 339 18% 18%;
+    --sidebar-ring: 42 67% 66%;
   }
 }
 

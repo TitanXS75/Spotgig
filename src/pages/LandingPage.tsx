@@ -13,6 +13,7 @@ import { StripeStatsBanner } from '@/components/landing/StripeStatsBanner';
 import { StripeHowItWorks } from '@/components/landing/StripeHowItWorks';
 import { StripeAudienceBento } from '@/components/landing/StripeAudienceBento';
 import { StripeMobileInstall } from '@/components/landing/StripeMobileInstall';
+import { LandingNavbar } from '@/components/landing/LandingNavbar';
 
 const DEMO_IMAGES = [
   // Center main image (Zooms 4x — high-res 4K/ultra HD to remain crystal clear)
@@ -61,22 +62,8 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white text-[#0a2540] flex flex-col font-sans selection:bg-[#635bff]/20">
       
-      {/* ─── NAVBAR with Stripe Hairline Margin Borders ─── */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e3e8ee]">
-        <div className="flex items-center justify-between px-6 md:px-12 py-4 max-w-[1560px] mx-auto w-full">
-          <div className="flex items-center cursor-pointer" onClick={() => handleNavigate('/')}>
-            <img src="/aplg.png" alt="Spotgig" className="w-auto h-10 object-contain transform scale-125" />
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => handleNavigate('/auth', 'login')}
-              className="text-sm font-semibold bg-[#0a2540] hover:bg-[#1a385c] text-white px-5 py-2.5 rounded-full transition-all duration-200 shadow-sm flex items-center"
-            >
-              <span>Sign In</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* ─── PROFESSIONAL STRIPE-GRADE NAVBAR ─── */}
+      <LandingNavbar />
 
       {/* ─── HERO SECTION (With Stripe Pre-Dawn Sunrise Wave & High Contrast Text) ─── */}
       <ShuffleHero

@@ -1,8 +1,8 @@
-
+import { CheckCircle2 } from 'lucide-react';
 import {
-  Briefcase, GraduationCap,
-  CheckCircle2, Building2, TrendingUp, Users
-} from 'lucide-react';
+  StripePlatformBlueWaveArt,
+  StripeStartupsWaveArt,
+} from './BoxBackgroundArt';
 
 interface StripeAudienceBentoProps {
   onClientAction: () => void;
@@ -27,129 +27,92 @@ export function StripeAudienceBento({ onClientAction, onFreelancerAction }: Stri
           </p>
         </div>
 
-        {/* ─── Stripe-Style Dual Program Cards ─── */}
+        {/* ─── Stripe-Style Dual Cards with Silk Wave Art & Boundary Glow (Zero Triangles, Zero Badges, Zero Fake Data) ─── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          {/* Card 1: Clients & Business Owners */}
+          {/* Card 1: Clients & Business Owners (Clean White, No BG) */}
           <div
-            className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-8 md:p-10 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
+            className="group relative rounded-2xl bg-white border border-[#e3e8ee] hover:border-[#635bff]/60 hover:ring-1 hover:ring-[#635bff]/30 p-8 md:p-10 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_8px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(99,91,255,0.08),0_16px_36px_rgba(10,37,64,0.06)] transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <div className="w-12 h-12 rounded-xl bg-[#f8fafc] border border-[#e3e8ee] flex items-center justify-center text-[#0a2540]">
-                  <Briefcase className="w-6 h-6 text-[#635bff]" />
-                </div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#635bff] bg-[#635bff]/5 px-3 py-1 rounded-full border border-[#635bff]/15">
-                  For Businesses
-                </span>
-              </div>
-
+            <div className="relative z-10 w-full">
               {/* Stripe Inline Title and Description */}
               <div className="mb-6">
-                <h4 className="font-bold text-[#0a2540] inline text-2xl mr-1.5">
+                <h4 className="font-bold text-[#0a2540] inline text-2xl mr-1.5 leading-snug">
                   Clients &amp; Business Owners.
                 </h4>
                 <p className="text-[#425466] inline text-base leading-relaxed">
-                  Need a website, app, or tech project done? Post it here and find talented students. Affordable rates, real skills, direct collaboration.
+                  Need a responsive website, mobile application, or technical task completed? Post your requirements and connect with skilled students. Fast delivery, transparent rates, and direct communication.
                 </p>
               </div>
 
-              {/* Checkmarks */}
+              {/* Genuine Value Points (No Badges, No Fake Reviews) */}
               <div className="space-y-3 mb-8">
                 {[
-                  'Business owners wanting a digital presence',
-                  'Experienced professionals seeking project guidance',
-                  'Startups needing part-time tech help'
+                  'Direct WhatsApp and LinkedIn connection with student creators',
+                  'Clear milestone-based agreements with zero intermediary platform fees',
+                  'Collaborate with individual specialists or assembled campus project squads'
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 text-sm text-[#425466]">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <div key={idx} className="flex items-start gap-3 text-sm text-[#425466]">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </div>
                 ))}
               </div>
-
-              {/* Mini Showcase Card */}
-              <div className="p-4 rounded-xl bg-[#f8fafc] border border-[#e3e8ee] mb-8 space-y-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-[#0a2540]">
-                  <span className="flex items-center gap-1.5">
-                    <Building2 className="w-4 h-4 text-[#635bff]" /> Retail Point of Sale App
-                  </span>
-                  <span className="text-emerald-600 font-bold font-mono">Completed</span>
-                </div>
-                <p className="text-xs text-[#425466]">
-                  "Hired 2 B.Tech student developers. Delivered our inventory and checkout web app on time and on budget."
-                </p>
-              </div>
             </div>
 
-            {/* Stripe Action Link Button */}
-            <button
-              onClick={onClientAction}
-              className="w-full py-3.5 px-6 rounded-xl bg-[#0a2540] hover:bg-[#1a385c] text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center shadow-sm"
-            >
-              <span>Post a Project</span>
-            </button>
+            {/* Action Button */}
+            <div className="relative z-10 mt-4">
+              <button
+                onClick={onClientAction}
+                className="w-full sm:w-auto py-3.5 px-8 rounded-xl bg-[#0a2540] hover:bg-[#1a385c] text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center shadow-sm"
+              >
+                <span>Post a Project</span>
+              </button>
+            </div>
           </div>
 
           {/* Card 2: Students & Freelancers */}
           <div
-            className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-8 md:p-10 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
+            className="group relative rounded-2xl bg-white border border-[#e3e8ee] hover:border-[#635bff]/60 hover:ring-1 hover:ring-[#635bff]/30 p-8 md:p-10 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_8px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(99,91,255,0.08),0_16px_36px_rgba(10,37,64,0.06)] transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <div className="w-12 h-12 rounded-xl bg-[#f8fafc] border border-[#e3e8ee] flex items-center justify-center text-purple-600">
-                  <GraduationCap className="w-6 h-6 text-purple-600" />
-                </div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full border border-purple-200">
-                  For Campus Builders
-                </span>
-              </div>
+            {/* Luminous Startups Magenta Silk Wave (No Triangle) */}
+            <StripeStartupsWaveArt />
 
+            <div className="relative z-10 max-w-[68%]">
               {/* Stripe Inline Title and Description */}
               <div className="mb-6">
-                <h4 className="font-bold text-[#0a2540] inline text-2xl mr-1.5">
+                <h4 className="font-bold text-[#0a2540] inline text-2xl mr-1.5 leading-snug">
                   Students &amp; Freelancers.
                 </h4>
                 <p className="text-[#425466] inline text-base leading-relaxed">
-                  College students, B.Tech engineers, MBA grads, and vibe coders: register your skills and earn real money from real clients. Work solo or team up!
+                  University students, engineering builders, and designers: showcase your verified GitHub repositories, work with real local businesses, and build a competitive portfolio before graduating.
                 </p>
               </div>
 
-              {/* Checkmarks */}
+              {/* Genuine Value Points (No Badges, No Fake Reviews) */}
               <div className="space-y-3 mb-8">
                 {[
-                  'Students wanting part-time income',
-                  'Coders building their first portfolio',
-                  'Teams who want to tackle bigger projects'
+                  'Keep 100% of your earnings with zero platform cuts on client payouts',
+                  'Build verified proof of work and real production code on your resume',
+                  'Tackle projects independently or assemble project squads with classmates'
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 text-sm text-[#425466]">
-                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0" />
+                  <div key={idx} className="flex items-start gap-3 text-sm text-[#425466]">
+                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </div>
                 ))}
               </div>
-
-              {/* Mini Showcase Card */}
-              <div className="p-4 rounded-xl bg-[#f8fafc] border border-[#e3e8ee] mb-8 space-y-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-[#0a2540]">
-                  <span className="flex items-center gap-1.5">
-                    <TrendingUp className="w-4 h-4 text-purple-600" /> Dev Portfolio Momentum
-                  </span>
-                  <span className="text-purple-600 font-bold font-mono">₹24,000 Earned</span>
-                </div>
-                <p className="text-xs text-[#425466]">
-                  "Built 3 commercial client projects during 3rd semester. Landed off-campus interviews through verified portfolio links."
-                </p>
-              </div>
             </div>
 
-            {/* Stripe Action Link Button */}
-            <button
-              onClick={onFreelancerAction}
-              className="w-full py-3.5 px-6 rounded-xl bg-[#635bff] hover:bg-[#534be8] text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center shadow-sm"
-            >
-              <span>Register as Freelancer</span>
-            </button>
+            {/* Action Button */}
+            <div className="relative z-10 mt-4">
+              <button
+                onClick={onFreelancerAction}
+                className="w-full sm:w-auto py-3.5 px-8 rounded-xl bg-[#635bff] hover:bg-[#534be8] text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center shadow-sm"
+              >
+                <span>Register as Freelancer</span>
+              </button>
+            </div>
           </div>
 
         </div>

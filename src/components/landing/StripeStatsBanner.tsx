@@ -3,31 +3,31 @@ import { motion } from 'framer-motion';
 
 const STATS = [
   {
-    id: 'delivery',
-    value: '99%',
-    description: 'project completion rate with verified student collaborators',
-    linkText: 'successful delivery',
+    id: 'commission',
+    value: '0%',
+    description: 'platform commission on student earnings (keep 100% of client payout)',
+    linkText: 'zero commission',
     href: '#why-choose-spotgig',
   },
   {
-    id: 'turnaround',
-    value: '24 hrs',
-    description: 'average turnaround from project post to active collaboration',
-    linkText: 'rapid turnaround',
+    id: 'connection',
+    value: '1:1',
+    description: 'direct collaboration via WhatsApp & LinkedIn without platform lock-in',
+    linkText: 'direct contact',
     href: '#how-it-works',
   },
   {
     id: 'verified',
     value: '100%',
-    description: 'verified university students and authentic project portfolios',
-    linkText: 'verified profiles',
+    description: 'verifiable portfolio projects backed by authentic code repositories',
+    linkText: 'verified work',
     href: '#why-choose-spotgig',
   },
   {
-    id: 'skills',
-    value: '500+',
-    description: 'active technical skills across development, design and marketing',
-    linkText: 'skills directory',
+    id: 'squads',
+    value: 'Squads',
+    description: 'collaborate independently or form student teams with your classmates',
+    linkText: 'campus squads',
     href: '#why-choose-spotgig',
   },
 ];
@@ -36,7 +36,7 @@ export function StripeStatsBanner() {
   const [activeStatIndex, setActiveStatIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Auto-cycle indicator every 4 seconds if user is not hovering (just like Stripe)
+  // Auto-cycle indicator every 4 seconds if user is not hovering
   useEffect(() => {
     if (isHovered) return;
     const interval = setInterval(() => {
@@ -56,10 +56,10 @@ export function StripeStatsBanner() {
         {/* Section Title */}
         <div className="mb-16 md:mb-20">
           <div className="text-xs font-semibold uppercase tracking-wider text-[#635bff] mb-3">
-            Scale &amp; Authenticity
+            Core Principles
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0a2540] max-w-2xl leading-[1.1]">
-            The backbone of student freelancing
+            Transparent, student-first freelancing
           </h2>
         </div>
 
@@ -68,7 +68,6 @@ export function StripeStatsBanner() {
           
           {/* Top Border Track with Stripe's Sliding Active Indicator */}
           <div className="absolute top-0 inset-x-0 h-[2px] bg-[#e3e8ee]">
-            {/* Sliding Glowing Indigo Line */}
             <motion.div
               className="h-[2px] bg-[#635bff] shadow-[0_0_12px_rgba(99,91,255,0.6)]"
               animate={{
@@ -80,7 +79,7 @@ export function StripeStatsBanner() {
             />
           </div>
 
-          {/* 4 Stats Grid (Matching Stripe index.html stats-menu) */}
+          {/* 4 Pillars Grid (Honest, authentic guarantees) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             {STATS.map((stat, idx) => {
               const isActive = activeStatIndex === idx;
@@ -91,12 +90,12 @@ export function StripeStatsBanner() {
                   onClick={() => setActiveStatIndex(idx)}
                   className="cursor-pointer group flex flex-col justify-start text-left pt-4 transition-all duration-200"
                 >
-                  {/* Big Number */}
+                  {/* Metric Display */}
                   <div className="overflow-hidden">
                     <motion.p
                       key={stat.value}
                       initial={false}
-                      className={`text-5xl md:text-6xl font-extrabold tracking-tight font-sans tabular-nums transition-colors duration-200 ${
+                      className={`text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight font-sans transition-colors duration-200 ${
                         isActive ? 'text-[#0a2540]' : 'text-[#0a2540]/60 group-hover:text-[#0a2540]'
                       }`}
                     >

@@ -351,7 +351,7 @@ const PostProject = () => {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed max-w-xl">
-                    Don't worry about technical terms. Tell Aaspass what you want to build in your own words, and we'll generate structured public & private specifications for you.
+                    Don't worry about technical terms. Tell Spotgig what you want to build in your own words, and we'll generate structured public & private specifications for you.
                   </p>
                 </div>
                 <button
@@ -360,7 +360,7 @@ const PostProject = () => {
                   className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition shadow-sm shrink-0"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>✨ Tell Aaspass</span>
+                  <span>✨ Tell Spotgig</span>
                 </button>
               </div>
 

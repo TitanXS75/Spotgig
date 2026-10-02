@@ -1,4 +1,4 @@
-// Supabase database types for Aaspass Trusted Real-World Project Marketplace
+// Supabase database types for Spotgig Trusted Real-World Project Marketplace
 
 export type Json =
   | string

@@ -5,7 +5,7 @@ import type { CopilotContext } from '@/lib/copilot/types';
 import type { Project, ProjectRequirements } from '@/lib/db-types';
 import type { Profile } from '@/lib/api/profiles';
 
-describe('Aaspass AI Copilot Intelligence Layer', () => {
+describe('Spotgig AI Copilot Intelligence Layer', () => {
   const sampleProject: Project = {
     id: 'proj-101',
     owner_id: 'owner-999',

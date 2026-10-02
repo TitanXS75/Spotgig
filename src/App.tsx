@@ -163,7 +163,7 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+  <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" enableSystem={false}>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />

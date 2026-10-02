@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 const FREELANCER_FEATURES = [
-  'Public skill profile on Aaspass',
+  'Public skill profile on Spotgig',
   'WhatsApp & LinkedIn integration',
   'Distance-based client discovery',
   'Searchable by skill & category',

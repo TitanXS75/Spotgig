@@ -6,13 +6,6 @@
 
 @layer base {
   :root {
-    /* ─── Named Palette Tokens ─── */
-    --dark-amaranth: 339 54% 28%;       /* #6d213c */
-    --toffee-brown: 26 36% 43%;         /* #946846 */
-    --sand: 49 37% 57%;                 /* #baab68 */
-    --metallic-gold: 42 67% 66%;        /* #e3c16f */
-    --canary-yellow: 62 100% 72%;       /* #faff70 */
-
     /* ─── Light Theme (Stripe Palette: Pure White, Deep Navy Slate, Crisp Borders) ─── */
     --background: 0 0% 100%;            /* #ffffff - Pure crisp white canvas */
     --foreground: 222 47% 11%;          /* #0a2540 - Stripe deep slate navy */
@@ -62,71 +55,58 @@
   }
 
   .dark {
-    /* ─── Named Palette Tokens ─── */
-    --dark-amaranth: 339 54% 28%;
-    --toffee-brown: 26 36% 43%;
-    --sand: 49 37% 57%;
-    --metallic-gold: 42 67% 66%;
-    --canary-yellow: 62 100% 72%;
+    /* ─── Unified Clean White Palette (Matches Landing Page) ─── */
+    --background: 0 0% 100%;            /* #ffffff - Pure crisp white canvas */
+    --foreground: 222 47% 11%;          /* #0a2540 - Stripe deep slate navy */
 
-    /* ─── Dark Theme ─── */
-    --background: 339 35% 7%;           /* #180c10 - Deep velvet amaranth-black */
-    --foreground: 60 20% 98%;           /* #fbfbf9 - Warm ivory typography (18.4:1 contrast) */
+    --card: 0 0% 100%;                  /* #ffffff - Elevated white surface */
+    --card-foreground: 222 47% 11%;
 
-    --card: 339 25% 11%;                /* #24141b - Elevated dark amaranth surface */
-    --card-foreground: 60 20% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --popover: 339 25% 11%;
-    --popover-foreground: 60 20% 98%;
+    --primary: 243 75% 59%;             /* #635bff - Stripe Signature Indigo */
+    --primary-foreground: 0 0% 100%;    /* #ffffff */
 
-    --primary: 42 67% 66%;              /* #e3c16f - Radiant Metallic Gold */
-    --primary-foreground: 339 54% 16%;  /* #3f1222 - Deep amaranth text (9:1 AAA contrast) */
+    --secondary: 222 47% 11%;           /* #0a2540 - Deep Slate */
+    --secondary-foreground: 0 0% 100%;
 
-    --secondary: 49 37% 57%;            /* #baab68 - Sand */
-    --secondary-foreground: 339 54% 14%;/* #370e1c - Deep amaranth text (7.3:1 AAA contrast) */
+    --muted: 210 40% 96.1%;             /* #f1f5f9 - Soft clean slate */
+    --muted-foreground: 215 19% 35%;    /* #425466 - Stripe body slate text */
 
-    --muted: 339 20% 15%;               /* #2d2025 - Deep muted amaranth */
-    --muted-foreground: 49 20% 68%;     /* #beb89d - Soft golden sand text (9.5:1 AAA contrast) */
-
-    --accent: 339 30% 18%;              /* #3c202a - Warm amaranth hover wash */
-    --accent-foreground: 42 67% 72%;    /* #e8cb80 - Glowing gold hover text */
+    --accent: 243 75% 96%;              /* #f0f0ff - Light indigo hover wash */
+    --accent-foreground: 243 75% 59%;   /* #635bff */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 339 18% 18%;              /* #36282e - Subtle amaranth border */
-    --input: 339 18% 18%;
-    --ring: 42 67% 66%;                 /* Metallic gold focus ring */
+    --border: 214 32% 91%;              /* #e3e8ee - Stripe hairline border */
+    --input: 214 32% 91%;
+    --ring: 243 75% 59%;                /* Stripe indigo focus ring */
 
-    --accent-product: 26 50% 60%;       /* Warm toffee-gold for products */
-    --accent-service: 42 67% 66%;       /* #e3c16f - Metallic gold for services */
-    --brand-accent: 62 100% 72%;        /* #faff70 - Canary Yellow */
-    --brand-accent-foreground: 339 54% 16%;
+    --radius: 0.625rem;
 
-    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(227, 193, 111, 0.12);
+    --accent-product: 243 75% 59%;
+    --accent-service: 222 47% 11%;
+    --brand-accent: 243 75% 59%;
+    --brand-accent-foreground: 0 0% 100%;
 
-    --sidebar-background: 339 40% 5%;
-    --sidebar-foreground: 60 20% 98%;
-    --sidebar-primary: 42 67% 66%;
-    --sidebar-primary-foreground: 339 54% 16%;
-    --sidebar-accent: 339 30% 18%;
-    --sidebar-accent-foreground: 42 67% 72%;
-    --sidebar-border: 339 18% 18%;
-    --sidebar-ring: 42 67% 66%;
+    --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.02), 0 10px 24px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.05);
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 243 75% 59%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 243 75% 59%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 250ms;
-  }
-
-  html {
-    transition: color 250ms cubic-bezier(0.4, 0, 0.2, 1),
-                background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   body {
@@ -135,8 +115,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
-    transition: color 250ms cubic-bezier(0.4, 0, 0.2, 1),
-                background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   h1, h2, h3, h4, h5, h6 {

@@ -174,7 +174,7 @@ Write a concise, professional proposal. You must ONLY mention skills and tools f
   const allowGreeting = userGreeted || isFirstTurn;
 
   if (!allowGreeting) {
-    formattedPrompt += `\n\nCONVERSATIONAL RULE: Do NOT include greetings, pleasantries, or self-introductions (such as "Hello! I am Aaspass Copilot..."). Directly answer the user's inquiry immediately.`;
+    formattedPrompt += `\n\nCONVERSATIONAL RULE: Do NOT include greetings, pleasantries, or self-introductions (such as "Hello! I am Spotgig Copilot..."). Directly answer the user's inquiry immediately.`;
   }
 
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${apiKey}`;
@@ -225,7 +225,7 @@ Write a concise, professional proposal. You must ONLY mention skills and tools f
 
       if (!res.ok) {
         const errText = await res.text().catch(() => '');
-        console.warn(`[Aaspass Copilot] Model ${model} returned HTTP ${res.status}:`, errText.slice(0, 120));
+        console.warn(`[Spotgig Copilot] Model ${model} returned HTTP ${res.status}:`, errText.slice(0, 120));
         continue;
       }
 
@@ -237,7 +237,7 @@ Write a concise, professional proposal. You must ONLY mention skills and tools f
       }
     } catch (err: unknown) {
       lastError = err as Error;
-      console.warn(`[Aaspass Copilot] Model ${model} attempt failed:`, (err as Error).message);
+      console.warn(`[Spotgig Copilot] Model ${model} attempt failed:`, (err as Error).message);
     }
   }
 
@@ -303,7 +303,7 @@ Write a concise, professional proposal. You must ONLY mention skills and tools f
         },
       };
     } catch (parseErr) {
-      console.warn('[Aaspass Copilot] Failed to parse Gemini JSON output, falling back to local schema parser:', parseErr);
+      console.warn('[Spotgig Copilot] Failed to parse Gemini JSON output, falling back to local schema parser:', parseErr);
     }
   }
 
@@ -997,7 +997,7 @@ function parseDiscoveryIntent(input: string): DiscoverySearchSuggestion {
 }
 
 /**
- * Strips repetitive greeting introductions like "Hello! I am Aaspass, your AI Copilot."
+ * Strips repetitive greeting introductions like "Hello! I am Spotgig, your AI Copilot."
  * when the user has not greeted or it is not the first turn.
  */
 function stripRepetitiveIntro(text: string): string {
@@ -1022,7 +1022,7 @@ function generateGeneralAssistantReply(input: string, context: CopilotContext): 
   const isFirstTurn = context.metadata?.isFirstTurn === true || context.metadata?.isFirstTurn === undefined;
 
   const intro = (userGreeted || isFirstTurn)
-    ? `Hello! I'm here to assist you as a **${role}** on Aaspass!\n\n`
+    ? `Hello! I'm here to assist you as a **${role}** on Spotgig!\n\n`
     : `Here is how I can assist you with this:\n\n`;
 
   return intro +

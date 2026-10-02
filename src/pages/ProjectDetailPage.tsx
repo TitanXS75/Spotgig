@@ -187,7 +187,7 @@ const ProjectDetailPage = () => {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-foreground">Aaspass Copilot Insights</span>
+                  <span className="text-xs font-bold text-foreground">Spotgig Copilot Insights</span>
                   <p className="text-[11px] text-muted-foreground">Understand scope, evaluate compatibility, and ask questions</p>
                 </div>
               </div>
@@ -481,7 +481,7 @@ const ProjectDetailPage = () => {
               <div className="flex items-center gap-2 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-xs text-green-700 dark:text-green-300">
                 <ShieldCheck className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400" />
                 <span>
-                  You have been authorized by the project owner to view confidential requirements under Aaspass security guidelines.
+                  You have been authorized by the project owner to view confidential requirements under Spotgig security guidelines.
                 </span>
               </div>
 

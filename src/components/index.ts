@@ -16,5 +16,4 @@ export { default as ProjectReviewModal } from './ProjectReviewModal';
 
 // Filters & Controls
 export { default as SearchBar } from './SearchBar';
-export { default as ThemeToggle } from './ThemeToggle';
 

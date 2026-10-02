@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
+
 import {
   Users, Zap, GraduationCap, ShieldCheck,
-  UserCheck, ArrowRight, CheckCircle2,
+  UserCheck, CheckCircle2,
   Gauge
 } from 'lucide-react';
 
@@ -13,7 +13,7 @@ const CHART_BAR_HEIGHTS = [
 
 export function StripeBentoFeatures() {
   return (
-    <section id="why-choose-aaspass" className="py-24 md:py-32 px-6 bg-white relative border-b border-[#e3e8ee]">
+    <section id="why-choose-spotgig" className="py-24 md:py-32 px-6 bg-white relative border-b border-[#e3e8ee]">
       <div className="max-w-[1400px] mx-auto">
         
         {/* Section Header */}
@@ -22,7 +22,7 @@ export function StripeBentoFeatures() {
             Modular Platform
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0a2540] leading-[1.1]">
-            Why Choose Aaspass?
+            Why Choose Spotgig?
           </h2>
           <p className="text-xl md:text-2xl text-[#425466] mt-4 font-normal leading-relaxed">
             Features designed for the next generation of freelancing. Connect, collaborate, and build credibility with direct student-business partnerships.
@@ -34,11 +34,7 @@ export function StripeBentoFeatures() {
 
           {/* ─── CARD 1: Large Featured Card with Stripe's Silk Wave Background ─── */}
           {/* Reference: Stripe "Accept and optimise payments globally – online and in person" */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
+          <div
             className="lg:col-span-2 group relative rounded-2xl bg-[#f8fafc] border border-[#e3e8ee] p-8 md:p-10 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between overflow-hidden min-h-[380px]"
           >
             {/* Stripe Signature Silk Wave Background Image */}
@@ -99,15 +95,11 @@ export function StripeBentoFeatures() {
             <div className="relative z-10 mt-8 pt-4 border-t border-[#e3e8ee]/80 flex items-center text-sm font-semibold text-[#635bff] group-hover:text-[#0a2540] transition-colors">
               <span>Explore student talent</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* ─── CARD 2: Exact Stripe "Enable any billing model" Card Design ─── */}
           {/* Reference: Pro Plan + Usage Meter + 30-day vertical bar chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.1 }}
+          <div
             className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-7 md:p-8 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
@@ -182,19 +174,12 @@ export function StripeBentoFeatures() {
 
             {/* Action */}
             <div className="mt-6 pt-4 border-t border-[#e3e8ee]/80 flex items-center text-sm font-semibold text-[#635bff] group-hover:text-[#0a2540] transition-colors">
-              <span className="flex items-center gap-1.5">
-                Explore project models
-                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-              </span>
+              <span>Explore project models</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* ─── CARD 3: Instant Connection ─── */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.15 }}
+          <div
             className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-7 md:p-8 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
@@ -233,19 +218,12 @@ export function StripeBentoFeatures() {
             </div>
 
             <div className="mt-6 pt-4 border-t border-[#e3e8ee]/80 flex items-center text-sm font-semibold text-[#635bff] group-hover:text-[#0a2540] transition-colors">
-              <span className="flex items-center gap-1.5">
-                Start direct chats
-                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-              </span>
+              <span>Start direct chats</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* ─── CARD 4: Solo or Team Projects ─── */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.2 }}
+          <div
             className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-7 md:p-8 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
@@ -285,19 +263,12 @@ export function StripeBentoFeatures() {
             </div>
 
             <div className="mt-6 pt-4 border-t border-[#e3e8ee]/80 flex items-center text-sm font-semibold text-[#635bff] group-hover:text-[#0a2540] transition-colors">
-              <span className="flex items-center gap-1.5">
-                Form a project squad
-                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-              </span>
+              <span>Form a project squad</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* ─── CARD 5: Real Experience ─── */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.25 }}
+          <div
             className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-7 md:p-8 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
@@ -332,19 +303,12 @@ export function StripeBentoFeatures() {
             </div>
 
             <div className="mt-6 pt-4 border-t border-[#e3e8ee]/80 flex items-center text-sm font-semibold text-[#635bff] group-hover:text-[#0a2540] transition-colors">
-              <span className="flex items-center gap-1.5">
-                Browse student portfolios
-                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-              </span>
+              <span>Browse student portfolios</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* ─── CARD 6: Verified Profiles ─── */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.3 }}
+          <div
             className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-7 md:p-8 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
@@ -379,12 +343,9 @@ export function StripeBentoFeatures() {
             </div>
 
             <div className="mt-6 pt-4 border-t border-[#e3e8ee]/80 flex items-center text-sm font-semibold text-[#635bff] group-hover:text-[#0a2540] transition-colors">
-              <span className="flex items-center gap-1.5">
-                Check credentials
-                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-              </span>
+              <span>Check credentials</span>
             </div>
-          </motion.div>
+          </div>
 
         </div>
 

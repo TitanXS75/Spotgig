@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+
 import {
   Share2, PlusSquare, MoreVertical, DownloadCloud,
   CheckCircle2, Smartphone
@@ -18,7 +18,7 @@ export function StripeMobileInstall() {
             Get the App on Your Phone
           </h2>
           <p className="text-xl md:text-2xl text-[#425466] mt-4 font-normal leading-relaxed max-w-2xl">
-            Add Aaspass directly to your home screen for fast, one tap access with zero downloads or app store updates needed.
+            Add Spotgig directly to your home screen for fast, one tap access with zero downloads or app store updates needed.
           </p>
         </div>
 
@@ -26,11 +26,7 @@ export function StripeMobileInstall() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           
           {/* iOS Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
+          <div
             className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-8 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
@@ -61,7 +57,7 @@ export function StripeMobileInstall() {
                     1
                   </span>
                   <span className="text-sm text-[#0a2540] font-medium">
-                    Open Aaspass in your Safari browser
+                    Open Spotgig in your Safari browser
                   </span>
                 </div>
 
@@ -98,14 +94,10 @@ export function StripeMobileInstall() {
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>Instant launch · Offline cache · Zero storage usage</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* Android Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.1 }}
+          <div
             className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-8 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
@@ -136,7 +128,7 @@ export function StripeMobileInstall() {
                     1
                   </span>
                   <span className="text-sm text-[#0a2540] font-medium">
-                    Open Aaspass in your Chrome or browser
+                    Open Spotgig in your Chrome or browser
                   </span>
                 </div>
 
@@ -173,7 +165,7 @@ export function StripeMobileInstall() {
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>One tap access · Fast performance · Real time updates</span>
             </div>
-          </motion.div>
+          </div>
 
         </div>
 

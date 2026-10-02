@@ -146,7 +146,7 @@ const ListingDetail = () => {
 
   const whatsappUrl = listing.whatsapp
     ? `https://wa.me/${listing.whatsapp}?text=${encodeURIComponent(
-        `Hi! I found you on Aaspass. I'm interested in ${listing.name}.`
+        `Hi! I found you on Spotgig. I'm interested in ${listing.name}.`
       )}`
     : null;
 
@@ -477,7 +477,7 @@ const ListingDetail = () => {
               className="bg-card w-full max-w-sm rounded-[24px] p-6 shadow-2xl border border-border flex flex-col items-center text-center relative overflow-hidden"
             >
               <div className="mb-6 mt-2 flex justify-center w-full">
-                <img src="/aplg.png" alt="Aaspass logo" className="w-32 md:w-36 h-auto object-contain drop-shadow-sm" />
+                <img src="/aplg.png" alt="Spotgig logo" className="w-32 md:w-36 h-auto object-contain drop-shadow-sm" />
               </div>
               <div className="flex items-center justify-center gap-2.5 mb-2">
                 <h3 className="text-xl font-bold text-foreground tracking-tight">Login Required</h3>

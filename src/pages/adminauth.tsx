@@ -245,7 +245,7 @@ export default function AdminAuth() {
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-8 bg-card border-border shadow-lg">
           <div className="text-center mb-8">
-            <img src="/aplg.png" alt="Aaspass Logo" className="h-12 w-auto mx-auto mb-4" />
+            <img src="/aplg.png" alt="Spotgig Logo" className="h-12 w-auto mx-auto mb-4" />
             <h1 className="text-3xl font-bold text-foreground mb-2">Admin Panel</h1>
             <p className="text-muted-foreground">Secure Access Required</p>
           </div>
@@ -304,7 +304,7 @@ export default function AdminAuth() {
       <div className="max-w-7xl mx-auto">
         {/* Header - Logo and Logout */}
         <div className="flex justify-between items-center mb-12">
-          <img src="/aplg.png" alt="Aaspass Logo" className="h-10 w-auto" />
+          <img src="/aplg.png" alt="Spotgig Logo" className="h-10 w-auto" />
 
           <AlertDialog>
             <AlertDialogTrigger asChild>

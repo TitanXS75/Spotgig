@@ -15,7 +15,7 @@ export const CopilotFloatingButton = () => {
   }
 
   // Determine contextual badge label based on route and user role
-  let contextualLabel = 'Ask Aaspass';
+  let contextualLabel = 'Ask Spotgig';
   let contextType: 'general' | 'post_project' | 'project_detail' | 'developer_profile' | 'workspace' | 'discovery' = 'general';
 
   if (location.pathname.startsWith('/post-project')) {
@@ -54,7 +54,7 @@ export const CopilotFloatingButton = () => {
           <button
             onClick={handleClick}
             className="group relative flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-full bg-gradient-to-r from-primary via-primary/95 to-primary/90 text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 border border-primary-foreground/20 backdrop-blur-md"
-            title="Open Aaspass AI Copilot"
+            title="Open Spotgig AI Copilot"
           >
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-foreground/40 opacity-75" />

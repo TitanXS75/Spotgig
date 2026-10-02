@@ -29,7 +29,7 @@ const AboutPage = () => {
           Bridging the Gap Between Talent & Opportunity
         </h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Aaspass is a hyperlocal freelancing platform that connects business owners and project clients with 
+          Spotgig is a hyperlocal freelancing platform that connects business owners and project clients with 
           skilled students and freelancers nearby for real work, real experience, and real pay.
         </p>
       </motion.div>
@@ -65,7 +65,7 @@ const AboutPage = () => {
             <GraduationCap className="w-8 h-8 text-purple-500 mb-3" />
             <h4 className="font-semibold text-foreground mb-2">Student-First</h4>
             <p className="text-sm text-muted-foreground">
-              We believe students deserve real work opportunities instead of just mock projects. Aaspass turns learning into earning.
+              We believe students deserve real work opportunities instead of just mock projects. Spotgig turns learning into earning.
             </p>
           </div>
           <div className="bg-muted/30 rounded-xl p-6">
@@ -86,7 +86,7 @@ const AboutPage = () => {
             <Award className="w-8 h-8 text-green-500 mb-3" />
             <h4 className="font-semibold text-foreground mb-2">Quality & Growth</h4>
             <p className="text-sm text-muted-foreground">
-              We measure success by the number of students who build portfolios, get hired, or launch their own ventures through Aaspass.
+              We measure success by the number of students who build portfolios, get hired, or launch their own ventures through Spotgig.
             </p>
           </div>
         </div>
@@ -102,17 +102,17 @@ const AboutPage = () => {
         <h3 className="text-2xl font-bold text-foreground mb-4">Our Story</h3>
         <div className="space-y-4 text-muted-foreground">
           <p>
-            Aaspass started from a simple observation: talented students struggle to get their first client, 
+            Spotgig started from a simple observation: talented students struggle to get their first client, 
             while small businesses struggle to find affordable, reliable tech talent. The mismatch was obvious, 
             yet no platform was solving it at a hyperlocal level.
           </p>
           <p>
-            We built Aaspass in 2024 with one goal: bridge that gap. Our location-based matching means a 
+            We built Spotgig in 2024 with one goal: bridge that gap. Our location-based matching means a 
             business owner in your city can find a B.Tech student three streets away who can build their 
             website for a fair price, and that student gets real money and a real portfolio project.
           </p>
           <p>
-            Today, Aaspass supports thousands of freelancers and clients across multiple cities. Students work 
+            Today, Spotgig supports thousands of freelancers and clients across multiple cities. Students work 
             solo or form teams for bigger projects. Business owners get quality work at fair rates. Communities 
             get stronger, one project at a time.
           </p>

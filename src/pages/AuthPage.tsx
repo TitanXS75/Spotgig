@@ -32,7 +32,7 @@ const ImagePanel = ({ mode }: { mode: 'login' | 'signup' }) => (
     {/* Top Left tagline */}
     <div className="relative z-10 p-8 xl:p-10 text-white mr-auto flex flex-col items-start text-left">
       <div className="mb-3">
-        <img src="/aplg.png" alt="Aaspass" className="h-12 w-auto object-contain brightness-110 drop-shadow" />
+        <img src="/aplg.png" alt="Spotgig" className="h-12 w-auto object-contain brightness-110 drop-shadow" />
       </div>
       <h2 className="text-2xl xl:text-3xl font-bold leading-tight drop-shadow-md">
         {mode === 'login' ? (
@@ -146,7 +146,7 @@ const AuthPage = () => {
         await signUp(email, password, name, role);
         toast({
           title: 'Account created!',
-          description: `Welcome to Aaspass as a ${role === 'project_owner' ? 'Project Owner' : 'Student / Developer'}.`,
+          description: `Welcome to Spotgig as a ${role === 'project_owner' ? 'Project Owner' : 'Student / Developer'}.`,
         });
         navigate('/profile');
       }
@@ -208,7 +208,7 @@ const AuthPage = () => {
           {/* Title & Subtitle */}
           <div className="mb-3">
             <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
-              {mode === 'login' ? 'Welcome back 👋' : 'Join Aaspass 🚀'}
+              {mode === 'login' ? 'Welcome back 👋' : 'Join Spotgig 🚀'}
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 leading-normal">
               {mode === 'login'

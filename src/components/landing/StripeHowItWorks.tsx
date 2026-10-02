@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText, Compass, UserCheck, MessageSquare,
   Sparkles, Star, CheckCircle2, ShieldCheck,
-  Send, Users, DollarSign, ArrowRight
+  Send, Users, DollarSign
 } from 'lucide-react';
 
 interface StepItem {
@@ -340,7 +340,7 @@ export function StripeHowItWorks() {
               {/* Bottom Card Summary */}
               <div className="pt-4 border-t border-[#e3e8ee] flex items-center justify-between text-xs text-[#425466]">
                 <span>{currentStep.title}</span>
-                <span className="font-semibold text-[#635bff]">Aaspass Platform</span>
+                <span className="font-semibold text-[#635bff]">Spotgig Platform</span>
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
+
 import {
-  Briefcase, GraduationCap, ArrowRight,
+  Briefcase, GraduationCap,
   CheckCircle2, Building2, TrendingUp, Users
 } from 'lucide-react';
 
@@ -20,7 +20,7 @@ export function StripeAudienceBento({ onClientAction, onFreelancerAction }: Stri
             Two Sides of the Marketplace
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#0a2540] leading-[1.1]">
-            Who is Aaspass for?
+            Who is Spotgig for?
           </h2>
           <p className="text-xl md:text-2xl text-[#425466] mt-4 font-normal leading-relaxed">
             Designed for businesses seeking agile technical talent and students building real-world software careers.
@@ -31,11 +31,7 @@ export function StripeAudienceBento({ onClientAction, onFreelancerAction }: Stri
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* Card 1: Clients & Business Owners */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
+          <div
             className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-8 md:p-10 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
@@ -89,19 +85,14 @@ export function StripeAudienceBento({ onClientAction, onFreelancerAction }: Stri
             {/* Stripe Action Link Button */}
             <button
               onClick={onClientAction}
-              className="group/btn w-full py-3.5 px-6 rounded-xl bg-[#0a2540] hover:bg-[#1a385c] text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+              className="w-full py-3.5 px-6 rounded-xl bg-[#0a2540] hover:bg-[#1a385c] text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center shadow-sm"
             >
               <span>Post a Project</span>
-              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
             </button>
-          </motion.div>
+          </div>
 
           {/* Card 2: Students & Freelancers */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.1 }}
+          <div
             className="group relative rounded-2xl bg-white border border-[#e3e8ee] p-8 md:p-10 shadow-[0_2px_4px_rgba(0,0,0,0.02),0_10px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_8px_rgba(0,0,0,0.04),0_16px_36px_rgba(0,0,0,0.08)] hover:border-slate-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
@@ -155,12 +146,11 @@ export function StripeAudienceBento({ onClientAction, onFreelancerAction }: Stri
             {/* Stripe Action Link Button */}
             <button
               onClick={onFreelancerAction}
-              className="group/btn w-full py-3.5 px-6 rounded-xl bg-[#635bff] hover:bg-[#534be8] text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+              className="w-full py-3.5 px-6 rounded-xl bg-[#635bff] hover:bg-[#534be8] text-white font-semibold text-sm transition-all duration-200 flex items-center justify-center shadow-sm"
             >
               <span>Register as Freelancer</span>
-              <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
             </button>
-          </motion.div>
+          </div>
 
         </div>
 

@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import { getProjectRequestsForOwner } from '@/lib/api/requests';
 import aplgLogo from '/aplg.png';
 import { motion } from 'framer-motion';
-import ThemeToggle from './ThemeToggle';
 
 const TopBar = () => {
   const { user } = useAppStore();
@@ -35,7 +34,7 @@ const TopBar = () => {
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => navigate('/home')}
         >
-          <img src={aplgLogo} alt="Aaspass logo" className="w-auto h-8 object-contain transform scale-110" />
+          <img src={aplgLogo} alt="Spotgig logo" className="w-auto h-8 object-contain transform scale-110" />
         </div>
 
         {/* Desktop nav links */}
@@ -110,8 +109,6 @@ const TopBar = () => {
 
         {/* Right actions */}
         <div className="flex items-center gap-2.5">
-          <ThemeToggle />
-
           {/* Post a Project button (for owners or guests, hidden on explore page) */}
           {(!user || isOwner) && location.pathname !== '/home' && location.pathname !== '/projects' && (
             <motion.button

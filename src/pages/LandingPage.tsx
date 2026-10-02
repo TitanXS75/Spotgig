@@ -1,14 +1,13 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Code2, ArrowRight, ShieldCheck, Zap,
+  Code2, ShieldCheck, Zap,
   CheckCircle2, Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Lenis from '@studio-freight/lenis';
 import { ZoomParallax } from '@/components/ui/zoom-parallax';
 import { ShuffleHero } from '@/components/ui/shuffle-grid';
-import ThemeToggle from '@/components/ThemeToggle';
 import { StripeBentoFeatures } from '@/components/landing/StripeBentoFeatures';
 import { StripeStatsBanner } from '@/components/landing/StripeStatsBanner';
 import { StripeHowItWorks } from '@/components/landing/StripeHowItWorks';
@@ -66,16 +65,14 @@ const LandingPage = () => {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e3e8ee]">
         <div className="flex items-center justify-between px-6 md:px-12 py-4 max-w-[1560px] mx-auto w-full">
           <div className="flex items-center cursor-pointer" onClick={() => handleNavigate('/')}>
-            <img src="/aplg.png" alt="Aaspass" className="w-auto h-10 object-contain transform scale-125" />
+            <img src="/aplg.png" alt="Spotgig" className="w-auto h-10 object-contain transform scale-125" />
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <button
               onClick={() => handleNavigate('/auth', 'login')}
-              className="group text-sm font-semibold bg-[#0a2540] hover:bg-[#1a385c] text-white px-5 py-2.5 rounded-full transition-all duration-200 shadow-sm flex items-center gap-1.5"
+              className="text-sm font-semibold bg-[#0a2540] hover:bg-[#1a385c] text-white px-5 py-2.5 rounded-full transition-all duration-200 shadow-sm flex items-center"
             >
               <span>Sign In</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
             </button>
           </div>
         </div>
@@ -138,17 +135,15 @@ const LandingPage = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
               <button
                 onClick={() => handleNavigate('/auth', 'signup')}
-                className="group/btn bg-[#635bff] hover:bg-[#534be8] text-white px-8 py-4 rounded-xl font-bold text-base transition-all duration-200 shadow-[0_4px_16px_rgba(99,91,255,0.25)] hover:shadow-[0_6px_24px_rgba(99,91,255,0.35)] active:scale-95 text-center w-full sm:w-auto flex items-center justify-center gap-2"
+                className="bg-[#635bff] hover:bg-[#534be8] text-white px-8 py-4 rounded-xl font-bold text-base transition-all duration-200 shadow-[0_4px_16px_rgba(99,91,255,0.25)] hover:shadow-[0_6px_24px_rgba(99,91,255,0.35)] active:scale-95 text-center w-full sm:w-auto flex items-center justify-center"
               >
                 <span>Join as Freelancer</span>
-                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
               </button>
               <button
                 onClick={() => handleNavigate('/home')}
-                className="group/btn px-8 py-4 rounded-xl border border-[#e3e8ee] bg-white hover:bg-[#f8fafc] text-[#0a2540] font-bold text-base transition-all duration-200 active:scale-95 text-center w-full sm:w-auto flex items-center justify-center gap-2 shadow-sm"
+                className="px-8 py-4 rounded-xl border border-[#e3e8ee] bg-white hover:bg-[#f8fafc] text-[#0a2540] font-bold text-base transition-all duration-200 active:scale-95 text-center w-full sm:w-auto flex items-center justify-center shadow-sm"
               >
                 <span>Explore Platform</span>
-                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1 text-[#635bff]" />
               </button>
             </div>
 
@@ -174,7 +169,7 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4 cursor-pointer" onClick={() => handleNavigate('/')}>
-                <img src="/aplg.png" alt="Aaspass" className="h-10 w-auto object-contain" />
+                <img src="/aplg.png" alt="Spotgig" className="h-10 w-auto object-contain" />
               </div>
               <p className="text-sm text-[#425466] leading-relaxed">
                 Bridge between student talent and real business needs. Direct freelancing, done right.
@@ -209,7 +204,7 @@ const LandingPage = () => {
           
           {/* Bottom Bar */}
           <div className="pt-8 border-t border-[#e3e8ee] flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-[#425466]">
-            <p>© {new Date().getFullYear()} Aaspass. All Rights Reserved.</p>
+            <p>© {new Date().getFullYear()} Spotgig. All Rights Reserved.</p>
             <div className="flex gap-4 items-center">
               <span className="flex items-center gap-1.5 opacity-90">
                 <Code2 className="w-3.5 h-3.5 text-[#635bff]" /> Built for student freelancers

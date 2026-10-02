@@ -30,7 +30,7 @@ const PrivacyPage = () => {
           <h2 className="text-xl font-bold text-foreground">Your Privacy Matters</h2>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          At Aaspass, we're committed to protecting your personal information and ensuring your privacy. This policy explains how we collect, use, and safeguard your data when you use our platform.
+          At Spotgig, we're committed to protecting your personal information and ensuring your privacy. This policy explains how we collect, use, and safeguard your data when you use our platform.
         </p>
       </motion.div>
 
@@ -220,7 +220,7 @@ const PrivacyPage = () => {
           If you have questions about this privacy policy or want to exercise your rights, contact us:
         </p>
         <div className="space-y-2 text-sm">
-          <p><strong>Email:</strong> privacy@aaspass.com</p>
+          <p><strong>Email:</strong> privacy@spotgig.com</p>
           <p><strong>Phone:</strong> +91 98765 43210</p>
           <p className="text-xs text-muted-foreground mt-3">
             We'll respond to privacy inquiries within 7 business days.

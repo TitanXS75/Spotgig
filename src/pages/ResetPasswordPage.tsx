@@ -116,13 +116,13 @@ const ResetPasswordPage = () => {
           animate={{ scale: 1.15 }}
           transition={{ duration: 25, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
           src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1200"
-          alt="Aaspass Community"
+          alt="Spotgig Community"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10 pointer-events-none" />
         <div className="relative z-10 mt-auto p-12 text-white">
           <div className="mb-3">
-            <img src="/aplg.png" alt="Aaspass" className="h-12 w-auto object-contain brightness-110 drop-shadow" />
+            <img src="/aplg.png" alt="Spotgig" className="h-12 w-auto object-contain brightness-110 drop-shadow" />
           </div>
           <h2 className="text-3xl font-bold leading-tight drop-shadow-md">
             Set your new password

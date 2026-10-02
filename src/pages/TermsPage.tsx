@@ -27,10 +27,10 @@ const TermsPage = () => {
       >
         <div className="flex items-center gap-3 mb-4">
           <FileText className="w-6 h-6 text-primary" />
-          <h2 className="text-xl font-bold text-foreground">Welcome to Aaspass</h2>
+          <h2 className="text-xl font-bold text-foreground">Welcome to Spotgig</h2>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          These terms govern your use of Aaspass, a hyperlocal marketplace connecting buyers and sellers. By using our platform, you agree to these terms.
+          These terms govern your use of Spotgig, a hyperlocal marketplace connecting buyers and sellers. By using our platform, you agree to these terms.
         </p>
       </motion.div>
 
@@ -43,7 +43,7 @@ const TermsPage = () => {
       >
         <h2 className="text-2xl font-bold text-foreground mb-4">1. Acceptance of Terms</h2>
         <p className="text-muted-foreground leading-relaxed">
-          By accessing or using Aaspass, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree to these terms, please do not use our platform.
+          By accessing or using Spotgig, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree to these terms, please do not use our platform.
         </p>
       </motion.div>
 
@@ -56,7 +56,7 @@ const TermsPage = () => {
       >
         <h2 className="text-2xl font-bold text-foreground mb-4">2. Platform Services</h2>
         <p className="text-muted-foreground mb-4">
-          Aaspass provides a platform for:
+          Spotgig provides a platform for:
         </p>
         <ul className="space-y-2 text-muted-foreground">
           <li className="flex items-start gap-2">
@@ -123,7 +123,7 @@ const TermsPage = () => {
       >
         <h2 className="text-2xl font-bold text-foreground mb-4">4. Prohibited Activities</h2>
         <div className="bg-card rounded-xl p-6 shadow-card">
-          <p className="text-muted-foreground mb-4">You may not use Aaspass to:</p>
+          <p className="text-muted-foreground mb-4">You may not use Spotgig to:</p>
           <ul className="space-y-2 text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
@@ -187,7 +187,7 @@ const TermsPage = () => {
               <h3 className="font-semibold text-foreground">Platform Limitation</h3>
             </div>
             <p className="text-sm text-muted-foreground">
-              Aaspass is a platform connecting buyers and sellers. We don't directly facilitate transactions or guarantee seller performance.
+              Spotgig is a platform connecting buyers and sellers. We don't directly facilitate transactions or guarantee seller performance.
             </p>
           </div>
           <div className="bg-muted/30 rounded-xl p-4">
@@ -208,7 +208,7 @@ const TermsPage = () => {
       >
         <h2 className="text-2xl font-bold text-foreground mb-4">7. Intellectual Property</h2>
         <p className="text-muted-foreground leading-relaxed">
-          All content on Aaspass, including text, graphics, logos, and software, is owned by Aaspass or its licensors and is protected by intellectual property laws.
+          All content on Spotgig, including text, graphics, logos, and software, is owned by Spotgig or its licensors and is protected by intellectual property laws.
         </p>
       </motion.div>
 
@@ -250,7 +250,7 @@ const TermsPage = () => {
           If you have questions about these Terms of Service, contact us:
         </p>
         <div className="space-y-2 text-sm">
-          <p><strong>Email:</strong> legal@aaspass.com</p>
+          <p><strong>Email:</strong> legal@spotgig.com</p>
           <p><strong>Phone:</strong> +91 98765 43210</p>
           <p className="text-xs text-muted-foreground mt-3">
             These terms are governed by the laws of India.

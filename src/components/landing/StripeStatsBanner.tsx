@@ -7,7 +7,7 @@ const STATS = [
     value: '99%',
     description: 'project completion rate with verified student collaborators',
     linkText: 'successful delivery',
-    href: '#why-choose-aaspass',
+    href: '#why-choose-spotgig',
   },
   {
     id: 'turnaround',
@@ -21,14 +21,14 @@ const STATS = [
     value: '100%',
     description: 'verified university students and authentic project portfolios',
     linkText: 'verified profiles',
-    href: '#why-choose-aaspass',
+    href: '#why-choose-spotgig',
   },
   {
     id: 'skills',
     value: '500+',
     description: 'active technical skills across development, design and marketing',
     linkText: 'skills directory',
-    href: '#why-choose-aaspass',
+    href: '#why-choose-spotgig',
   },
 ];
 

@@ -138,7 +138,7 @@ export const CopilotDrawer = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-bold text-foreground">Aaspass Copilot</h2>
+                  <h2 className="text-sm font-bold text-foreground">Spotgig Copilot</h2>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                     {activeContext.type.replace('_', ' ').toUpperCase()}
                   </span>
@@ -179,7 +179,7 @@ export const CopilotDrawer = () => {
                     Hi {user?.name ? user.name.split(' ')[0] : 'there'} 👋
                   </p>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    I'm your intelligent Aaspass assistant. I understand your role as a{' '}
+                    I'm your intelligent Spotgig assistant. I understand your role as a{' '}
                     <span className="font-semibold text-foreground">
                       {activeContext.userRole === 'project_owner' ? 'Project Owner' : 'Developer'}
                     </span>{' '}
@@ -295,7 +295,7 @@ export const CopilotDrawer = () => {
             {isGenerating && (
               <div className="flex items-center gap-2 p-3.5 rounded-2xl bg-muted/40 border border-border/60 max-w-[80%]">
                 <Sparkles className="w-4 h-4 text-primary animate-spin" />
-                <span className="text-xs text-muted-foreground">Aaspass Copilot is thinking...</span>
+                <span className="text-xs text-muted-foreground">Spotgig Copilot is thinking...</span>
               </div>
             )}
 

@@ -178,7 +178,7 @@ const SellerOnboarding = () => {
       });
       
       setUsedFreeTrial(true);
-      toast({ title: 'Success!', description: 'Your profile is now live on Aaspass.' });
+      toast({ title: 'Success!', description: 'Your profile is now live on Spotgig.' });
       navigate('/profile');
     } catch (err: unknown) {
       const error = err as Error;
@@ -239,7 +239,7 @@ const SellerOnboarding = () => {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID || '', // Needs to be generated and set in .env
         amount: data.amount,
         currency: data.currency,
-        name: "Aaspass",
+        name: "Spotgig",
         description: "Listing Subscription",
         order_id: data.id,
         handler: async function (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
@@ -258,7 +258,7 @@ const SellerOnboarding = () => {
           if (verifyError) {
              toast({ title: 'Payment check failed', description: 'Please contact support.', variant: 'destructive' });
           } else {
-             toast({ title: 'Success!', description: 'Your listing is now live on Aaspass.' });
+             toast({ title: 'Success!', description: 'Your listing is now live on Spotgig.' });
              navigate('/profile');
           }
         },
@@ -703,7 +703,7 @@ const SellerOnboarding = () => {
             {/* Pricing */}
             <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl p-5 border border-primary/20">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="font-bold text-foreground text-lg">Go Live on Aaspass</h3>
+                <h3 className="font-bold text-foreground text-lg">Go Live on Spotgig</h3>
                 <span className="text-xs font-semibold text-primary bg-primary/20 px-3 py-1 rounded-full">20-Day Free Trial</span>
               </div>
               <p className="text-xs text-muted-foreground mb-4">Your free trial will automatically expire after 20 days. Pay to list or renew anytime to keep your listing active.</p>
@@ -765,7 +765,7 @@ const SellerOnboarding = () => {
               <div className="space-y-2 mb-5">
                 <p className="text-xs font-semibold text-foreground mb-3">What's Included:</p>
                 <div className="space-y-1.5">
-                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">Public listing on Aaspass</span></div>
+                  <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">Public listing on Spotgig</span></div>
                   <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">WhatsApp / Instagram connect</span></div>
                   <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">Distance-based discovery</span></div>
                   <div className="flex items-center gap-2"><Check className="w-4 h-4 text-primary flex-shrink-0" /> <span className="text-xs text-muted-foreground">Searchable by keyword & category</span></div>

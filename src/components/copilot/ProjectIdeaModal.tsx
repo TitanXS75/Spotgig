@@ -121,7 +121,7 @@ export const ProjectIdeaModal = ({
                   Start with an Idea
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  Tell Aaspass what you want to build in your own words.
+                  Tell Spotgig what you want to build in your own words.
                 </p>
               </div>
             </div>

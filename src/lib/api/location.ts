@@ -164,7 +164,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<string |
       {
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'Aaspass (hyperlocal marketplace)',
+          'User-Agent': 'Spotgig (hyperlocal marketplace)',
         },
       }
     );
@@ -189,7 +189,7 @@ export async function forwardGeocode(address: string): Promise<GeolocationCoords
       {
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'Aaspass (hyperlocal marketplace)',
+          'User-Agent': 'Spotgig (hyperlocal marketplace)',
         },
       }
     );

@@ -15,7 +15,7 @@ const SafetyTipsPage = () => {
           </button>
         </div>
         <h1 className="text-subhead text-foreground">Safety Tips</h1>
-        <p className="text-sm text-muted-foreground mt-1">Stay safe while using Aaspass</p>
+        <p className="text-sm text-muted-foreground mt-1">Stay safe while using Spotgig</p>
       </motion.div>
 
       {/* Introduction */}
@@ -30,7 +30,7 @@ const SafetyTipsPage = () => {
           <h2 className="text-xl font-bold text-foreground">Your Safety Matters</h2>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          Aaspass connects clients and freelancers nearby. While most interactions are genuine, follow these 
+          Spotgig connects clients and freelancers nearby. While most interactions are genuine, follow these 
           guidelines to protect yourself during every engagement.
         </p>
       </motion.div>
@@ -132,7 +132,7 @@ const SafetyTipsPage = () => {
           <p>💳 Prefer UPI, bank transfer, or well-known payment platforms</p>
           <p>📝 Always get a digital receipt or payment confirmation</p>
           <p>🔐 Never share OTPs or card details with anyone</p>
-          <p>⚠️ Report suspicious payment requests to <strong>support@aaspass.com</strong></p>
+          <p>⚠️ Report suspicious payment requests to <strong>support@spotgig.com</strong></p>
         </div>
       </motion.div>
 
@@ -158,10 +158,10 @@ const SafetyTipsPage = () => {
             <Phone className="w-4 h-4" /> Report Now
           </button>
           <button
-            onClick={() => window.open('mailto:safety@aaspass.com')}
+            onClick={() => window.open('mailto:safety@spotgig.com')}
             className="flex items-center gap-2 px-5 py-2.5 bg-muted text-foreground font-semibold rounded-xl text-sm hover:bg-muted/80 transition"
           >
-            safety@aaspass.com
+            safety@spotgig.com
           </button>
         </div>
       </motion.div>

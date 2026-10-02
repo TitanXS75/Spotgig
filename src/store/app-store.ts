@@ -118,7 +118,7 @@ export const useAppStore = create<AppState>()(
         }),
     }),
     {
-      name: 'aaspass-store',
+      name: 'spotgig-store',
       partialize: (state) => ({
         user: state.user,
         userLat: state.userLat,

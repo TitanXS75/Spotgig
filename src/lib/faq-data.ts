@@ -10,7 +10,7 @@ export const faqs: FAQItem[] = [
     id: 1,
     category: 'client',
     question: 'How do I find freelancers near me?',
-    answer: 'Enable location access and Aaspass will automatically show freelancers sorted by distance from you. You can filter by skill category, solo/team, and radius.'
+    answer: 'Enable location access and Spotgig will automatically show freelancers sorted by distance from you. You can filter by skill category, solo/team, and radius.'
   },
   {
     id: 2,
@@ -63,7 +63,7 @@ export const faqs: FAQItem[] = [
   {
     id: 10,
     category: 'payment',
-    question: 'Does Aaspass take a commission from projects?',
+    question: 'Does Spotgig take a commission from projects?',
     answer: 'No! We charge a flat subscription fee only. There is zero commission on any project you complete. All project payments happen directly between you and the client.'
   },
   {
@@ -75,7 +75,7 @@ export const faqs: FAQItem[] = [
   {
     id: 12,
     category: 'safety',
-    question: 'How does Aaspass verify freelancers?',
+    question: 'How does Spotgig verify freelancers?',
     answer: 'We verify identity through phone number and email. Freelancers can also link their LinkedIn and GitHub profiles for additional trust signals.'
   },
   {
@@ -99,7 +99,7 @@ export const faqs: FAQItem[] = [
   {
     id: 16,
     category: 'technical',
-    question: 'Can I use Aaspass on desktop?',
-    answer: 'Yes! Aaspass works on all devices. You can also install it as a PWA on your phone for an app-like experience with no app store needed.'
+    question: 'Can I use Spotgig on desktop?',
+    answer: 'Yes! Spotgig works on all devices. You can also install it as a PWA on your phone for an app-like experience with no app store needed.'
   },
 ];

@@ -31,7 +31,7 @@ const FAQPage = () => {
           </button>
         </div>
         <h1 className="text-subhead text-foreground">Frequently Asked Questions</h1>
-        <p className="text-sm text-muted-foreground mt-1">Everything you need to know about Aaspass</p>
+        <p className="text-sm text-muted-foreground mt-1">Everything you need to know about Spotgig</p>
       </motion.div>
 
       {/* Categories */}
@@ -107,7 +107,7 @@ const FAQPage = () => {
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.96 }}
-            onClick={() => window.open('mailto:support@aaspass.com')}
+            onClick={() => window.open('mailto:support@spotgig.com')}
             className="px-6 py-3 rounded-xl bg-muted text-foreground font-semibold hover:bg-muted/80 transition-colors"
           >
             Email Us

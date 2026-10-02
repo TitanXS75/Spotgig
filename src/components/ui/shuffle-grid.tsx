@@ -84,44 +84,76 @@ type ShuffleHeroProps = {
 
 export const ShuffleHero = ({ onGetStarted, onExploreMarketplace }: ShuffleHeroProps) => {
   return (
-    <section className="w-full px-6 py-12 md:px-8 xl:px-12 md:py-20 grid grid-cols-1 lg:grid-cols-2 items-center gap-12 max-w-[1680px] mx-auto">
-      <div className="space-y-4">
-        <span className="block text-xs md:text-sm text-primary font-semibold tracking-wide uppercase">
-          Aaspass • Hyperlocal Freelancing Platform
-        </span>
-        <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
-          Find skilled student &amp; pro freelancers near you
-        </h1>
-        <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-          Connect businesses, founders, and project leads with talented students and tech freelancers in your neighborhood. Get your website, app, design, or project built with verified local talent.
-        </p>
-        <div className="flex flex-wrap gap-3 pt-2">
-          <button
-            onClick={onGetStarted}
-            className={cn(
-              "inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold py-3 px-6 rounded-xl shadow-sm",
-              "transition-all duration-200 hover:bg-primary/90 active:scale-95",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            )}
-          >
-            Get Started
-          </button>
-
-          <button
-            onClick={onExploreMarketplace}
-            className={cn(
-              "inline-flex items-center gap-2 border border-border hover:border-primary/40 text-foreground font-semibold py-3 px-6 rounded-xl bg-background",
-              "transition-all duration-200 hover:bg-muted active:scale-95",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            )}
-          >
-            Explore Platform
-            <Compass className="w-4 h-4 text-primary" />
-          </button>
-        </div>
+    <div className="relative w-full bg-white overflow-hidden border-b border-[#e3e8ee]">
+      {/* ─── Stripe Signature Pre-Dawn Sunrise Gradient Wave Effect ─── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        {/* Luminous Pre-Dawn Sunrise Diagonal Canvas */}
+        <div
+          className="absolute -top-[30%] -right-[15%] w-[1100px] h-[750px] opacity-75 blur-[90px] rounded-full transform -rotate-12"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(255, 107, 107, 0.45) 0%, rgba(249, 200, 81, 0.35) 30%, rgba(132, 94, 194, 0.30) 60%, rgba(99, 91, 255, 0.20) 80%, transparent 100%)',
+          }}
+        />
+        {/* Soft Twilight Indigo Aura on Left */}
+        <div
+          className="absolute -top-[10%] -left-[10%] w-[650px] h-[550px] opacity-50 blur-[100px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(99, 91, 255, 0.22) 0%, rgba(121, 40, 202, 0.15) 50%, transparent 80%)',
+          }}
+        />
+        {/* Subtle Angle Mesh Sweep */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white" />
       </div>
 
-      <ShuffleGrid />
-    </section>
+      {/* ─── Stripe Architectural Margin Borders (Fullbleed Lines) ─── */}
+      <div className="max-w-[1560px] mx-auto border-x border-[#e3e8ee]/70 relative z-10">
+        <section className="w-full px-6 py-16 md:px-12 xl:px-16 md:py-24 grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
+          <div className="space-y-6">
+            {/* High-Contrast Bold Stripe Heading */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-extrabold text-[#0a2540] tracking-tight leading-[1.08]">
+              Find skilled student &amp; pro freelancers.
+            </h1>
+
+            {/* Crisp High-Readability Description */}
+            <p className="text-base sm:text-lg md:text-xl text-[#425466] leading-relaxed max-w-xl font-normal">
+              Connect businesses, startups, and founders with ambitious college students and tech specialists. Get your website, app, design, or project built with authentic, verified talent.
+            </p>
+
+            {/* High-Agency Stripe Button Group */}
+            <div className="flex flex-wrap gap-4 pt-2">
+              <button
+                onClick={onGetStarted}
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 bg-[#635bff] hover:bg-[#534be8] text-white font-bold py-3.5 px-7 rounded-xl text-base shadow-[0_4px_16px_rgba(99,91,255,0.25)] hover:shadow-[0_8px_24px_rgba(99,91,255,0.35)]",
+                  "transition-all duration-200 active:scale-95",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635bff]"
+                )}
+              >
+                Get Started
+              </button>
+
+              <button
+                onClick={onExploreMarketplace}
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 border border-[#e3e8ee] hover:border-slate-300 bg-white hover:bg-slate-50 text-[#0a2540] font-bold py-3.5 px-7 rounded-xl text-base shadow-sm",
+                  "transition-all duration-200 active:scale-95",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a2540]"
+                )}
+              >
+                Explore Platform
+                <Compass className="w-4 h-4 text-[#635bff]" />
+              </button>
+            </div>
+          </div>
+
+          <div className="relative">
+            {/* Subtle glow border around the grid */}
+            <div className="relative rounded-2xl p-2 bg-gradient-to-b from-white/80 to-white/40 border border-[#e3e8ee] shadow-[0_12px_36px_rgba(0,0,0,0.06)] backdrop-blur-sm">
+              <ShuffleGrid />
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
   );
 };

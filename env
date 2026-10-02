@@ -1,0 +1,14 @@
+# Supabase Configuration
+VITE_SUPABASE_URL=https://fccqifyfwhynkaahhidx.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjY3FpZnlmd2h5bmthYWhoaWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwMjE4NjAsImV4cCI6MjEwNDU5Nzg2MH0.jT4haKhG4E6f0pRVRbQ8sS8VsZcbS8AEWmvQqbU1FUs
+
+# Cloudinary (Optional, for avatars and project images)
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+VITE_CLOUDINARY_UPLOAD_PRESET=aaspass_unsigned
+
+# Razorpay (Optional, for payments)
+VITE_RAZORPAY_KEY_ID=rzp_test_XXXXXXXXXXXXXXXX
+
+# Google Gemini AI Copilot
+VITE_GEMINI_API_KEY=AQ.Ab8RN6JQvueYHxrXYzU2LQJzQ6avHosIxLE6dwU3xJUQZhlwIw
+GEMINI_API_KEY=AQ.Ab8RN6JQvueYHxrXYzU2LQJzQ6avHosIxLE6dwU3xJUQZhlwIw

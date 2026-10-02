@@ -13,52 +13,52 @@
     --metallic-gold: 42 67% 66%;        /* #e3c16f */
     --canary-yellow: 62 100% 72%;       /* #faff70 */
 
-    /* ─── Light Theme ─── */
-    --background: 45 30% 98%;           /* #fbfbf8 - Warm ivory canvas */
-    --foreground: 339 35% 12%;          /* #29141b - Deep amaranth charcoal */
+    /* ─── Light Theme (Stripe Palette: Pure White, Deep Navy Slate, Crisp Borders) ─── */
+    --background: 0 0% 100%;            /* #ffffff - Pure crisp white canvas */
+    --foreground: 222 47% 11%;          /* #0a2540 - Stripe deep slate navy */
 
-    --card: 0 0% 100%;                  /* #ffffff - Crisp elevated surface */
-    --card-foreground: 339 35% 12%;
+    --card: 0 0% 100%;                  /* #ffffff - Elevated white surface */
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 339 35% 12%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 339 54% 28%;             /* #6d213c - Dark Amaranth */
-    --primary-foreground: 0 0% 100%;    /* #ffffff - High contrast white (10.8:1 AAA) */
+    --primary: 243 75% 59%;             /* #635bff - Stripe Signature Indigo */
+    --primary-foreground: 0 0% 100%;    /* #ffffff */
 
-    --secondary: 26 36% 43%;            /* #946846 - Toffee Brown */
-    --secondary-foreground: 0 0% 100%;  /* #ffffff - AAA contrast */
+    --secondary: 222 47% 11%;           /* #0a2540 - Deep Slate */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 45 25% 93%;                /* #f2efe9 - Warm sand cream */
-    --muted-foreground: 26 22% 40%;     /* #7c6350 - Warm toffee slate */
+    --muted: 210 40% 96.1%;             /* #f1f5f9 - Soft clean slate */
+    --muted-foreground: 215 19% 35%;    /* #425466 - Stripe body slate text */
 
-    --accent: 42 60% 92%;               /* #f8eccf - Soft gold hover wash */
-    --accent-foreground: 339 54% 28%;   /* #6d213c - Dark amaranth interactive text */
+    --accent: 243 75% 96%;              /* #f0f0ff - Light indigo hover wash */
+    --accent-foreground: 243 75% 59%;   /* #635bff */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 45 20% 88%;               /* #e5e2db - Subtle warm sand border */
-    --input: 45 20% 88%;
-    --ring: 339 54% 28%;                /* Dark amaranth focus ring */
+    --border: 214 32% 91%;              /* #e3e8ee - Stripe hairline border */
+    --input: 214 32% 91%;
+    --ring: 243 75% 59%;                /* Stripe indigo focus ring */
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
 
-    --accent-product: 26 36% 43%;       /* #946846 - Toffee Brown for products */
-    --accent-service: 42 67% 45%;       /* #c2992d - Metallic Gold for services */
-    --brand-accent: 42 67% 66%;         /* #e3c16f - Metallic Gold */
-    --brand-accent-foreground: 339 54% 18%;
+    --accent-product: 243 75% 59%;
+    --accent-service: 222 47% 11%;
+    --brand-accent: 243 75% 59%;
+    --brand-accent-foreground: 0 0% 100%;
 
-    --shadow-card: 0 1px 3px 0 rgba(109, 33, 60, 0.04), 0 4px 12px -2px rgba(109, 33, 60, 0.06), 0 0 0 1px rgba(109, 33, 60, 0.05);
+    --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.02), 0 10px 24px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.05);
 
-    --sidebar-background: 45 30% 96%;
-    --sidebar-foreground: 339 35% 12%;
-    --sidebar-primary: 339 54% 28%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 243 75% 59%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 42 60% 92%;
-    --sidebar-accent-foreground: 339 54% 28%;
-    --sidebar-border: 45 20% 88%;
-    --sidebar-ring: 339 54% 28%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 243 75% 59%;
   }
 
   .dark {

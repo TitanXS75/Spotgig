@@ -9,7 +9,6 @@ import Lenis from '@studio-freight/lenis';
 import { ZoomParallax } from '@/components/ui/zoom-parallax';
 import { ShuffleHero } from '@/components/ui/shuffle-grid';
 import { StripeBentoFeatures } from '@/components/landing/StripeBentoFeatures';
-import { StripeStatsBanner } from '@/components/landing/StripeStatsBanner';
 import { StripeHowItWorks } from '@/components/landing/StripeHowItWorks';
 import { StripeAudienceBento } from '@/components/landing/StripeAudienceBento';
 import { StripeMobileInstall } from '@/components/landing/StripeMobileInstall';
@@ -76,9 +75,6 @@ const LandingPage = () => {
 
       {/* ─── STRIPE-STYLE PROGRAM BENTO FEATURES ─── */}
       <StripeBentoFeatures />
-
-      {/* ─── STRIPE-STYLE STATS BANNER WITH ACTIVE INDICATOR ANIMATION ─── */}
-      <StripeStatsBanner />
 
       {/* ─── STRIPE-STYLE AUDIENCE PROGRAM CARDS ─── */}
       <StripeAudienceBento

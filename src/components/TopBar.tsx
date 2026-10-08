@@ -114,10 +114,10 @@ const TopBar = () => {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/post-project')}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 shadow-sm transition"
+              className="hidden sm:inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs sm:text-sm font-semibold hover:bg-primary/90 shadow-sm transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
-              Post a Project
+              <span>Post a Project</span>
             </motion.button>
           )}
 
@@ -125,7 +125,7 @@ const TopBar = () => {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/auth')}
-              className="h-9 px-4 rounded-xl border border-border/80 bg-muted/60 hover:bg-muted text-xs sm:text-sm font-semibold text-foreground transition-colors flex items-center justify-center shadow-xs"
+              className="inline-flex items-center justify-center h-9 px-4 rounded-xl border border-border/80 bg-muted/60 hover:bg-muted text-xs sm:text-sm font-semibold text-foreground transition-colors shadow-xs"
             >
               Sign In
             </motion.button>

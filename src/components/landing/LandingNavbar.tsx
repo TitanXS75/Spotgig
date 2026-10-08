@@ -93,14 +93,14 @@ export function LandingNavbar() {
         <div className="hidden md:flex items-center gap-3">
           <button
             onClick={() => handleNavigate('/auth', { mode: 'login' })}
-            className="text-sm font-semibold text-[#0a2540] hover:text-[#635bff] px-4 py-2 rounded-full transition-colors"
+            className="h-10 px-4 rounded-full text-sm font-semibold text-[#0a2540] hover:text-[#635bff] hover:bg-slate-100/70 transition-colors inline-flex items-center justify-center"
           >
             Sign in
           </button>
 
           <button
             onClick={() => handleNavigate('/post-project')}
-            className="text-sm font-semibold bg-[#0a2540] hover:bg-[#635bff] text-white px-5 py-2.5 rounded-full transition-all duration-200 shadow-sm hover:shadow-[0_4px_16px_rgba(99,91,255,0.25)] flex items-center gap-1.5 group"
+            className="h-10 px-5 rounded-full text-sm font-semibold bg-[#0a2540] hover:bg-[#635bff] text-white transition-all duration-200 shadow-sm hover:shadow-[0_4px_16px_rgba(99,91,255,0.25)] inline-flex items-center justify-center gap-1.5 group"
           >
             <span>Post a Project</span>
             <span aria-hidden="true" className="transform group-hover:translate-x-0.5 transition-transform text-[#a5b4fc]">

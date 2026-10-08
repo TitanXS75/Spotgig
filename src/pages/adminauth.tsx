@@ -1,14 +1,54 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import AnimatedDropdown from '@/components/ui/animated-dropdown';
-import { Trash2, LogOut, Search, Filter, Store, Home, Eye, EyeOff } from 'lucide-react';
+import {
+  Trash2,
+  LogOut,
+  Search,
+  Filter,
+  Store,
+  Home,
+  Eye,
+  EyeOff,
+  ShieldAlert,
+  CreditCard,
+  PauseCircle,
+  PlayCircle,
+  TrendingUp,
+  Users,
+  Briefcase,
+  DollarSign,
+  CheckCircle2,
+  Clock,
+  Settings2,
+  Save,
+  RefreshCw,
+  FolderKanban,
+} from 'lucide-react';
 import { CATEGORIES, type Listing } from '@/lib/mock-data';
+import {
+  getPlatformSettings,
+  updatePlatformSettings,
+  getAdminPayments,
+  type PlatformSettings,
+  type PaymentRecord,
+} from '@/lib/api/platform-settings';
 
 interface AdminUser {
   id: string;
@@ -23,188 +63,241 @@ interface AdminUser {
   revenue: number;
 }
 
-interface CategoryStats {
-  category: string;
-  emoji: string;
-  count: number;
-  shops: number;
-  homes: number;
-  revenue: number;
+interface ProjectSummary {
+  id: string;
+  title: string;
+  status: string;
+  compensation_type: string;
+  compensation_amount: number | null;
+  created_at: string;
+  owner_name?: string;
 }
 
 export default function AdminAuth() {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentAdminEmail, setCurrentAdminEmail] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'income' | 'settings' | 'projects' | 'users'>('income');
+
+  // Monetization and Income State
+  const [platformSettings, setPlatformSettings] = useState<PlatformSettings>({
+    id: 'global',
+    payment_gateway_enabled: false,
+    free_client_limit: 1,
+    platform_fee_percent: 0,
+    monthly_plan_price: 10000,
+    yearly_plan_price: 120000,
+    announcement_banner: '',
+    updated_at: new Date().toISOString(),
+  });
+  const [payments, setPayments] = useState<PaymentRecord[]>([]);
+  const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'pending' | 'failed'>('all');
+  const [paymentSearch, setPaymentSearch] = useState('');
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  // Settings form editing
+  const [freeClientLimitInput, setFreeClientLimitInput] = useState('1');
+  const [monthlyPriceInput, setMonthlyPriceInput] = useState('100');
+
+  // Platform entities
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [categoryStats, setCategoryStats] = useState<CategoryStats[]>([]);
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [dataLoading, setDataLoading] = useState(false);
+
+  // User moderation
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [businessNameConfirm, setBusinessNameConfirm] = useState('');
   const [deleteError, setDeleteError] = useState('');
-  
-  // Filter states
+
+  // Seller filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-  const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedOperatingType, setSelectedOperatingType] = useState<'all' | 'home' | 'shop'>('all');
-  const [selectedMembership, setSelectedMembership] = useState<'all' | 'monthly' | 'yearly'>('all');
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    // Step 1: Sign in with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (authError || !authData.user) {
-      alert('Invalid email or password.');
-      setLoading(false);
-      return;
-    }
-
-    // Step 2: Verify this user has is_admin = true in profiles
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', authData.user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      await supabase.auth.signOut();
-      alert('Access denied. You are not an admin.');
-      setLoading(false);
-      return;
-    }
-
-    setIsAuthenticated(true);
-    fetchAdminData();
-    setLoading(false);
-  };
-
-  // Debounced search effect
-  useEffect(() => {
-    // Only show loading if there's actual search text
-    if (searchQuery.trim()) {
-      setIsSearchLoading(true);
-    }
-
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-      setIsSearchLoading(false);
-    }, 300); // 300ms delay
-
-    return () => {
-      clearTimeout(timer);
-      setIsSearchLoading(false);
-    };
-  }, [searchQuery]);
-
-  const fetchAdminData = async () => {
+  const fetchAdminData = useCallback(async () => {
     setDataLoading(true);
     try {
-      const { data: listings, error } = await supabase.from('listings').select('*').neq('status', 'suspended');
-      if (error) throw error;
-      
-      // Transform listings into AdminUser format
+      // 1. Fetch monetization settings
+      const settings = await getPlatformSettings();
+      setPlatformSettings(settings);
+      setFreeClientLimitInput(String(settings.free_client_limit ?? 1));
+      setMonthlyPriceInput(String(Math.round((settings.monthly_plan_price || 10000) / 100)));
+
+      // 2. Fetch payments & income ledger
+      const paymentsList = await getAdminPayments();
+      setPayments(paymentsList);
+
+      const incomeFromDb = paymentsList
+        .filter((p) => p.status === 'paid')
+        .reduce((acc, p) => acc + Number(p.amount || 0), 0);
+
+      // 3. Fetch listings (with fallback)
+      const { data: listings } = await supabase
+        .from('listings')
+        .select('*')
+        .neq('status', 'suspended');
+
       const usersMap: Record<string, AdminUser> = {};
-      
+      let listingEstimatedRev = 0;
+
       (listings || []).forEach((listing) => {
         const userId = listing.user_id;
         if (!usersMap[userId]) {
           usersMap[userId] = {
             id: userId,
-            seller_name: listing.seller_name,
-            category: listing.category,
-            operating_type: listing.operating_type,
+            seller_name: listing.seller_name || 'Member',
+            category: listing.category || 'General',
+            operating_type: listing.operating_type || 'home',
             created_at: listing.created_at,
-            location: listing.area,
+            location: listing.area || 'Anywhere',
             listings: [],
             membershipType: listing.plan === 'yearly' ? 'yearly' : 'monthly',
             revenue: 0,
           };
         }
-        
+
         usersMap[userId].listings.push(listing);
-        usersMap[userId].revenue += listing.plan === 'yearly' ? 1200 : 100;
-        
-        // Also keep track of membership visually
-        if (listing.plan === 'yearly') {
-          usersMap[userId].membershipType = 'yearly';
-        }
+        const rev = listing.plan === 'yearly' ? 1200 : 100;
+        usersMap[userId].revenue += rev;
+        listingEstimatedRev += rev;
       });
-      
+
       const adminUsers = Object.values(usersMap);
       setUsers(adminUsers);
-      calculateStats(adminUsers);
+      setTotalRevenue(incomeFromDb > 0 ? incomeFromDb : listingEstimatedRev);
+
+      // 4. Fetch projects summary
+      const { data: projectsData } = await supabase
+        .from('projects')
+        .select('id, title, status, compensation_type, compensation_amount, created_at, profiles(full_name)')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (projectsData) {
+        setProjects(
+          projectsData.map((p: any) => ({
+            id: p.id,
+            title: p.title,
+            status: p.status,
+            compensation_type: p.compensation_type,
+            compensation_amount: p.compensation_amount,
+            created_at: p.created_at,
+            owner_name: p.profiles?.full_name || 'Anonymous Client',
+          }))
+        );
+      }
     } catch (error) {
       console.error('Error fetching admin data:', error);
-      alert('Error fetching data.');
+      toast.error('Failed to load some admin data');
     } finally {
       setDataLoading(false);
     }
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError || !authData.user) {
+        toast.error('Invalid email or password credentials');
+        setLoading(false);
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileError || !profile?.is_admin) {
+        await supabase.auth.signOut();
+        toast.error('Access denied: You do not have administrator permissions.');
+        setLoading(false);
+        return;
+      }
+
+      setIsAuthenticated(true);
+      setCurrentAdminEmail(authData.user.email || email);
+      toast.success('Admin authentication verified');
+      fetchAdminData();
+    } catch (err) {
+      console.error(err);
+      toast.error('Authentication failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const calculateStats = (data: AdminUser[]) => {
-    const stats: { [key: string]: { count: number; shops: number; homes: number; revenue: number } } = {};
-    let totalRev = 0;
+  const handleTogglePaymentGateway = async () => {
+    const nextState = !platformSettings.payment_gateway_enabled;
+    setSavingSettings(true);
+    try {
+      const updated = await updatePlatformSettings({
+        payment_gateway_enabled: nextState,
+      });
+      setPlatformSettings(updated);
+      toast.success(
+        nextState
+          ? 'Payment Gateway ACTIVATED: Paid charges & subscriptions are now enforced!'
+          : 'Payment Gateway PAUSED: Platform is now in 100% FREE MODE!'
+      );
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to update payment gateway state: ' + err.message);
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
-    data.forEach((user) => {
-      const category = user.category;
-      if (!stats[category]) {
-        stats[category] = { count: 0, shops: 0, homes: 0, revenue: 0 };
-      }
-      stats[category].count += 1;
-      if (user.operating_type === 'shop') {
-        stats[category].shops += 1;
-      } else {
-        stats[category].homes += 1;
-      }
-      stats[category].revenue += user.revenue;
-      totalRev += user.revenue;
-    });
+  const handleSaveMonetizationConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      const parsedLimit = parseInt(freeClientLimitInput, 10);
+      const parsedMonthly = Math.round(parseFloat(monthlyPriceInput) * 100);
 
-    const statsArray = Object.entries(stats)
-      .map(([categoryName, stat]) => {
-        const categoryEmoji = CATEGORIES.find((cat) => cat.name === categoryName)?.emoji || '✨';
-        return {
-          category: categoryName,
-          emoji: categoryEmoji,
-          count: stat.count,
-          shops: stat.shops,
-          homes: stat.homes,
-          revenue: stat.revenue,
-        };
-      })
-      .sort((a, b) => b.revenue - a.revenue);
+      const updated = await updatePlatformSettings({
+        free_client_limit: isNaN(parsedLimit) ? 1 : parsedLimit,
+        monthly_plan_price: isNaN(parsedMonthly) ? 10000 : parsedMonthly,
+      });
 
-    setCategoryStats(statsArray);
-    setTotalRevenue(totalRev);
+      setPlatformSettings(updated);
+      toast.success('Monetization settings saved successfully!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to save settings: ' + err.message);
+    } finally {
+      setSavingSettings(false);
+    }
   };
 
   const handleDeleteUser = async (userToDelete: AdminUser) => {
     try {
-      // Soft delete by suspending all their listings
-      const { error } = await supabase.from('listings').update({ status: 'suspended' }).eq('user_id', userToDelete.id);
+      const { error } = await supabase
+        .from('listings')
+        .update({ status: 'suspended' })
+        .eq('user_id', userToDelete.id);
       if (error) throw error;
-      
+
       const updatedUsers = users.filter((u) => u.id !== userToDelete.id);
       setUsers(updatedUsers);
       setDeleteConfirmOpen(false);
-      calculateStats(updatedUsers);
-      alert('User suspended successfully!');
-    } catch (err: unknown) {
-      const error = err as Error;
-      setDeleteError(error.message || 'Failed to suspend user');
+      toast.success('User suspended successfully');
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to suspend user');
       console.error(err);
     }
   };
@@ -215,67 +308,90 @@ export default function AdminAuth() {
     setEmail('');
     setPassword('');
     setUsers([]);
-    setCategoryStats([]);
-    setTotalRevenue(0);
+    setPayments([]);
     navigate('/');
   };
 
-  // Filter users
+  // Filtered Payments
+  const filteredPayments = payments.filter((p) => {
+    const matchesFilter = paymentFilter === 'all' || p.status === paymentFilter;
+    const searchLower = paymentSearch.toLowerCase();
+    const matchesSearch =
+      !paymentSearch ||
+      p.id.toLowerCase().includes(searchLower) ||
+      (p.profiles?.full_name && p.profiles.full_name.toLowerCase().includes(searchLower)) ||
+      (p.razorpay_payment_id && p.razorpay_payment_id.toLowerCase().includes(searchLower)) ||
+      p.plan.toLowerCase().includes(searchLower);
+
+    return matchesFilter && matchesSearch;
+  });
+
+  // Filtered Users
   const filteredUsers = users.filter((user) => {
-    const matchesSearch = user.seller_name.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+    const matchesSearch = user.seller_name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || user.category === selectedCategory;
     const matchesType = selectedOperatingType === 'all' || user.operating_type === selectedOperatingType;
     return matchesSearch && matchesCategory && matchesType;
   });
 
-  // Prepare dropdown data
   const categoryDropdownItems = [
     { name: 'All Categories', id: 'all' },
-    ...CATEGORIES.map(cat => ({ name: `${cat.emoji} ${cat.name}`, id: cat.name }))
+    ...CATEGORIES.map((cat) => ({ name: `${cat.emoji} ${cat.name}`, id: cat.name })),
   ];
 
   const typeDropdownItems = [
     { name: 'All Types', id: 'all' },
     { name: '🏪 Shop', id: 'shop' },
-    { name: '🏠 Home', id: 'home' }
+    { name: '🏠 Home / Remote', id: 'home' },
   ];
 
+  // ── Login Gate (When Not Authenticated) ──
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 bg-card border-border shadow-lg">
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md p-8 bg-slate-900 border-slate-800 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-primary to-amber-500" />
+
           <div className="text-center mb-8">
-            <img src="/aplg.png" alt="Spotgig Logo" className="h-12 w-auto mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-foreground mb-2">Admin Panel</h1>
-            <p className="text-muted-foreground">Secure Access Required</p>
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4 text-primary">
+              <ShieldAlert className="w-8 h-8" />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Spotgig Admin Console</h1>
+            <p className="text-sm text-slate-400 mt-1">Platform Control & Income Oversight</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Email</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+                Administrator Email
+              </label>
               <Input
                 type="email"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter email"
-                className="bg-muted border-border text-foreground"
+                placeholder="admin@spotgig.com"
+                className="bg-slate-950/70 border-slate-800 text-white placeholder:text-slate-500 focus:border-primary"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Password</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
+                Admin Password
+              </label>
               <div className="relative">
                 <Input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
+                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  className="bg-muted border-border text-foreground pr-10"
+                  placeholder="••••••••••••"
+                  className="bg-slate-950/70 border-slate-800 text-white placeholder:text-slate-500 pr-10 focus:border-primary"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -285,512 +401,657 @@ export default function AdminAuth() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2.5 mt-2 transition-all shadow-lg shadow-primary/20"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? 'Authenticating...' : 'Sign In as Administrator'}
             </Button>
           </form>
 
-          <p className="text-xs text-muted-foreground mt-6 text-center">
-            🔒 Restricted. Authorised personnel only.
-          </p>
+          <div className="mt-6 pt-5 border-t border-slate-800/80 text-center">
+            <p className="text-xs text-slate-500">
+              🔒 Unexposed entrypoint (<code className="text-slate-400">/adminauth</code>).
+              Protected by database kernel role enforcement.
+            </p>
+          </div>
         </Card>
       </div>
     );
   }
 
+  // ── Authenticated Admin Console ──
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header - Logo and Logout */}
-        <div className="flex justify-between items-center mb-12">
-          <img src="/aplg.png" alt="Spotgig Logo" className="h-10 w-auto" />
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" className="border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive">
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-card border-border">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-foreground">Confirm Logout</AlertDialogTitle>
-                <AlertDialogDescription className="text-muted-foreground">
-                  Are you sure you want to logout? You will need to login again to access the admin panel.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <div className="flex gap-3 justify-end">
-                <AlertDialogCancel className="bg-muted text-foreground border-border">
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleLogout}
-                  className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                >
-                  Logout
-                </AlertDialogAction>
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Top Bar */}
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold">
+              ⚡
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-white tracking-tight">Spotgig Admin Console</h1>
+                <span className="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono">
+                  PROD
+                </span>
               </div>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-
-        {/* Admin Title */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage sellers, view analytics, and monitor revenue</p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-card border-border p-6">
-            <div className="text-muted-foreground text-sm font-medium mb-2">Total Revenue</div>
-            <div className="text-4xl font-bold text-primary">₹{totalRevenue.toLocaleString()}</div>
-            <div className="text-muted-foreground text-xs mt-2">From all listings</div>
-          </Card>
-
-          <Card className="bg-card border-border p-6">
-            <div className="text-muted-foreground text-sm font-medium mb-2">Total Sellers</div>
-            <div className="text-4xl font-bold text-secondary">{users.length}</div>
-            <div className="text-muted-foreground text-xs mt-2">Active sellers</div>
-          </Card>
-
-          <Card className="bg-card border-border p-6">
-            <div className="text-muted-foreground text-sm font-medium mb-2">Shop Businesses</div>
-            <div className="text-4xl font-bold text-secondary">{users.filter((u) => u.operating_type === 'shop').length}</div>
-            <div className="text-muted-foreground text-xs mt-2">Physical locations</div>
-            <div className="text-muted-foreground text-xs mt-3 pt-3 border-t border-border">
-              {(() => {
-                const shopListings = users.filter((u) => u.operating_type === 'shop').flatMap(u => u.listings);
-                const products = shopListings.filter(l => l.type === 'product').length;
-                const services = shopListings.filter(l => l.type === 'service').length;
-                return <span>{products} products • {services} services</span>;
-              })()}
-            </div>
-          </Card>
-
-          <Card className="bg-card border-border p-6">
-            <div className="text-muted-foreground text-sm font-medium mb-2">Home Businesses</div>
-            <div className="text-4xl font-bold text-primary">{users.filter((u) => u.operating_type === 'home').length}</div>
-            <div className="text-muted-foreground text-xs mt-2">Home based</div>
-            <div className="text-muted-foreground text-xs mt-3 pt-3 border-t border-border">
-              {(() => {
-                const homeListings = users.filter((u) => u.operating_type === 'home').flatMap(u => u.listings);
-                const products = homeListings.filter(l => l.type === 'product').length;
-                const services = homeListings.filter(l => l.type === 'service').length;
-                return <span>{products} products • {services} services</span>;
-              })()}
-            </div>
-          </Card>
-        </div>
-
-        {/* Category Statistics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="bg-card border-border p-6">
-            <h2 className="text-xl font-bold text-foreground mb-6">Sellers by Category</h2>
-            <div className="space-y-4">
-              {dataLoading ? (
-                <div className="text-muted-foreground">Loading data...</div>
-              ) : categoryStats.length > 0 ? (
-                (() => {
-                  const colorPalette = [
-                    'from-primary to-primary/80',                // Primary
-                    'from-secondary to-secondary/80',            // Secondary
-                    'from-accent-service to-accent-service/80',  // Service / Accent
-                    'from-pink-500 to-pink-400',                 // Pink
-                    'from-purple-500 to-purple-400',             // Purple
-                    'from-cyan-500 to-cyan-400',                 // Cyan
-                    'from-red-500 to-red-400',                   // Red
-                    'from-amber-500 to-amber-400',               // Amber
-                    'from-indigo-500 to-indigo-400',             // Indigo
-                    'from-emerald-500 to-emerald-400',           // Emerald
-                  ];
-
-                  return categoryStats.map((stat, index) => (
-                    <div key={stat.category} className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="text-sm font-medium text-foreground mb-1 flex items-center gap-2">
-                          <span className="text-lg">{stat.emoji}</span>
-                          {stat.category}
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-2">
-                          <div
-                            className={`bg-gradient-to-r ${colorPalette[index % colorPalette.length]} h-2 rounded-full`}
-                            style={{ width: `${(stat.count / users.length) * 100}%` }}
-                          ></div>
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {stat.shops > 0 && <span>{stat.shops} shops</span>}
-                          {stat.shops > 0 && stat.homes > 0 && <span> • </span>}
-                          {stat.homes > 0 && <span>{stat.homes} homes</span>}
-                        </div>
-                      </div>
-                      <div className="text-right ml-4">
-                        <div className="text-foreground font-bold">{stat.count}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {Math.round((stat.count / users.length) * 100)}%
-                        </div>
-                      </div>
-                    </div>
-                  ));
-                })()
-              ) : (
-                <p className="text-muted-foreground">No category data available</p>
-              )}
-            </div>
-          </Card>
-
-          {/* Revenue by Category */}
-          <Card className="bg-card border-border p-6">
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-foreground mb-4">Revenue by Category</h2>
-              
-              {/* Membership Filter */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSelectedMembership('all')}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 ${
-                    selectedMembership === 'all'
-                      ? 'bg-primary text-primary-foreground shadow-lg'
-                      : 'bg-muted text-foreground hover:bg-accent'
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => setSelectedMembership('monthly')}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 ${
-                    selectedMembership === 'monthly'
-                      ? 'bg-secondary text-secondary-foreground shadow-lg'
-                      : 'bg-muted text-foreground hover:bg-accent'
-                  }`}
-                >
-                  Monthly (₹100)
-                </button>
-                <button
-                  onClick={() => setSelectedMembership('yearly')}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 ${
-                    selectedMembership === 'yearly'
-                      ? 'bg-primary text-primary-foreground shadow-lg'
-                      : 'bg-muted text-foreground hover:bg-accent'
-                  }`}
-                >
-                  Yearly (₹1200)
-                </button>
-              </div>
-            </div>
-
-            {/* Filtered Revenue Data */}
-            <div className="space-y-4">
-              {categoryStats.length > 0 ? (
-                (() => {
-                  const filteredStats = categoryStats.map(stat => {
-                    let filteredRevenue = 0;
-                    users.forEach(user => {
-                      if (stat.category === user.category) {
-                        if (selectedMembership === 'all' || user.membershipType === selectedMembership) {
-                          filteredRevenue += user.revenue;
-                        }
-                      }
-                    });
-                    return { ...stat, revenue: filteredRevenue };
-                  }).filter(s => s.revenue > 0);
-
-                  const maxRevenue = Math.max(...filteredStats.map((s) => s.revenue), 1);
-                  
-                  const colorPalette = [
-                    'from-primary to-primary/80',                // Primary
-                    'from-secondary to-secondary/80',            // Secondary
-                    'from-accent-service to-accent-service/80',  // Service / Accent
-                    'from-pink-500 to-pink-400',                 // Pink
-                    'from-purple-500 to-purple-400',             // Purple
-                    'from-cyan-500 to-cyan-400',                 // Cyan
-                    'from-red-500 to-red-400',                   // Red
-                    'from-amber-500 to-amber-400',               // Amber
-                    'from-indigo-500 to-indigo-400',             // Indigo
-                    'from-emerald-500 to-emerald-400',           // Emerald
-                  ];
-                  
-                  return filteredStats.map((stat, index) => (
-                    <div key={`revenue-${stat.category}`} className="flex items-center gap-3">
-                      <div className="text-lg min-w-fit">{stat.emoji}</div>
-                      <div className="flex-1">
-                        <div className="text-xs font-medium text-foreground mb-1">{stat.category}</div>
-                        <div
-                          className={`h-6 bg-gradient-to-r ${colorPalette[index % colorPalette.length]} rounded flex items-center px-2 transition-all duration-300`}
-                          style={{ width: `${(stat.revenue / maxRevenue) * 100}%`, minWidth: '60px' }}
-                        >
-                          <span className="text-xs font-bold text-white">
-                            ₹{stat.revenue.toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ));
-                })()
-              ) : (
-                <p className="text-muted-foreground">No revenue data available</p>
-              )}
-            </div>
-          </Card>
-        </div>
-
-        {/* Registered Sellers with Listings */}
-        {/* Users Management Table */}
-        <Card className="bg-card border-border p-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Manage Sellers</h2>
-            
-            {/* Filters */}
-            <div className="flex flex-col gap-4">
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className={`absolute left-3 top-3 w-4 h-4 transition-colors duration-200 ${
-                  isSearchLoading ? 'text-primary animate-pulse' : 'text-muted-foreground'
-                }`} />
-                <Input
-                  type="text"
-                  placeholder="Search seller name..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`pl-10 bg-muted border-border text-foreground transition-all duration-200 ${
-                    isSearchLoading ? 'border-primary/50 shadow-sm' : ''
-                  }`}
-                />
-                {isSearchLoading && (
-                  <div className="absolute right-3 top-3">
-                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
-              </div>
-
-              {/* Filter Controls */}
-              <div className="flex flex-col md:flex-row gap-3">
-                <div className="flex-1">
-                  <label className="text-xs font-semibold text-foreground block mb-2">
-                    <Filter className="w-3 h-3 inline mr-1" />
-                    Category
-                  </label>
-                  <AnimatedDropdown
-                    items={categoryDropdownItems}
-                    text="Select Category"
-                    selectedId={selectedCategory}
-                    onSelect={(item) => setSelectedCategory(item.id)}
-                    className="w-full"
-                  />
-                </div>
-
-                <div className="flex-1">
-                  <label className="text-xs font-semibold text-foreground block mb-2">
-                    <Filter className="w-3 h-3 inline mr-1" />
-                    Type
-                  </label>
-                  <AnimatedDropdown
-                    items={typeDropdownItems}
-                    text="Select Type"
-                    selectedId={selectedOperatingType}
-                    onSelect={(item) => setSelectedOperatingType(item.id as 'all' | 'home' | 'shop')}
-                    className="w-full"
-                  />
-                </div>
-              </div>
+              <p className="text-xs text-slate-400">
+                Logged in as <span className="text-slate-200 font-medium">{currentAdminEmail}</span>
+              </p>
             </div>
           </div>
 
-          {dataLoading ? (
-            <div className="text-muted-foreground text-center py-8">
-              Loading sellers...
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchAdminData}
+              disabled={dataLoading}
+              className="border-slate-800 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 mr-2 ${dataLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-red-900/40 text-red-400 hover:bg-red-950/40 hover:text-red-300"
+                >
+                  <LogOut className="w-3.5 h-3.5 mr-2" />
+                  Logout
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirm Admin Logout</AlertDialogTitle>
+                  <AlertDialogDescription className="text-slate-400">
+                    Are you sure you want to exit the admin dashboard? You will need your master
+                    credentials to log back in.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="flex gap-3 justify-end mt-4">
+                  <AlertDialogCancel className="bg-slate-800 text-slate-300 border-slate-700">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleLogout}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    Logout
+                  </AlertDialogAction>
+                </div>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </header>
+
+        {/* Global Key Metrics Banner */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Revenue */}
+          <Card className="bg-slate-900 border-slate-800 p-5 relative overflow-hidden">
+            <div className="flex justify-between items-start mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Total Income (INR)
+              </span>
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <DollarSign className="w-5 h-5" />
+              </div>
             </div>
-          ) : filteredUsers.length > 0 ? (
-            <div className="relative overflow-x-auto">
-              {isSearchLoading && (
-                <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 flex items-center justify-center">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-sm">Searching...</span>
+            <div className="text-3xl font-extrabold text-emerald-400">
+              ₹{totalRevenue.toLocaleString()}
+            </div>
+            <div className="text-xs text-slate-400 mt-2 flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{payments.filter((p) => p.status === 'paid').length} completed transactions</span>
+            </div>
+          </Card>
+
+          {/* Gateway Status Card */}
+          <Card className="bg-slate-900 border-slate-800 p-5 relative overflow-hidden">
+            <div className="flex justify-between items-start mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Payment Gateway
+              </span>
+              <div
+                className={`p-2 rounded-lg ${
+                  platformSettings.payment_gateway_enabled
+                    ? 'bg-emerald-500/10 text-emerald-400'
+                    : 'bg-amber-500/10 text-amber-400'
+                }`}
+              >
+                <CreditCard className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={`w-3 h-3 rounded-full ${
+                  platformSettings.payment_gateway_enabled ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+                }`}
+              />
+              <span className="text-xl font-bold text-white">
+                {platformSettings.payment_gateway_enabled ? 'Active (Paid Mode)' : 'Paused (100% Free)'}
+              </span>
+            </div>
+            <div className="text-xs text-slate-400 mt-2">
+              {platformSettings.payment_gateway_enabled
+                ? 'Charges enforced after free limit'
+                : 'Platform is totally free for all users'}
+            </div>
+          </Card>
+
+          {/* Monetization Rule */}
+          <Card className="bg-slate-900 border-slate-800 p-5 relative overflow-hidden">
+            <div className="flex justify-between items-start mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Free Client Policy
+              </span>
+              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+                <Settings2 className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="text-3xl font-extrabold text-blue-400">
+              {platformSettings.free_client_limit} Free Client
+              {platformSettings.free_client_limit === 1 ? '' : 's'}
+            </div>
+            <div className="text-xs text-slate-400 mt-2">
+              {platformSettings.payment_gateway_enabled
+                ? 'Subsequent clients require unlock / plan'
+                : 'Free limit dormant while gateway paused'}
+            </div>
+          </Card>
+
+          {/* Total Projects / Talent */}
+          <Card className="bg-slate-900 border-slate-800 p-5 relative overflow-hidden">
+            <div className="flex justify-between items-start mb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Platform Activity
+              </span>
+              <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
+                <Briefcase className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="text-3xl font-extrabold text-purple-400">{projects.length} Projects</div>
+            <div className="text-xs text-slate-400 mt-2">
+              {users.length} active registered sellers/talent
+            </div>
+          </Card>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex border-b border-slate-800 gap-2">
+          <button
+            onClick={() => setActiveTab('income')}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'income'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-slate-400 hover:text-white'
+            }`}
+          >
+            <DollarSign className="w-4 h-4" />
+            Income & Gateway Control
+          </button>
+          <button
+            onClick={() => setActiveTab('projects')}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'projects'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-slate-400 hover:text-white'
+            }`}
+          >
+            <FolderKanban className="w-4 h-4" />
+            Projects ({projects.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'users'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-slate-400 hover:text-white'
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            Sellers & Moderation ({users.length})
+          </button>
+        </div>
+
+        {/* ── TAB 1: Income & Gateway Control ── */}
+        {activeTab === 'income' && (
+          <div className="space-y-6">
+            {/* Gateway Controller Banner */}
+            <Card className="bg-slate-900 border-slate-800 p-6 relative overflow-hidden">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="space-y-2 max-w-2xl">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-xs uppercase font-mono px-2 py-0.5 rounded ${
+                        platformSettings.payment_gateway_enabled
+                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      }`}
+                    >
+                      {platformSettings.payment_gateway_enabled ? 'STATUS: PAID GATEWAY ACTIVE' : 'STATUS: 100% FREE MODE'}
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-bold text-white">Payment Gateway Master Switch</h2>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    {platformSettings.payment_gateway_enabled
+                      ? 'The gateway is currently active. Users will be prompted to purchase a plan or unlock once they exceed the free client threshold.'
+                      : 'The gateway is currently PAUSED. All project posting, client discovery, and developer collaborations are 100% free with zero paywalls.'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={handleTogglePaymentGateway}
+                    disabled={savingSettings}
+                    size="lg"
+                    className={`font-semibold shadow-xl transition-all ${
+                      platformSettings.payment_gateway_enabled
+                        ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    }`}
+                  >
+                    {platformSettings.payment_gateway_enabled ? (
+                      <>
+                        <PauseCircle className="w-5 h-5 mr-2" />
+                        Pause Gateway (Make Platform Free)
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle className="w-5 h-5 mr-2" />
+                        Start Gateway (Enable Paid Monetization)
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Monetization Rule Configuration */}
+              <form
+                onSubmit={handleSaveMonetizationConfig}
+                className="mt-6 pt-6 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end"
+              >
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    Free Client / Project Limit
+                  </label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="50"
+                    value={freeClientLimitInput}
+                    onChange={(e) => setFreeClientLimitInput(e.target.value)}
+                    className="bg-slate-950 border-slate-800 text-white"
+                  />
+                  <p className="text-[11px] text-slate-500 mt-1">Free client projects allowed before charging</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                    Monthly Plan Fee (₹ INR)
+                  </label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={monthlyPriceInput}
+                    onChange={(e) => setMonthlyPriceInput(e.target.value)}
+                    className="bg-slate-950 border-slate-800 text-white"
+                  />
+                  <p className="text-[11px] text-slate-500 mt-1">Monthly subscription fee per user</p>
+                </div>
+
+                <div>
+                  <Button
+                    type="submit"
+                    disabled={savingSettings}
+                    className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 h-10"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Monetization Rules
+                  </Button>
+                </div>
+              </form>
+            </Card>
+
+            {/* Income Transactions Ledger */}
+            <Card className="bg-slate-900 border-slate-800 p-6 space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white">Platform Income & Payments Ledger</h3>
+                  <p className="text-xs text-slate-400">
+                    Live transaction stream from the database payments table
+                  </p>
+                </div>
+
+                {/* Filter and Search */}
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  <div className="relative flex-1 sm:w-64">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Input
+                      placeholder="Search transactions..."
+                      value={paymentSearch}
+                      onChange={(e) => setPaymentSearch(e.target.value)}
+                      className="pl-8 bg-slate-950 border-slate-800 text-white text-xs h-9"
+                    />
+                  </div>
+
+                  <div className="flex gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+                    {(['all', 'paid', 'pending', 'failed'] as const).map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => setPaymentFilter(status)}
+                        className={`px-2.5 py-1 text-xs rounded font-medium capitalize transition-colors ${
+                          paymentFilter === status
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        {status}
+                      </button>
+                    ))}
                   </div>
                 </div>
+              </div>
+
+              {filteredPayments.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-slate-800 rounded-xl">
+                  <CreditCard className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-slate-300">No payment transactions recorded yet</p>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+                    Payments made via Razorpay or unlocked client milestones will automatically record
+                    here in real-time.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-slate-400 uppercase bg-slate-950/60 border-b border-slate-800">
+                      <tr>
+                        <th className="py-3 px-4">Date & Time</th>
+                        <th className="py-3 px-4">User / Payer</th>
+                        <th className="py-3 px-4">Plan / Type</th>
+                        <th className="py-3 px-4">Amount</th>
+                        <th className="py-3 px-4">Razorpay ID</th>
+                        <th className="py-3 px-4 text-center">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60">
+                      {filteredPayments.map((p) => (
+                        <tr key={p.id} className="hover:bg-slate-800/40">
+                          <td className="py-3 px-4 text-xs text-slate-400 whitespace-nowrap">
+                            {new Date(p.created_at).toLocaleString('en-IN', {
+                              dateStyle: 'medium',
+                              timeStyle: 'short',
+                            })}
+                          </td>
+                          <td className="py-3 px-4 font-medium text-white">
+                            {p.profiles?.full_name || 'Member'}
+                            {p.profiles?.phone && (
+                              <span className="block text-[11px] text-slate-400 font-mono">
+                                {p.profiles.phone}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-xs capitalize text-slate-300">
+                            {p.plan.replace('_', ' ')}
+                          </td>
+                          <td className="py-3 px-4 font-bold text-emerald-400">
+                            ₹{Number(p.amount).toLocaleString()}
+                          </td>
+                          <td className="py-3 px-4 text-xs font-mono text-slate-400">
+                            {p.razorpay_payment_id || p.razorpay_order_id || '—'}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span
+                              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                                p.status === 'paid'
+                                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                  : p.status === 'pending'
+                                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                  : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                              }`}
+                            >
+                              {p.status === 'paid' && <CheckCircle2 className="w-3 h-3" />}
+                              {p.status === 'pending' && <Clock className="w-3 h-3" />}
+                              {p.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
-              <table className={`w-full text-sm transition-opacity duration-200 ${
-                isSearchLoading ? 'opacity-50' : 'opacity-100'
-              }`}>
-                <thead className="border-b border-border">
-                  <tr>
-                    <th className="text-left py-3 px-4 text-foreground font-semibold">
-                      Seller Name
-                    </th>
-                    <th className="text-left py-3 px-4 text-foreground font-semibold">
-                      Category
-                    </th>
-                    <th className="text-left py-3 px-4 text-foreground font-semibold">
-                      Type
-                    </th>
-                    <th className="text-center py-3 px-4 text-foreground font-semibold">
-                      Listings
-                    </th>
-                    <th className="text-center py-3 px-4 text-foreground font-semibold">
-                      Membership
-                    </th>
-                    <th className="text-center py-3 px-4 text-foreground font-semibold">
-                      Revenue
-                    </th>
-                    <th className="text-center py-3 px-4 text-foreground font-semibold">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <AnimatePresence mode="popLayout">
-                    {filteredUsers.map((user) => {
-                      const categoryEmoji = CATEGORIES.find((cat) => cat.name === user.category)?.emoji || '✨';
-                      return (
+            </Card>
+          </div>
+        )}
+
+        {/* ── TAB 2: Projects ── */}
+        {activeTab === 'projects' && (
+          <Card className="bg-slate-900 border-slate-800 p-6 space-y-4">
+            <div>
+              <h3 className="text-lg font-bold text-white">Global Marketplace Projects</h3>
+              <p className="text-xs text-slate-400">
+                Live requirements posted by clients and business owners anywhere
+              </p>
+            </div>
+
+            {projects.length === 0 ? (
+              <div className="text-center py-12 text-slate-500">No projects found.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-slate-400 uppercase bg-slate-950/60 border-b border-slate-800">
+                    <tr>
+                      <th className="py-3 px-4">Project Title</th>
+                      <th className="py-3 px-4">Client / Owner</th>
+                      <th className="py-3 px-4">Compensation</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Created</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {projects.map((proj) => (
+                      <tr key={proj.id} className="hover:bg-slate-800/40">
+                        <td className="py-3 px-4 font-medium text-white">{proj.title}</td>
+                        <td className="py-3 px-4 text-xs text-slate-300">{proj.owner_name}</td>
+                        <td className="py-3 px-4 text-xs text-slate-300">
+                          {proj.compensation_amount
+                            ? `₹${proj.compensation_amount.toLocaleString()} (${proj.compensation_type})`
+                            : proj.compensation_type}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase">
+                            {proj.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-xs text-slate-400">
+                          {new Date(proj.created_at).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        )}
+
+        {/* ── TAB 3: Users & Sellers Moderation ── */}
+        {activeTab === 'users' && (
+          <Card className="bg-slate-900 border-slate-800 p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-bold text-white">Talent & Seller Management</h3>
+                <p className="text-xs text-slate-400">
+                  Manage registered sellers, verify authenticity, and suspend accounts
+                </p>
+              </div>
+
+              {/* Filters */}
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                <div className="relative flex-1 sm:w-60">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    placeholder="Search name..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8 bg-slate-950 border-slate-800 text-white text-xs h-9"
+                  />
+                </div>
+
+                <div className="w-40">
+                  <AnimatedDropdown
+                    items={categoryDropdownItems}
+                    text="Category"
+                    selectedId={selectedCategory}
+                    onSelect={(item) => setSelectedCategory(item.id)}
+                    className="w-full text-xs"
+                  />
+                </div>
+
+                <div className="w-36">
+                  <AnimatedDropdown
+                    items={typeDropdownItems}
+                    text="Type"
+                    selectedId={selectedOperatingType}
+                    onSelect={(item) => setSelectedOperatingType(item.id as any)}
+                    className="w-full text-xs"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {filteredUsers.length === 0 ? (
+              <div className="text-center py-12 text-slate-500">No sellers matching filter</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-slate-400 uppercase bg-slate-950/60 border-b border-slate-800">
+                    <tr>
+                      <th className="py-3 px-4">Seller Name</th>
+                      <th className="py-3 px-4">Category</th>
+                      <th className="py-3 px-4">Type</th>
+                      <th className="py-3 px-4 text-center">Listings</th>
+                      <th className="py-3 px-4 text-center">Plan</th>
+                      <th className="py-3 px-4 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    <AnimatePresence mode="popLayout">
+                      {filteredUsers.map((user) => (
                         <motion.tr
                           key={user.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="border-b border-border hover:bg-muted"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="hover:bg-slate-800/40"
                         >
-                        <td className="py-3 px-4 text-foreground font-medium">
-                          {user.seller_name}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="bg-primary/10 text-primary dark:bg-primary/20 px-2 py-1 rounded text-xs font-medium">
-                            {categoryEmoji} {user.category}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="flex items-center gap-1">
-                            {user.operating_type === 'shop' ? (
-                              <>
-                                <Store className="w-4 h-4 text-secondary" />
-                                <span className="text-foreground">Shop</span>
-                              </>
-                            ) : (
-                              <>
-                                <Home className="w-4 h-4 text-primary" />
-                                <span className="text-foreground">Home</span>
-                              </>
-                            )}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-center text-muted-foreground">
-                          {user.listings.length}
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <span className={`px-3 py-1 rounded text-xs font-semibold ${
-                            user.membershipType === 'yearly' 
-                              ? 'bg-primary/10 text-primary dark:bg-primary/20'
-                              : 'bg-secondary/10 text-secondary dark:bg-secondary/20'
-                          }`}>
-                            {user.membershipType === 'yearly' ? 'Yearly' : 'Monthly'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-center text-foreground font-semibold">
-                          ₹{user.revenue.toLocaleString()}
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <AlertDialog open={deleteConfirmOpen && selectedUser?.id === user.id}>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedUser(user);
-                                  setDeleteConfirmOpen(true);
-                                  setBusinessNameConfirm('');
-                                  setDeleteError('');
-                                }}
-                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent className="bg-card border-border">
-                              <AlertDialogHeader>
-                                <AlertDialogTitle className="text-foreground">
-                                  Delete Seller
-                                </AlertDialogTitle>
-                                <AlertDialogDescription className="text-muted-foreground">
-                                  To confirm deletion of{' '}
-                                  <span className="font-bold text-foreground">
-                                    {user.seller_name}
-                                  </span>
-                                  , please enter their name in the field below.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-
-                              <div className="my-4">
-                                <label className="block text-sm font-medium text-foreground mb-2">
-                                  Seller Name
-                                </label>
-                                <Input
-                                  type="text"
-                                  value={businessNameConfirm}
-                                  onChange={(e) => {
-                                    setBusinessNameConfirm(e.target.value);
-                                    setDeleteError('');
-                                  }}
-                                  placeholder={user.seller_name}
-                                  className="bg-muted border-border text-foreground"
-                                />
-                                {deleteError && (
-                                  <p className="text-destructive text-xs mt-2">
-                                    {deleteError}
-                                  </p>
-                                )}
-                              </div>
-
-                              <div className="flex gap-3 justify-end">
-                                <AlertDialogCancel
+                          <td className="py-3 px-4 font-medium text-white">{user.seller_name}</td>
+                          <td className="py-3 px-4 text-xs text-slate-300">{user.category}</td>
+                          <td className="py-3 px-4">
+                            <span className="flex items-center gap-1.5 text-xs text-slate-300">
+                              {user.operating_type === 'shop' ? (
+                                <>
+                                  <Store className="w-3.5 h-3.5 text-blue-400" /> Shop
+                                </>
+                              ) : (
+                                <>
+                                  <Home className="w-3.5 h-3.5 text-emerald-400" /> Remote
+                                </>
+                              )}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-center text-xs text-slate-400">
+                            {user.listings.length}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-primary/20 text-primary border border-primary/30 uppercase">
+                              {user.membershipType}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <AlertDialog
+                              open={deleteConfirmOpen && selectedUser?.id === user.id}
+                            >
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
                                   onClick={() => {
-                                    setDeleteConfirmOpen(false);
+                                    setSelectedUser(user);
+                                    setDeleteConfirmOpen(true);
                                     setBusinessNameConfirm('');
                                     setDeleteError('');
                                   }}
-                                  className="bg-muted text-foreground border-border"
+                                  className="text-red-400 hover:text-red-300 hover:bg-red-950/40 h-8 w-8 p-0"
                                 >
-                                  Cancel
-                                </AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => {
-                                    if (
-                                      businessNameConfirm.toLowerCase() ===
-                                      user.seller_name.toLowerCase()
-                                    ) {
-                                      handleDeleteUser(user);
-                                    } else {
-                                      setDeleteError('Name does not match');
-                                    }
-                                  }}
-                                  className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                                >
-                                  Delete Seller
-                                </AlertDialogAction>
-                              </div>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </td>
-                      </motion.tr>
-                    );
-                  })}
-                  </AnimatePresence>
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="text-muted-foreground text-center py-8">
-              No sellers found matching your filters
-            </div>
-          )}
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-slate-900 border-slate-800 text-white">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Suspend Seller Account</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-slate-400">
+                                    To suspend{' '}
+                                    <strong className="text-white">{user.seller_name}</strong>,
+                                    type their name below to confirm.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
 
-          {filteredUsers.length > 0 && (
-            <div className="mt-4 text-xs text-muted-foreground">
-              Showing {filteredUsers.length} of {users.length} sellers
-            </div>
-          )}
-        </Card>
+                                <div className="my-4">
+                                  <Input
+                                    value={businessNameConfirm}
+                                    onChange={(e) => {
+                                      setBusinessNameConfirm(e.target.value);
+                                      setDeleteError('');
+                                    }}
+                                    placeholder={user.seller_name}
+                                    className="bg-slate-950 border-slate-800 text-white"
+                                  />
+                                  {deleteError && (
+                                    <p className="text-red-400 text-xs mt-1">{deleteError}</p>
+                                  )}
+                                </div>
+
+                                <div className="flex gap-3 justify-end">
+                                  <AlertDialogCancel
+                                    onClick={() => setDeleteConfirmOpen(false)}
+                                    className="bg-slate-800 text-slate-300 border-slate-700"
+                                  >
+                                    Cancel
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => {
+                                      if (
+                                        businessNameConfirm.toLowerCase() ===
+                                        user.seller_name.toLowerCase()
+                                      ) {
+                                        handleDeleteUser(user);
+                                      } else {
+                                        setDeleteError('Name does not match');
+                                      }
+                                    }}
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                  >
+                                    Confirm Suspend
+                                  </AlertDialogAction>
+                                </div>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </td>
+                        </motion.tr>
+                      ))}
+                    </AnimatePresence>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        )}
       </div>
     </div>
   );

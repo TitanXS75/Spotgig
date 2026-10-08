@@ -6,6 +6,8 @@ import { getMyProfile } from '@/lib/api/profiles';
 import { executeCopilotIntent } from '@/lib/copilot/copilot-engine';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
+import { checkUserMonetizationStatus } from '@/lib/api/platform-settings';
 import type { Project } from '@/lib/db-types';
 
 interface RequestAccessModalProps {
@@ -71,6 +73,19 @@ export const RequestAccessModal = ({
 
     setIsSubmitting(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const status = await checkUserMonetizationStatus(user?.id);
+
+      if (status.requiresPayment) {
+        toast({
+          title: 'Monthly Subscription Required',
+          description: status.message,
+          variant: 'destructive',
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       await submitProjectRequest(project.id, message.trim());
       toast({
         title: 'Request Submitted!',

@@ -3,28 +3,40 @@ import { ArrowLeft, Check, Zap, Crown, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
+import { getPlatformSettings, type PlatformSettings } from '@/lib/api/platform-settings';
+
 const FREELANCER_FEATURES = [
   'Public skill profile on Spotgig',
   'WhatsApp & LinkedIn integration',
-  'Distance-based client discovery',
+  'Project & client discovery anywhere',
   'Searchable by skill & category',
   'Shareable profile URL',
   'Solo or Team listing',
 ];
 
 const CLIENT_FEATURES = [
-  'Post unlimited project listings',
-  'Discover nearby freelancers',
-  'Filter by skill, distance & team type',
-  'Direct WhatsApp/LinkedIn contact',
-  'Project detail & review system',
+  'Post project requirements',
+  'Discover student talent & developers',
+  'Filter by skill & location preference',
+  'Direct messaging & collaboration',
+  'Milestone workspace & reviews',
   'Priority placement in search',
 ];
 
 const PricingPage = () => {
   const navigate = useNavigate();
-  const [isYearly, setIsYearly] = useState(false);
   const [activeTab, setActiveTab] = useState<'freelancer' | 'client'>('freelancer');
+  const [isGatewayPaused, setIsGatewayPaused] = useState(true);
+  const [freeLimit, setFreeLimit] = useState(1);
+
+  useEffect(() => {
+    getPlatformSettings().then((settings) => {
+      setIsGatewayPaused(!settings.payment_gateway_enabled);
+      setFreeLimit(settings.free_client_limit);
+    }).catch(() => {
+      setIsGatewayPaused(true);
+    });
+  }, []);
 
   const features = activeTab === 'freelancer' ? FREELANCER_FEATURES : CLIENT_FEATURES;
 
@@ -51,9 +63,22 @@ const PricingPage = () => {
         <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
           Get Visible. Get Hired.
         </h2>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-6">
           One simple plan for freelancers and clients. No hidden fees, no commissions.
         </p>
+
+        {isGatewayPaused ? (
+          <div className="mb-8 p-4 max-w-xl mx-auto rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 dark:text-emerald-400">
+            <span className="font-bold text-sm block">🎉 Early Access Launch: 100% Free Right Now!</span>
+            <span className="text-xs text-muted-foreground mt-1 block">
+              The payment gateway is paused. You can post projects, contact developers, and collaborate with zero fees.
+            </span>
+          </div>
+        ) : (
+          <div className="mb-8 p-3 max-w-xl mx-auto rounded-2xl bg-primary/10 border border-primary/20 text-primary text-xs font-medium">
+            ✨ Free Tier: Your first {freeLimit} client collaboration{freeLimit > 1 ? 's are' : ' is'} completely free!
+          </div>
+        )}
 
         {/* Role tab */}
         <div className="flex gap-1 p-1 bg-muted rounded-xl w-max mx-auto mb-8">
@@ -71,47 +96,23 @@ const PricingPage = () => {
           </button>
         </div>
 
-        {/* Year Toggle */}
-        <div className="flex items-center justify-center gap-4 mb-12">
-          <span className={`text-sm font-medium ${!isYearly ? 'text-foreground' : 'text-muted-foreground'}`}>Monthly</span>
-          <button
-            onClick={() => setIsYearly(!isYearly)}
-            className="relative w-14 h-7 bg-muted rounded-full transition-colors"
-          >
-            <div className={`absolute top-1 w-5 h-5 bg-primary rounded-full transition-transform ${isYearly ? 'translate-x-7' : 'translate-x-1'}`} />
-          </button>
-          <span className={`text-sm font-medium ${isYearly ? 'text-foreground' : 'text-muted-foreground'}`}>
-            Yearly <span className="text-green-500 font-bold ml-1">-20%</span>
-          </span>
-        </div>
-      </motion.div>
-
-      {/* Pricing Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="max-w-md mx-auto"
-      >
-        <div className="bg-card rounded-2xl p-8 shadow-card border border-border/50">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              {activeTab === 'freelancer' ? <Zap className="w-8 h-8 text-primary" /> : <Users className="w-8 h-8 text-primary" />}
-            </div>
-            <h3 className="text-2xl font-bold text-foreground mb-2">
-              {activeTab === 'freelancer' ? 'Freelancer' : 'Client'} ({isYearly ? 'Annual' : 'Monthly'})
-            </h3>
-            <div className="text-4xl font-bold text-foreground mb-1">
-              ₹{isYearly ? (activeTab === 'freelancer' ? '1,200' : '2,000') : (activeTab === 'freelancer' ? '100' : '200')}
-            </div>
-            <p className="text-muted-foreground">
-              {isYearly ? 'per year' : 'per month'}
-            </p>
-            {isYearly && (
-              <p className="text-green-500 text-sm font-medium mt-1">
-                Save ₹{activeTab === 'freelancer' ? '400' : '400'} compared to monthly
+        {/* Pricing Card */}
+        <div className="max-w-md mx-auto">
+          <div className="bg-card rounded-2xl p-8 shadow-card border border-border/50">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                {activeTab === 'freelancer' ? <Zap className="w-8 h-8 text-primary" /> : <Users className="w-8 h-8 text-primary" />}
+              </div>
+              <h3 className="text-2xl font-bold text-foreground mb-2">
+                {activeTab === 'freelancer' ? 'Freelancer Plan' : 'Client Plan'}
+              </h3>
+              <div className="text-4xl font-bold text-foreground mb-1">
+                ₹{activeTab === 'freelancer' ? '100' : '200'}
+              </div>
+              <p className="text-muted-foreground text-sm">
+                per month • cancel anytime
               </p>
-            )}
+            </div>
           </div>
 
           <ul className="space-y-3 mb-8">

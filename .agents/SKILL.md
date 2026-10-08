@@ -10,9 +10,7 @@ description: >
 
 ## Project Identity
 
-Aaspass is a **location-aware freelancing marketplace** for Tier-2/3 Indian
-cities. It connects college students and early-career freelancers with local
-business owners who need tech/creative work.
+Aaspass (Spotgig) is a **freelancing and real-world project collaboration platform**. It connects college students and emerging developers with clients and business owners anywhere (remote-first, hybrid, or local) for real projects, verified experience, and fair compensation.
 
 ## Tech Stack — Quick Reference
 

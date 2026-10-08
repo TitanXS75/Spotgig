@@ -1,6 +1,6 @@
 # Aaspass — Agent Instructions
 
-> Hyperlocal freelancing platform connecting student talent with local business needs.
+> Freelance marketplace & real-world project collaboration platform connecting student talent with clients and businesses anywhere (remote, hybrid, or local).
 
 ## Quick Context
 

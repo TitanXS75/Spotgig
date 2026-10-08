@@ -4,24 +4,116 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Lock, Unlock, ShieldCheck, Clock, Users, MapPin, 
-  Coins, Briefcase, Building2, User, CheckCircle2, AlertCircle, 
-  Send, Edit3, Share2, Sparkles, FolderKanban, Check, Eye 
+  Briefcase, CheckCircle2, AlertCircle, 
+  Send, Edit3, Share2, FolderKanban,
+  MessageCircle
 } from 'lucide-react';
 import { useAppStore } from '@/store/app-store';
 import { fetchProjectById, fetchProjectRequirements } from '@/lib/api/projects';
 import { checkProjectAccess, getMyRequestStatusForProject } from '@/lib/api/requests';
 import { RequestAccessModal } from '@/components/RequestAccessModal';
 import { useToast } from '@/hooks/use-toast';
-import { useCopilotStore } from '@/store/copilot-store';
 import { getMyProfile } from '@/lib/api/profiles';
+import { 
+  fetchProjectComments, 
+  submitProjectComment, 
+  type ProjectComment 
+} from '@/lib/api/platform-settings';
 import type { Project, ProjectRequirements, RequestStatus } from '@/lib/db-types';
+
+function ProjectDetailSkeleton() {
+  return (
+    <div className="min-h-screen bg-background text-foreground pb-24 md:pb-12 animate-pulse">
+      <div className="w-full max-w-6xl mx-auto px-4 py-8 sm:px-6 md:px-8 space-y-6">
+        {/* Navigation & Share Row */}
+        <div className="flex items-center justify-between">
+          <div className="h-5 w-20 bg-muted rounded-lg" />
+          <div className="h-8 w-20 bg-muted rounded-lg" />
+        </div>
+
+        {/* Top Overview Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+          {/* Main Info Column */}
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="h-5 w-24 bg-muted rounded-lg" />
+                <div className="h-5 w-20 bg-muted rounded-lg" />
+                <div className="h-5 w-16 bg-muted rounded-lg" />
+              </div>
+              <div className="h-9 w-3/4 bg-muted rounded-xl" />
+              <div className="flex items-center gap-4 pt-1">
+                <div className="h-4 w-24 bg-muted rounded-md" />
+                <div className="h-4 w-28 bg-muted rounded-md" />
+                <div className="h-4 w-32 bg-muted rounded-md" />
+              </div>
+            </div>
+
+            {/* Problem Overview Skeleton */}
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
+              <div className="h-4 w-52 bg-muted rounded-md" />
+              <div className="space-y-2 pt-1">
+                <div className="h-3 w-full bg-muted rounded" />
+                <div className="h-3 w-5/6 bg-muted rounded" />
+                <div className="h-3 w-4/6 bg-muted rounded" />
+              </div>
+            </div>
+
+            {/* Skills Skeleton */}
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
+              <div className="h-4 w-44 bg-muted rounded-md" />
+              <div className="flex flex-wrap gap-2 pt-1">
+                <div className="h-7 w-20 bg-muted rounded-xl" />
+                <div className="h-7 w-24 bg-muted rounded-xl" />
+                <div className="h-7 w-16 bg-muted rounded-xl" />
+              </div>
+            </div>
+
+            {/* Pitches Skeleton */}
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-4">
+              <div className="h-4 w-48 bg-muted rounded-md" />
+              <div className="h-20 w-full bg-muted/60 rounded-xl" />
+            </div>
+          </div>
+
+          {/* Right Sidebar Skeleton */}
+          <div className="space-y-4">
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
+              <div className="h-3 w-28 bg-muted rounded" />
+              <div className="h-8 w-32 bg-muted rounded-lg" />
+              <div className="h-3 w-48 bg-muted rounded" />
+            </div>
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
+              <div className="h-4 w-36 bg-muted rounded" />
+              <div className="h-10 w-full bg-muted rounded-xl" />
+            </div>
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
+              <div className="h-3 w-24 bg-muted rounded" />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-muted" />
+                <div className="space-y-1.5 flex-1">
+                  <div className="h-3.5 w-28 bg-muted rounded" />
+                  <div className="h-3 w-20 bg-muted rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Private Requirements Skeleton */}
+        <div className="mt-8 pt-8 border-t border-border/80">
+          <div className="h-32 w-full bg-muted/40 rounded-3xl border border-border" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const ProjectDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAppStore();
   const { toast } = useToast();
-  const { openCopilot } = useCopilotStore();
   const [showRequestModal, setShowRequestModal] = useState(false);
 
   // Fetch logged-in user profile
@@ -64,6 +156,64 @@ const ProjectDetailPage = () => {
     enabled: !!project?.id && isUnlocked,
   });
 
+  // 5. Candidate Pitches & Messages (1 send per account)
+  const { data: comments = [], refetch: refetchComments } = useQuery<ProjectComment[]>({
+    queryKey: ['project-comments', project?.id],
+    queryFn: () => fetchProjectComments(project!.id),
+    enabled: !!project?.id,
+  });
+
+  // 6. Monetization check (Free at start, or 1st client free trial)
+  const { data: monetizationStatus } = useQuery({
+    queryKey: ['monetization-status', user?.id],
+    queryFn: () => checkUserMonetizationStatus(user?.id),
+    enabled: !!user,
+  });
+
+  const [commentText, setCommentText] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
+  const userComment = comments.find((c) => c.user_id === user?.id);
+
+  const handleSendComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim() || !project) return;
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    if (monetizationStatus?.requiresPayment) {
+      toast({
+        title: 'Monthly Subscription Required',
+        description: monetizationStatus.message,
+        variant: 'destructive',
+      });
+      navigate('/pricing');
+      return;
+    }
+
+    setIsSubmittingComment(true);
+    try {
+      await submitProjectComment(project.id, commentText.trim());
+      toast({
+        title: 'Pitch Sent to Project Owner!',
+        description: 'Your message was delivered. (Limit: 1 message per account).',
+      });
+      setCommentText('');
+      refetchComments();
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast({
+        title: 'Could not send pitch',
+        description: error.message || 'Failed to submit message.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
@@ -88,12 +238,22 @@ const ProjectDetailPage = () => {
     return 'Verified Experience';
   };
 
+  const formatRelativeTime = (dateString?: string) => {
+    if (!dateString) return 'Recently';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInDays === 1) return '1 day ago';
+    return `${diffInDays} days ago`;
+  };
+
   if (loadingProject) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <p className="text-sm text-muted-foreground animate-pulse">Loading project details...</p>
-      </div>
-    );
+    return <ProjectDetailSkeleton />;
   }
 
   if (projectError || !project) {
@@ -115,7 +275,12 @@ const ProjectDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-24 md:pb-12">
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="min-h-screen bg-background text-foreground pb-24 md:pb-12"
+    >
       <div className="w-full max-w-6xl mx-auto px-4 py-8 sm:px-6 md:px-8 space-y-6">
         {/* Navigation & Share Row */}
         <div className="flex items-center justify-between">
@@ -164,7 +329,7 @@ const ProjectDetailPage = () => {
               {/* Logistics bar */}
               <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-1">
                 <span className="flex items-center gap-1.5 font-medium">
-                  <Clock className="w-4 h-4 text-primary" /> {project.duration}
+                  <Clock className="w-4 h-4 text-primary" /> {formatRelativeTime(project.created_at)}
                 </span>
                 <span className="flex items-center gap-1.5 font-medium">
                   <Users className="w-4 h-4 text-purple-500" />
@@ -174,74 +339,6 @@ const ProjectDetailPage = () => {
                   <MapPin className="w-4 h-4 text-green-500" />
                   {project.location_type === 'remote' ? 'Remote (Anywhere in India)' : (project.area || 'On-site')}
                 </span>
-                <span className="flex items-center gap-1.5 font-medium">
-                  <Eye className="w-4 h-4 text-muted-foreground" /> {project.views} Views
-                </span>
-              </div>
-            </div>
-
-            {/* Copilot Assistant Quick Bar */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-card border border-primary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center text-primary shrink-0">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-foreground">Spotgig Copilot Insights</span>
-                  <p className="text-[11px] text-muted-foreground">Understand scope, evaluate compatibility, and ask questions</p>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    openCopilot({
-                      type: 'project_detail',
-                      project,
-                      userRole: isOwner ? 'project_owner' : 'developer',
-                      userProfile: profile || null,
-                      hasPrivateAccess: isUnlocked,
-                    }, 'Explain this project in simple words. What will I build and what are the main goals?', true);
-                  }}
-                  className="px-2.5 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition shadow-sm"
-                >
-                  ✨ Explain Project
-                </button>
-                {!isOwner && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        openCopilot({
-                          type: 'project_detail',
-                          project,
-                          userRole: 'developer',
-                          userProfile: profile || null,
-                          hasPrivateAccess: isUnlocked,
-                        }, 'Assess whether this project fits my developer profile and skills.', true);
-                      }}
-                      className="px-2.5 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition shadow-sm"
-                    >
-                      ✨ Is this for me?
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        openCopilot({
-                          type: 'project_detail',
-                          project,
-                          userRole: 'developer',
-                          userProfile: profile || null,
-                          hasPrivateAccess: isUnlocked,
-                        }, 'What questions should I ask the project owner before requesting access?', true);
-                      }}
-                      className="px-2.5 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground transition shadow-sm"
-                    >
-                      ✨ What to clarify?
-                    </button>
-                  </>
-                )}
               </div>
             </div>
 
@@ -278,6 +375,124 @@ const ProjectDetailPage = () => {
                     <strong className="text-foreground font-medium">Suggested Tech:</strong>{' '}
                     {project.technologies.join(', ')}
                   </p>
+                </div>
+              )}
+            </div>
+
+            {/* Candidate Messages / Gigs Pitches Section */}
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4 text-primary" />
+                    Candidate Messages &amp; Pitches
+                  </h2>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Gigs can send 1 message to pitch skills and help the owner decide. All messages wipe automatically once accepted.
+                  </p>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                  {comments.length} {comments.length === 1 ? 'message' : 'messages'}
+                </span>
+              </div>
+
+              {/* Status Notice if already accepted/in progress */}
+              {project.status === 'in_progress' || project.status === 'completed' ? (
+                <div className="p-3.5 rounded-xl bg-muted/60 border border-border text-xs text-muted-foreground flex items-center gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>
+                    <strong>Project Accepted &amp; In Progress:</strong> All candidate pitch messages have been automatically wiped from the database.
+                  </span>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Messages Feed */}
+                  {comments.length > 0 ? (
+                    <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                      {comments.map((c) => (
+                        <div
+                          key={c.id}
+                          className="p-3 rounded-xl bg-muted/30 border border-border/70 hover:border-border transition-colors text-xs space-y-1.5"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                                {c.profiles?.full_name?.charAt(0) || 'D'}
+                              </div>
+                              <span className="font-semibold text-foreground">
+                                {c.profiles?.full_name || 'Emerging Developer'}
+                              </span>
+                              {c.user_id === user?.id && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/20 text-primary font-medium">
+                                  You
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-muted-foreground">
+                              {new Date(c.created_at).toLocaleDateString('en-IN', {
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </span>
+                          </div>
+                          <p className="text-foreground/90 leading-relaxed pl-8">
+                            {c.message}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic py-2">
+                      No messages sent yet. Be the first gig to send a message to the owner!
+                    </p>
+                  )}
+
+                  {/* Comment Input Box for Developer (Only 1 message per account) */}
+                  {!isOwner && (
+                    <div className="pt-2 border-t border-border/60">
+                      {userComment ? (
+                        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span>
+                            You have sent your message to the owner: <em>"{userComment.message}"</em> (1 send limit per account).
+                          </span>
+                        </div>
+                      ) : user ? (
+                        <form onSubmit={handleSendComment} className="space-y-2.5">
+                          <textarea
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            rows={2}
+                            placeholder="Send a pitch or question to the owner (e.g. your skills, portfolio experience, or availability)..."
+                            className="w-full text-xs p-3 rounded-xl bg-background border border-border focus:border-primary focus:outline-none resize-none text-foreground placeholder:text-muted-foreground"
+                          />
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-muted-foreground">
+                              🔒 1 message limit per account. Wiped when project is accepted.
+                            </span>
+                            <button
+                              type="submit"
+                              disabled={isSubmittingComment || !commentText.trim()}
+                              className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition disabled:opacity-50 inline-flex items-center gap-1.5 shadow-sm"
+                            >
+                              <Send className="w-3 h-3" />
+                              {isSubmittingComment ? 'Sending...' : 'Send Pitch (1 Only)'}
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div className="text-center py-2">
+                          <button
+                            type="button"
+                            onClick={() => navigate('/auth')}
+                            className="text-xs text-primary font-semibold hover:underline"
+                          >
+                            Sign in to send a pitch message to the owner →
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -541,7 +756,7 @@ const ProjectDetailPage = () => {
           onClose={() => setShowRequestModal(false)}
         />
       )}
-    </div>
+    </motion.div>
   );
 };
 

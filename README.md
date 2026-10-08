@@ -1,11 +1,11 @@
-# Aaspass — Hyperlocal Freelancing Platform
+# Spotgig (Aaspass) — Freelancing & Real-World Project Platform
 
-> **Bridge the gap between student talent and real client needs in Tier-2 and Tier-3 Indian cities.**
+> **Bridge the gap between student talent and real client needs anywhere — remote, nationwide, or local.**
 
-Aaspass is a **location-aware freelancing marketplace** that connects:
+Spotgig is a **freelancing & project collaboration marketplace** that connects:
 
-- 🏢 **Clients** — Business owners, entrepreneurs, and coaches who need websites, apps, designs, or tech help
-- 🎓 **Freelancers** — College students (B.Tech, MBA, BCA) & vibe coders looking for real project experience and income
+- 🏢 **Clients** — Business owners, startups, entrepreneurs, and teams anywhere who need real software, design, or tech help
+- 🎓 **Developers & Freelancers** — College students & emerging developers looking for real-world projects, verified experience, and fair compensation
 
 ---
 
@@ -32,7 +32,7 @@ Aaspass is a **location-aware freelancing marketplace** that connects:
 
 | Feature | Description |
 |---|---|
-| 📍 **Hyperlocal (GPS)** | Find freelancers & clients in your local area with zero distance guesswork |
+| 🌍 **Work From Anywhere** | Connect with talent & clients anywhere with flexible remote, hybrid, or local options |
 | 👥 **Solo or Team** | Freelancers can work individually or assemble student squads for large gigs |
 | 🔗 **Trust & Verification** | LinkedIn & GitHub profile links for verified student credibility |
 | 💼 **Zero Commission** | Flat subscription only — no 20% commission cuts like traditional platforms |

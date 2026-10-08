@@ -45,6 +45,20 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
     return 'Experience';
   };
 
+  const formatRelativeTime = (dateString?: string) => {
+    if (!dateString) return 'Recently';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInDays === 1) return '1 day ago';
+    return `${diffInDays} days ago`;
+  };
+
   const handleRequestClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
@@ -135,8 +149,8 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
 
           {/* Logistics meta bar */}
           <div className="pt-2 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-primary" /> {project.duration}
+            <span className="flex items-center gap-1 font-medium">
+              <Clock className="w-3.5 h-3.5 text-primary" /> {formatRelativeTime(project.created_at)}
             </span>
             <span className="flex items-center gap-1">
               <Users className="w-3.5 h-3.5 text-purple-500" />

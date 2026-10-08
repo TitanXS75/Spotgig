@@ -1,14 +1,14 @@
-# Aaspass (आसपास) — Project Overview & Architecture Guide
+# Spotgig (Aaspass) — Project Overview & Architecture Guide
 
-> **Tagline:** Hyperlocal freelancing platform connecting student talent with local business needs in Tier-2 and Tier-3 Indian cities.
+> **Tagline:** Freelancing & project collaboration platform connecting student talent with clients and businesses anywhere (remote, nationwide, or local).
 
 ---
 
 ## 1. Executive Summary & Identity
 
-**Aaspass** (*Hindi for "Nearby"* or *"In the vicinity"*) is a location-aware marketplace platform engineered to bridge the gap between skilled college students and local business owners.
+**Spotgig (Aaspass)** is a talent marketplace engineered to bridge the gap between skilled college students/emerging developers and businesses that need real projects built.
 
-Unlike global freelancing platforms (such as Upwork or Fiverr) that prioritize remote, dollar-based, international transactions, Aaspass operates on **geographic proximity**. It empowers local businesses to discover and hire verified, affordable student talent right within their city or neighborhood, enabling in-person trust, face-to-face collaboration, and zero-commission transactions.
+It empowers businesses, startups, and clients anywhere to discover and work with verified, affordable student talent, enabling transparent collaboration, verified experience, and zero-commission transactions.
 
 ---
 
@@ -24,11 +24,11 @@ Unlike global freelancing platforms (such as Upwork or Fiverr) that prioritize r
   * Hesitation and mistrust around hiring completely anonymous, remote freelancers.
   * Complex, dollar-denominated interfaces that are intimidating for small business owners.
 
-### The Aaspass Solution
-* **Hyperlocal Discovery:** Freelancers are discovered based on live GPS distance (from 1 km to 50+ km).
-* **Zero Commission:** Aaspass charges 0% commission on client-to-freelancer transactions. Freelancers keep 100% of their earnings.
-* **Direct Communication:** Seamless WhatsApp and Instagram integration for direct, low-friction client inquiries.
-* **Flat Subscription Pricing:** Affordable recurring subscription model tailored for Tier-2/3 Indian cities.
+### The Spotgig Solution
+* **Work From Anywhere:** Talent & projects can connect remotely across any city, with optional local meeting preferences.
+* **Zero Commission:** Spotgig charges 0% commission on client-to-freelancer transactions. Freelancers keep 100% of their earnings.
+* **Direct Communication:** Seamless WhatsApp and messaging integration for direct, low-friction client inquiries.
+* **Affordable & Fair Monetization:** Free at start; configurable client limits and flat pricing when monetization is activated.
 
 ---
 

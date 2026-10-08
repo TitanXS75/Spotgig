@@ -29,8 +29,8 @@ const AboutPage = () => {
           Bridging the Gap Between Talent & Opportunity
         </h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Spotgig is a hyperlocal freelancing platform that connects business owners and project clients with 
-          skilled students and freelancers nearby for real work, real experience, and real pay.
+          Spotgig is a freelancing and project collaboration platform connecting business owners and project clients with 
+          skilled students and developers anywhere — whether remote, across cities, or in-person — for real work, real experience, and real pay.
         </p>
       </motion.div>
 
@@ -77,9 +77,9 @@ const AboutPage = () => {
           </div>
           <div className="bg-muted/30 rounded-xl p-6">
             <Heart className="w-8 h-8 text-red-500 mb-3" />
-            <h4 className="font-semibold text-foreground mb-2">Hyperlocal Impact</h4>
+            <h4 className="font-semibold text-foreground mb-2">Work From Anywhere</h4>
             <p className="text-sm text-muted-foreground">
-              Keeping freelancing local means stronger collaboration, faster turnarounds, and real community-building.
+              Work remotely or locally. We empower students and clients across any city to collaborate with zero geographic friction.
             </p>
           </div>
           <div className="bg-muted/30 rounded-xl p-6">

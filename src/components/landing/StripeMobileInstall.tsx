@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   Share2, PlusSquare, MoreVertical, DownloadCloud,
   CheckCircle2, QrCode, ArrowUpRight,
-  Smartphone, MessageCircle, MapPin, Wifi, BatteryCharging,
+  Smartphone, MapPin, Wifi, BatteryCharging,
   CreditCard, ShieldCheck, Zap
 } from 'lucide-react';
 import {
@@ -29,7 +29,7 @@ export function StripeMobileInstall() {
             Spotgig in Your Pocket
           </h2>
           <p className="text-xl md:text-2xl text-[#425466] mt-4 font-normal leading-relaxed max-w-2xl">
-            Instant access to verified student talent, live hyperlocal gigs, and direct WhatsApp communication right from your smartphone.
+            Instant access to verified student talent, live project requirements, and direct communication right from your smartphone.
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export function StripeMobileInstall() {
                   Mobile Talent Pass &amp; Live App
                 </h3>
                 <p className="text-sm text-[#425466] mt-0.5">
-                  Native device speed · Hyperlocal radar · Direct WhatsApp outreach
+                  Native device speed · Remote &amp; local talent · Direct WhatsApp outreach
                 </p>
               </div>
             </div>
@@ -200,77 +200,58 @@ export function StripeMobileInstall() {
                         </div>
                       </div>
 
-                      {/* Live Hyperlocal Gig Match Feed in Phone */}
+                      {/* Live Collaboration Status in Phone */}
                       <div className="space-y-2 mt-0.5">
                         <div className="flex items-center justify-between text-[10px]">
-                          <span className="font-bold text-white">Nearby Open Projects</span>
-                          <span className="text-[9px] text-[#00d4ff] font-medium">Within 3 km</span>
+                          <span className="font-bold text-white">Active Milestone Tracking</span>
+                          <span className="text-[9px] text-[#00d4ff] font-medium">Secure Escrow</span>
                         </div>
 
-                        {/* Gig 1 */}
+                        {/* Verified Milestone Card 1 */}
                         <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-colors">
                           <div className="flex items-start justify-between">
                             <div>
-                              <div className="text-xs font-bold text-slate-100">
-                                E-Commerce Store &amp; Next.js
+                              <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+                                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                                Milestone Deliverable Approved
                               </div>
                               <div className="text-[9px] text-slate-400 mt-0.5">
-                                Cafe North Hub · 1.2 km away
+                                Sprint 1 · Architecture &amp; API Contracts
                               </div>
                             </div>
                             <span className="text-xs font-bold text-emerald-400 font-mono">
-                              ₹18,000
+                              ₹14,000
                             </span>
                           </div>
                           <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-800/80">
-                            <span className="text-[8px] text-slate-400">Milestone Escrow</span>
-                            <button
-                              type="button"
-                              className="px-2.5 py-1 rounded-md bg-[#25D366] hover:bg-[#20ba59] text-white text-[9px] font-bold flex items-center gap-1 shadow-sm transition-transform active:scale-95"
-                            >
-                              <MessageCircle className="w-2.5 h-2.5" />
-                              <span>WhatsApp</span>
-                            </button>
+                            <span className="text-[8px] text-slate-400">Payment Released</span>
+                            <span className="text-[9px] font-semibold text-emerald-400 flex items-center gap-1">
+                              <CheckCircle2 className="w-2.5 h-2.5" /> Verified
+                            </span>
                           </div>
                         </div>
 
-                        {/* Gig 2 */}
+                        {/* Verified Milestone Card 2 */}
                         <div className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-colors">
                           <div className="flex items-start justify-between">
                             <div>
-                              <div className="text-xs font-bold text-slate-100">
-                                Brand Identity &amp; UI Kit
+                              <div className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+                                <Zap className="w-3 h-3 text-[#635bff]" />
+                                Next Milestone In Review
                               </div>
                               <div className="text-[9px] text-slate-400 mt-0.5">
-                                Studio Arc · 800m away
+                                Sprint 2 · UI Components &amp; TanStack State
                               </div>
                             </div>
-                            <span className="text-xs font-bold text-emerald-400 font-mono">
+                            <span className="text-xs font-bold text-[#00d4ff] font-mono">
                               ₹10,500
                             </span>
                           </div>
                           <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-800/80">
-                            <span className="text-[8px] text-slate-400">Fixed Milestone</span>
-                            <button
-                              type="button"
-                              className="px-2.5 py-1 rounded-md bg-[#25D366] hover:bg-[#20ba59] text-white text-[9px] font-bold flex items-center gap-1 shadow-sm transition-transform active:scale-95"
-                            >
-                              <MessageCircle className="w-2.5 h-2.5" />
-                              <span>WhatsApp</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Gig 3 */}
-                        <div className="p-2 rounded-xl bg-slate-900/60 border border-slate-800/80 text-left">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="text-[11px] font-bold text-slate-200">
-                                Mobile App Flutter Prototype
-                              </div>
-                              <div className="text-[8px] text-slate-400">TechFoundry · 2.4 km</div>
-                            </div>
-                            <span className="text-[11px] font-bold text-emerald-400 font-mono">₹22,000</span>
+                            <span className="text-[8px] text-slate-400">Protected in Escrow</span>
+                            <span className="text-[9px] font-semibold text-slate-300">
+                              4 days ago
+                            </span>
                           </div>
                         </div>
                       </div>

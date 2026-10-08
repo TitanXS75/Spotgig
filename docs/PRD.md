@@ -9,15 +9,15 @@
 
 ## 1. Executive Summary
 
-Aaspass is a **hyperlocal freelancing marketplace** designed for Tier-2 and Tier-3 Indian cities. It connects college students and early-career freelancers with local business owners and professionals who need tech/creative work done — websites, apps, design, marketing, and more.
+Spotgig (Aaspass) is a **freelancing and real-world project marketplace**. It connects college students and emerging developers with business owners and clients anywhere who need tech/creative work done — websites, apps, design, AI tools, marketing, and more.
 
-Unlike global platforms (Upwork, Fiverr), Aaspass emphasizes **geographic proximity**, making it possible to meet in person, build trust, and collaborate on local projects.
+Unlike crowded international platforms with steep 20% fees, Spotgig emphasizes **direct communication, transparent collaboration, and fair access** — allowing talent and clients to collaborate remotely or in person with zero commission barriers.
 
 ### Vision
-> *Every student with a skill should be able to earn from it within their own city.*
+> *Every student and emerging developer with skill should be able to gain verified real-world project experience and earn fair compensation.*
 
 ### Mission
-Build the simplest, most trustworthy way for local businesses to discover and hire nearby student freelancers.
+Build the simplest, most trustworthy way for businesses and clients to discover and hire talented student developers and creators anywhere.
 
 ---
 

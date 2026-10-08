@@ -30,7 +30,7 @@ const TermsPage = () => {
           <h2 className="text-xl font-bold text-foreground">Welcome to Spotgig</h2>
         </div>
         <p className="text-muted-foreground leading-relaxed">
-          These terms govern your use of Spotgig, a hyperlocal marketplace connecting buyers and sellers. By using our platform, you agree to these terms.
+          These terms govern your use of Spotgig, a freelance and project marketplace connecting clients and talent anywhere. By using our platform, you agree to these terms.
         </p>
       </motion.div>
 

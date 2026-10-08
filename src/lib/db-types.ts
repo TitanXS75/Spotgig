@@ -208,17 +208,57 @@ export type Database = {
         Row: {
           id: string;
           user_id: string;
-          listing_id: string;
+          listing_id: string | null;
+          project_id?: string | null;
           amount: number;
-          plan: 'free_trial' | 'monthly' | 'yearly';
+          plan: string;
           razorpay_order_id: string | null;
           razorpay_payment_id: string | null;
           razorpay_signature: string | null;
           status: 'pending' | 'paid' | 'failed';
+          notes?: string | null;
           created_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['payments']['Row'], 'id' | 'created_at'>;
-        Update: Partial<Pick<Database['public']['Tables']['payments']['Row'], 'razorpay_payment_id' | 'razorpay_signature' | 'status'>>;
+        Insert: {
+          id?: string;
+          user_id: string;
+          listing_id?: string | null;
+          project_id?: string | null;
+          amount: number;
+          plan?: string;
+          razorpay_order_id?: string | null;
+          razorpay_payment_id?: string | null;
+          razorpay_signature?: string | null;
+          status?: 'pending' | 'paid' | 'failed';
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['payments']['Insert']>;
+      };
+      platform_settings: {
+        Row: {
+          id: string;
+          payment_gateway_enabled: boolean;
+          free_client_limit: number;
+          platform_fee_percent: number;
+          monthly_plan_price: number;
+          yearly_plan_price: number;
+          announcement_banner: string;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          payment_gateway_enabled?: boolean;
+          free_client_limit?: number;
+          platform_fee_percent?: number;
+          monthly_plan_price?: number;
+          yearly_plan_price?: number;
+          announcement_banner?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: Partial<Database['public']['Tables']['platform_settings']['Insert']>;
       };
       project_tasks: {
         Row: {

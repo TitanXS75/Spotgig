@@ -151,7 +151,9 @@ export async function respondToProjectRequest(
       }, { onConflict: 'project_id,developer_id' });
 
     if (accessError) throw accessError;
-  } else if (newStatus === 'rejected') {
+
+    // Wipe all candidate comments/pitch messages for this project from the database!
+    await supabase.from('project_comments').delete().eq('project_id', projectId);
     // Revoke access if it was previously granted
     await supabase
       .from('project_access')

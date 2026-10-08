@@ -347,3 +347,22 @@ CREATE POLICY "projects_update_admin" ON public.projects FOR UPDATE
 -- DELETE FROM public.projects WHERE title ILIKE '%Photo Studio%' OR title ILIKE '%Demetia%';
 
 
+-- ── 12. Promote Administrators by Email ────────────────────────
+-- Run these statements in Supabase SQL Editor to grant full admin rights:
+/*
+UPDATE public.profiles
+SET is_admin = true, role = 'admin'
+WHERE id IN (
+  SELECT id FROM auth.users 
+  WHERE email IN (
+    'sarthak.sontakke05@gmail.com',
+    'rohitsable504@gmail.com'
+  )
+);
+
+-- Or run via helper RPC:
+SELECT public.set_admin_role_by_email('sarthak.sontakke05@gmail.com');
+SELECT public.set_admin_role_by_email('rohitsable504@gmail.com');
+*/
+
+

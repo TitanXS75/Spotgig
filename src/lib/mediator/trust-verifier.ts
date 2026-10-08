@@ -87,7 +87,7 @@ export function evaluateDeveloperTrust(profile: {
 
   const finalScore = Math.min(100, score);
   let level: TrustEvaluation['level'] = 'building';
-  let badgeText = 'New Developer Profile';
+  let badgeText = '';
 
   if (finalScore >= 80) {
     level = 'verified';
@@ -146,7 +146,7 @@ export function evaluateOwnerTrust(profile: {
 
   const finalScore = Math.min(100, score);
   let level: TrustEvaluation['level'] = 'building';
-  let badgeText = 'New Project Owner';
+  let badgeText = '';
 
   if (finalScore >= 75) {
     level = 'verified';

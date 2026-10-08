@@ -3,12 +3,9 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
   Lock, Clock, Users, MapPin, Coins, ArrowRight, 
-  CheckCircle2, ShieldCheck, Briefcase, Sparkles 
+  CheckCircle2, ShieldCheck, Briefcase 
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '@/store/app-store';
-import { getMyProfile } from '@/lib/api/profiles';
-import { calculateProjectMatch } from '@/lib/mediator/project-matcher';
 import { RequestAccessModal } from './RequestAccessModal';
 import type { Project } from '@/lib/db-types';
 
@@ -23,17 +20,6 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
 
   const isOwner = user?.id === project.owner_id;
   const projectLink = `/project/${project.slug || project.id}`;
-
-  const { data: profile } = useQuery({
-    queryKey: ['my-profile', user?.id],
-    queryFn: getMyProfile,
-    enabled: !!user,
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const matchResult = profile && !isOwner
-    ? calculateProjectMatch(project, profile)
-    : null;
 
   const formatCompensation = () => {
     if (project.compensation_type === 'paid') {
@@ -79,43 +65,13 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
       >
         <div className="space-y-3">
           {/* Badges Header */}
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary uppercase tracking-wide">
-                {project.industry}
-              </span>
-              <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                {project.project_type}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              {matchResult && matchResult.matchScore > 0 && (
-                <span 
-                  title={matchResult.highlights.join(' • ')}
-                  className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    matchResult.matchScore >= 70
-                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-                      : matchResult.matchScore >= 40
-                      ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  <Sparkles className="w-2.5 h-2.5" />
-                  {matchResult.matchScore}% Match
-                </span>
-              )}
-
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${
-                project.difficulty === 'beginner'
-                  ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                  : project.difficulty === 'intermediate'
-                  ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                  : 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
-              }`}>
-                {project.difficulty}
-              </span>
-            </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary uppercase tracking-wide">
+              {project.industry}
+            </span>
+            <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-muted text-muted-foreground">
+              {project.project_type}
+            </span>
           </div>
 
           {/* Title */}

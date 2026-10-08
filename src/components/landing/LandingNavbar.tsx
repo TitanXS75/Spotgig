@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronRight, Briefcase, Sparkles, Compass } from 'lucide-react';
+import { Menu, X, ChevronRight, Briefcase, Sparkles, Compass, User as UserIcon } from 'lucide-react';
+import { useAppStore } from '@/store/app-store';
 
 export function LandingNavbar() {
   const navigate = useNavigate();
+  const { user } = useAppStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -91,12 +93,22 @@ export function LandingNavbar() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <button
-            onClick={() => handleNavigate('/auth', { mode: 'login' })}
-            className="h-10 px-4 rounded-full text-sm font-semibold text-[#0a2540] hover:text-[#635bff] hover:bg-slate-100/70 transition-colors inline-flex items-center justify-center"
-          >
-            Sign in
-          </button>
+          {user ? (
+            <button
+              onClick={() => handleNavigate('/profile')}
+              className="h-10 px-4 rounded-full text-sm font-semibold text-[#0a2540] hover:text-[#635bff] hover:bg-slate-100/70 transition-colors inline-flex items-center justify-center gap-2"
+            >
+              <UserIcon className="w-4 h-4 text-[#635bff]" />
+              <span>My Account</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => handleNavigate('/auth', { mode: 'login' })}
+              className="h-10 px-4 rounded-full text-sm font-semibold text-[#0a2540] hover:text-[#635bff] hover:bg-slate-100/70 transition-colors inline-flex items-center justify-center"
+            >
+              Sign in
+            </button>
+          )}
 
           <button
             onClick={() => handleNavigate('/post-project')}
@@ -165,12 +177,22 @@ export function LandingNavbar() {
           </nav>
 
           <div className="pt-4 border-t border-[#e3e8ee] flex flex-col gap-3">
-            <button
-              onClick={() => handleNavigate('/auth', { mode: 'login' })}
-              className="w-full py-3 rounded-xl border border-[#e3e8ee] font-semibold text-sm text-[#0a2540] hover:bg-slate-50 transition-colors text-center"
-            >
-              Sign in
-            </button>
+            {user ? (
+              <button
+                onClick={() => handleNavigate('/profile')}
+                className="w-full py-3 rounded-xl border border-[#e3e8ee] font-semibold text-sm text-[#0a2540] hover:bg-slate-50 transition-colors text-center flex items-center justify-center gap-2"
+              >
+                <UserIcon className="w-4 h-4 text-[#635bff]" />
+                <span>My Account</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => handleNavigate('/auth', { mode: 'login' })}
+                className="w-full py-3 rounded-xl border border-[#e3e8ee] font-semibold text-sm text-[#0a2540] hover:bg-slate-50 transition-colors text-center"
+              >
+                Sign in
+              </button>
+            )}
             <button
               onClick={() => handleNavigate('/post-project')}
               className="w-full py-3 rounded-xl bg-[#0a2540] hover:bg-[#635bff] text-white font-semibold text-sm transition-colors text-center shadow-sm"

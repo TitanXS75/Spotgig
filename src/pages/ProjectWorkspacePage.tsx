@@ -29,7 +29,7 @@ type WorkspaceTab = 'tasks' | 'discussion' | 'deliverables' | 'specs';
 const ProjectWorkspacePage = () => {
   const { id: idOrSlug } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAppStore();
+  const { user, isAuthLoading, authInitialized } = useAppStore();
   const { openCopilot } = useCopilotStore();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -279,6 +279,15 @@ const ProjectWorkspacePage = () => {
         <button onClick={() => navigate('/home')} className="mt-4 px-4 py-2 bg-muted rounded-xl text-sm">
           Back to Projects
         </button>
+      </div>
+    );
+  }
+
+  if (!authInitialized || (isAuthLoading && !user)) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-24 text-center">
+        <div className="w-10 h-10 border-3 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-sm font-medium text-muted-foreground animate-pulse">Loading workspace...</p>
       </div>
     );
   }

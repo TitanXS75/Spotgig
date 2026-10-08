@@ -13,6 +13,7 @@ import { StripeHowItWorks } from '@/components/landing/StripeHowItWorks';
 import { StripeAudienceBento } from '@/components/landing/StripeAudienceBento';
 import { StripeMobileInstall } from '@/components/landing/StripeMobileInstall';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
+import { useAppStore } from '@/store/app-store';
 
 const DEMO_IMAGES = [
   // Center main image (Zooms 4x — high-res 4K/ultra HD to remain crystal clear)
@@ -28,6 +29,7 @@ const DEMO_IMAGES = [
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { user } = useAppStore();
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -66,7 +68,7 @@ const LandingPage = () => {
 
       {/* ─── HERO SECTION (With Stripe Pre-Dawn Sunrise Wave & High Contrast Text) ─── */}
       <ShuffleHero
-        onGetStarted={() => handleNavigate('/auth', 'signup')}
+        onGetStarted={() => (user ? navigate('/profile') : handleNavigate('/auth', 'signup'))}
         onExploreMarketplace={() => handleNavigate('/home')}
       />
 
@@ -78,8 +80,20 @@ const LandingPage = () => {
 
       {/* ─── STRIPE-STYLE AUDIENCE PROGRAM CARDS ─── */}
       <StripeAudienceBento
-        onClientAction={() => handleNavigate('/auth', 'signup')}
-        onFreelancerAction={() => handleNavigate('/auth', 'signup')}
+        onClientAction={() => {
+          if (user) {
+            navigate(user.role === 'project_owner' ? '/post-project' : '/home');
+          } else {
+            handleNavigate('/auth', 'signup');
+          }
+        }}
+        onFreelancerAction={() => {
+          if (user) {
+            navigate('/profile');
+          } else {
+            handleNavigate('/auth', 'signup');
+          }
+        }}
       />
 
       {/* ─── STRIPE-STYLE MOBILE APP INSTALL CARDS (Centered) ─── */}
@@ -117,10 +131,10 @@ const LandingPage = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
               <button
-                onClick={() => handleNavigate('/auth', 'signup')}
+                onClick={() => (user ? navigate('/profile') : handleNavigate('/auth', 'signup'))}
                 className="bg-[#635bff] hover:bg-[#534be8] text-white px-8 py-4 rounded-xl font-bold text-base transition-all duration-200 shadow-[0_4px_16px_rgba(99,91,255,0.25)] hover:shadow-[0_6px_24px_rgba(99,91,255,0.35)] active:scale-95 text-center w-full sm:w-auto flex items-center justify-center"
               >
-                <span>Join as Freelancer</span>
+                <span>{user ? 'Go to My Account' : 'Join as Freelancer'}</span>
               </button>
               <button
                 onClick={() => handleNavigate('/home')}
@@ -169,7 +183,7 @@ const LandingPage = () => {
             <div>
               <h4 className="font-bold text-[#0a2540] text-xs uppercase tracking-wider mb-4">For Freelancers</h4>
               <ul className="space-y-3 text-sm text-[#425466]">
-                <li><button onClick={() => handleNavigate('/auth', 'signup')} className="hover:text-[#0a2540] transition-colors">Register Skills</button></li>
+                <li><button onClick={() => (user ? navigate('/profile') : handleNavigate('/auth', 'signup'))} className="hover:text-[#0a2540] transition-colors">{user ? 'My Profile' : 'Register Skills'}</button></li>
                 <li><button onClick={() => handleNavigate('/pricing')} className="hover:text-[#0a2540] transition-colors">Pricing</button></li>
                 <li><button onClick={() => handleNavigate('/faq')} className="hover:text-[#0a2540] transition-colors">FAQ</button></li>
               </ul>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail, Lock, User, Eye, EyeOff, Phone, Briefcase, GraduationCap
@@ -7,6 +7,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { signIn, signUp } from '@/lib/api/auth';
 import { useToast } from '@/hooks/use-toast';
+import { useAppStore } from '@/store/app-store';
 
 // ─── Dynamic Image Panel ───────────────────────────────────────────────
 const ImagePanel = ({ mode }: { mode: 'login' | 'signup' }) => (
@@ -70,7 +71,14 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const location = useLocation();
-  const [mode, setMode] = useState<Mode>((location.state as { mode?: Mode } | null)?.mode || 'login');
+  const { user, setUser } = useAppStore();
+
+  const searchParams = new URLSearchParams(location.search);
+  const queryMode = searchParams.get('mode') as Mode | null;
+  const stateMode = (location.state as { mode?: Mode } | null)?.mode;
+  const initialMode = queryMode || stateMode || 'login';
+
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [direction, setDirection] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -85,6 +93,20 @@ const AuthPage = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [loading, setLoading] = useState(false);
+
+  // Immediately redirect to user's account if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/profile', { replace: true });
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        navigate('/profile', { replace: true });
+      }
+    });
+  }, [user, navigate]);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -139,16 +161,60 @@ const AuthPage = () => {
 
     try {
       if (mode === 'login') {
-        await signIn(email, password);
+        const authData = await signIn(email, password);
+        const authUser = authData?.user;
+
+        if (authUser) {
+          let userRole: Role = (authUser.user_metadata?.role as Role) || 'developer';
+          let fullName = authUser.user_metadata?.full_name || '';
+
+          try {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('role, full_name')
+              .eq('id', authUser.id)
+              .maybeSingle();
+
+            if (profileData) {
+              if (profileData.role) userRole = profileData.role;
+              if (profileData.full_name) fullName = profileData.full_name;
+            }
+          } catch {
+            // fallback to metadata
+          }
+
+          setUser({
+            id: authUser.id,
+            email: authUser.email || email,
+            name: fullName,
+            phone: authUser.phone || null,
+            gender: null,
+            role: userRole,
+          });
+        }
+
         toast({ title: 'Welcome back!' });
-        navigate('/profile');
+        navigate('/profile', { replace: true });
       } else {
-        await signUp(email, password, name, role);
+        const authData = await signUp(email, password, name, role);
+        const authUser = authData?.user;
+
+        if (authUser) {
+          setUser({
+            id: authUser.id,
+            email: authUser.email || email,
+            name: name,
+            phone: phone || null,
+            gender: null,
+            role: role,
+          });
+        }
+
         toast({
           title: 'Account created!',
           description: `Welcome to Spotgig as a ${role === 'project_owner' ? 'Project Owner' : 'Student / Developer'}.`,
         });
-        navigate('/profile');
+        navigate('/profile', { replace: true });
       }
     } catch (err: unknown) {
       const error = err as Error;
@@ -174,6 +240,16 @@ const AuthPage = () => {
       setLoading(false);
     }
   };
+
+  // If already authenticated, show clean redirection state
+  if (user) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-background p-6">
+        <div className="w-10 h-10 border-3 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
+        <p className="text-sm font-medium text-muted-foreground animate-pulse">Taking you to your account...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen min-h-[100dvh] lg:h-screen lg:max-h-screen w-full flex flex-col lg:flex-row bg-background overflow-y-auto lg:overflow-hidden">

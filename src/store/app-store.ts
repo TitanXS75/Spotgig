@@ -15,6 +15,8 @@ export interface User {
 interface AppState {
   // Auth
   user: User | null;
+  isAuthLoading: boolean;
+  authInitialized: boolean;
   // Location
   userLat: number;
   userLng: number;
@@ -38,6 +40,8 @@ interface AppState {
   theme: 'light' | 'dark' | 'system';
   // Actions
   setUser: (user: User | null) => void;
+  setAuthLoading: (loading: boolean) => void;
+  setAuthInitialized: (initialized: boolean) => void;
   updateUserProfile: (updates: Partial<User>) => void;
   logout: () => void;
   setUserLocation: (lat: number, lng: number, area?: string) => void;
@@ -61,6 +65,8 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       user: null,
+      isAuthLoading: true,
+      authInitialized: false,
       userLat: DEFAULT_LAT,
       userLng: DEFAULT_LNG,
       hasLocation: false,
@@ -80,6 +86,8 @@ export const useAppStore = create<AppState>()(
       theme: 'system',
 
       setUser: (user) => set({ user }),
+      setAuthLoading: (isAuthLoading) => set({ isAuthLoading }),
+      setAuthInitialized: (authInitialized) => set({ authInitialized }),
       updateUserProfile: (updates) => {
         const { user } = get();
         if (user) {

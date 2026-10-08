@@ -7,7 +7,7 @@ import aplgLogo from '/aplg.png';
 import { motion } from 'framer-motion';
 
 const TopBar = () => {
-  const { user } = useAppStore();
+  const { user, isAuthLoading, authInitialized } = useAppStore();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -121,7 +121,7 @@ const TopBar = () => {
             </motion.button>
           )}
 
-          {!user && (
+          {!user && authInitialized && !isAuthLoading && (
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/auth')}

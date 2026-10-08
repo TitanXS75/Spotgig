@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/lib/supabase";
@@ -50,7 +50,7 @@ const AppContent = () => {
   const navigate = useNavigate();
   const isNoNavPage = location.pathname === '/' || noNavPages.some(path => location.pathname.startsWith(path));
 
-  const { setUser } = useAppStore();
+  const { setUser, setAuthLoading, setAuthInitialized } = useAppStore();
 
   // Scroll to top on every route change
   useEffect(() => {
@@ -78,7 +78,7 @@ const AppContent = () => {
           .from('profiles')
           .select('role, full_name')
           .eq('id', sessionUser.id)
-          .single();
+          .maybeSingle();
 
         if (data) {
           if (data.role) role = data.role;
@@ -96,11 +96,16 @@ const AppContent = () => {
         gender: null,
         role: role,
       });
+      setAuthLoading(false);
+      setAuthInitialized(true);
     };
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         syncUser(session.user);
+      } else {
+        setAuthLoading(false);
+        setAuthInitialized(true);
       }
     });
 
@@ -111,13 +116,18 @@ const AppContent = () => {
       }
       if (session?.user) {
         syncUser(session.user);
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         setUser(null);
+        setAuthLoading(false);
+        setAuthInitialized(true);
+      } else if (!session) {
+        setAuthLoading(false);
+        setAuthInitialized(true);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [setUser, navigate]);
+  }, [setUser, setAuthLoading, setAuthInitialized, navigate]);
 
   return (
     <>
@@ -133,6 +143,7 @@ const AppContent = () => {
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/account" element={<Navigate to="/profile" replace />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/profile" element={<ProfilePage />} />

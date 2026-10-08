@@ -21,7 +21,7 @@ const EMOJI_OPTIONS = ['🍱', '🎨', '👗', '📱', '📐', '💄', '🔧', '
 
 const SellerOnboarding = () => {
   const navigate = useNavigate();
-  const { user, setUserLocation } = useAppStore();
+  const { user, setUserLocation, isAuthLoading, authInitialized } = useAppStore();
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   
@@ -66,10 +66,10 @@ const SellerOnboarding = () => {
   const [usedFreeTrial, setUsedFreeTrial] = useState(false);
 
   useEffect(() => {
-    if (!user) {
+    if (authInitialized && !isAuthLoading && !user) {
       navigate('/auth');
     }
-  }, [user, navigate]);
+  }, [user, isAuthLoading, authInitialized, navigate]);
 
   const maxDesc = 300;
 

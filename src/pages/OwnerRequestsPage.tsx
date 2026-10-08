@@ -21,7 +21,7 @@ type StatusFilter = 'all' | 'pending' | 'accepted' | 'rejected';
 const OwnerRequestsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAppStore();
+  const { user, isAuthLoading, authInitialized } = useAppStore();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -110,6 +110,15 @@ const OwnerRequestsPage = () => {
     intermediate: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
     advanced: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
   };
+
+  if (!authInitialized || (isAuthLoading && !user)) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-24 text-center">
+        <div className="w-10 h-10 border-3 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-sm font-medium text-muted-foreground animate-pulse">Loading requests...</p>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

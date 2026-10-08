@@ -321,3 +321,29 @@ CREATE TRIGGER trg_wipe_on_project_status
   FOR EACH ROW
   EXECUTE FUNCTION public.fn_wipe_on_project_status_change();
 
+
+-- ── 10. Admin Project Moderation & Deletion Policy ─────────────
+-- Allows verified administrators to delete or moderate any project in the platform.
+DROP POLICY IF EXISTS "projects_delete_admin" ON public.projects;
+CREATE POLICY "projects_delete_admin" ON public.projects FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() AND is_admin = true
+    )
+  );
+
+DROP POLICY IF EXISTS "projects_update_admin" ON public.projects;
+CREATE POLICY "projects_update_admin" ON public.projects FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() AND is_admin = true
+    )
+  );
+
+-- ── 11. One-Time Cleanup for Test/Mock Projects ────────────────
+-- Run these statements in Supabase SQL editor to remove the 2 demo projects:
+-- DELETE FROM public.projects WHERE title ILIKE '%Photo Studio%' OR title ILIKE '%Demetia%';
+
+

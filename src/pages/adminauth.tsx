@@ -302,6 +302,21 @@ export default function AdminAuth() {
     }
   };
 
+  const handleDeleteProject = async (projectId: string, projectTitle: string) => {
+    if (!window.confirm(`Are you sure you want to permanently delete "${projectTitle}" from the marketplace?`)) {
+      return;
+    }
+    try {
+      const { error } = await supabase.from('projects').delete().eq('id', projectId);
+      if (error) throw error;
+      setProjects((prev) => prev.filter((p) => p.id !== projectId));
+      toast.success(`Project "${projectTitle}" deleted successfully`);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Failed to delete project');
+    }
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setIsAuthenticated(false);
@@ -851,6 +866,7 @@ export default function AdminAuth() {
                       <th className="py-3 px-4">Compensation</th>
                       <th className="py-3 px-4">Status</th>
                       <th className="py-3 px-4">Created</th>
+                      <th className="py-3 px-4 text-center">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60">
@@ -870,6 +886,16 @@ export default function AdminAuth() {
                         </td>
                         <td className="py-3 px-4 text-xs text-slate-400">
                           {new Date(proj.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <button
+                            onClick={() => handleDeleteProject(proj.id, proj.title)}
+                            className="px-2.5 py-1 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold inline-flex items-center gap-1 transition"
+                            title="Delete Project"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}

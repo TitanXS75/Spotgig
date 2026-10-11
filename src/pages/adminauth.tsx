@@ -63,6 +63,16 @@ interface AdminUser {
   revenue: number;
 }
 
+interface RawProjectRow {
+  id: string;
+  title: string;
+  status: string;
+  compensation_type: string;
+  compensation_amount: number | null;
+  created_at: string;
+  profiles?: { full_name?: string | null } | { full_name?: string | null }[] | null;
+}
+
 interface ProjectSummary {
   id: string;
   title: string;
@@ -181,15 +191,18 @@ export default function AdminAuth() {
 
       if (projectsData) {
         setProjects(
-          projectsData.map((p: any) => ({
-            id: p.id,
-            title: p.title,
-            status: p.status,
-            compensation_type: p.compensation_type,
-            compensation_amount: p.compensation_amount,
-            created_at: p.created_at,
-            owner_name: p.profiles?.full_name || 'Anonymous Client',
-          }))
+          (projectsData as unknown as RawProjectRow[]).map((p) => {
+            const profile = Array.isArray(p.profiles) ? p.profiles[0] : p.profiles;
+            return {
+              id: p.id,
+              title: p.title,
+              status: p.status,
+              compensation_type: p.compensation_type,
+              compensation_amount: p.compensation_amount,
+              created_at: p.created_at,
+              owner_name: profile?.full_name || 'Anonymous Client',
+            };
+          })
         );
       }
     } catch (error) {
@@ -254,9 +267,10 @@ export default function AdminAuth() {
           ? 'Payment Gateway ACTIVATED: Paid charges & subscriptions are now enforced!'
           : 'Payment Gateway PAUSED: Platform is now in 100% FREE MODE!'
       );
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      toast.error('Failed to update payment gateway state: ' + err.message);
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error('Failed to update payment gateway state: ' + message);
     } finally {
       setSavingSettings(false);
     }
@@ -276,9 +290,10 @@ export default function AdminAuth() {
 
       setPlatformSettings(updated);
       toast.success('Monetization settings saved successfully!');
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      toast.error('Failed to save settings: ' + err.message);
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error('Failed to save settings: ' + message);
     } finally {
       setSavingSettings(false);
     }
@@ -296,8 +311,9 @@ export default function AdminAuth() {
       setUsers(updatedUsers);
       setDeleteConfirmOpen(false);
       toast.success('User suspended successfully');
-    } catch (err: any) {
-      setDeleteError(err.message || 'Failed to suspend user');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to suspend user';
+      setDeleteError(message);
       console.error(err);
     }
   };
@@ -311,9 +327,10 @@ export default function AdminAuth() {
       if (error) throw error;
       setProjects((prev) => prev.filter((p) => p.id !== projectId));
       toast.success(`Project "${projectTitle}" deleted successfully`);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      toast.error(err.message || 'Failed to delete project');
+      const message = err instanceof Error ? err.message : 'Failed to delete project';
+      toast.error(message);
     }
   };
 
@@ -944,7 +961,7 @@ export default function AdminAuth() {
                     items={typeDropdownItems}
                     text="Type"
                     selectedId={selectedOperatingType}
-                    onSelect={(item) => setSelectedOperatingType(item.id as any)}
+                    onSelect={(item) => setSelectedOperatingType(item.id as 'all' | 'home' | 'shop')}
                     className="w-full text-xs"
                   />
                 </div>

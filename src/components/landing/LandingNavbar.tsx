@@ -25,7 +25,7 @@ export function LandingNavbar() {
     }
   };
 
-  const handleNavigate = (path: string, state?: any) => {
+  const handleNavigate = (path: string, state?: unknown) => {
     setMobileMenuOpen(false);
     window.scrollTo(0, 0);
     navigate(path, { state });

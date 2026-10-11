@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Briefcase, FolderKanban, Plus, User, Inbox, LogOut } from 'lucide-react';
@@ -6,11 +7,14 @@ import { getProjectRequestsForOwner } from '@/lib/api/requests';
 import { supabase } from '@/lib/supabase';
 import aplgLogo from '/aplg.png';
 import { motion } from 'framer-motion';
+import { SignOutDialog } from '@/components/auth/SignOutDialog';
 
 const TopBar = () => {
   const { user, logout, isAuthLoading, authInitialized } = useAppStore();
   const location = useLocation();
   const navigate = useNavigate();
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const isHidden = location.pathname === '/' || location.pathname === '/auth' || location.pathname === '/forgot-password';
   const isOwner = user?.role === 'project_owner';
@@ -125,16 +129,8 @@ const TopBar = () => {
           {user && (
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={async () => {
-                try {
-                  await supabase.auth.signOut();
-                } catch (e) {
-                  console.error(e);
-                }
-                logout();
-                navigate('/auth');
-              }}
-              className="inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-xl border border-border/80 bg-muted/40 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 text-xs sm:text-sm font-medium text-muted-foreground transition-colors"
+              onClick={() => setShowSignOutConfirm(true)}
+              className="inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-xl border border-border/80 bg-muted/40 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 text-xs sm:text-sm font-medium text-muted-foreground transition-colors cursor-pointer"
               title="Sign Out"
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -153,6 +149,25 @@ const TopBar = () => {
           )}
         </div>
       </div>
+
+      {/* Sign Out Confirmation Modal */}
+      <SignOutDialog
+        open={showSignOutConfirm}
+        onOpenChange={setShowSignOutConfirm}
+        isLoading={isSigningOut}
+        onConfirm={async () => {
+          setIsSigningOut(true);
+          try {
+            await supabase.auth.signOut();
+          } catch (e) {
+            console.error(e);
+          }
+          logout();
+          setIsSigningOut(false);
+          setShowSignOutConfirm(false);
+          navigate('/auth');
+        }}
+      />
     </header>
   );
 };

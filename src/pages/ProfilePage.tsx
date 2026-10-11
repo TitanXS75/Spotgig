@@ -16,6 +16,7 @@ import { getMyProjectRequests } from '@/lib/api/requests';
 import { evaluateDeveloperTrust, evaluateOwnerTrust } from '@/lib/mediator/trust-verifier';
 import { useToast } from '@/hooks/use-toast';
 import type { ProjectDifficulty, ProjectRole } from '@/lib/db-types';
+import { SignOutDialog } from '@/components/auth/SignOutDialog';
 
 const POPULAR_SKILLS = [
   'React', 'TypeScript', 'JavaScript', 'Node.js', 'Python', 'Next.js', 
@@ -72,8 +73,11 @@ const ProfilePage = () => {
   const [skillInput, setSkillInput] = useState('');
   const [techInput, setTechInput] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await supabase.auth.signOut();
     } catch (err) {
@@ -81,6 +85,8 @@ const ProfilePage = () => {
     }
     logout();
     queryClient.clear();
+    setIsLoggingOut(false);
+    setShowSignOutConfirm(false);
     toast({
       title: 'Logged Out',
       description: 'You have been successfully signed out.',
@@ -450,9 +456,9 @@ const ProfilePage = () => {
                     </button>
 
                     <button
-                      onClick={handleLogout}
+                      onClick={() => setShowSignOutConfirm(true)}
                       title="Log out"
-                      className="p-2.5 rounded-xl border border-border bg-card hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 text-muted-foreground transition"
+                      className="p-2.5 rounded-xl border border-border bg-card hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 text-muted-foreground transition cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
                     </button>
@@ -1455,6 +1461,14 @@ const ProfilePage = () => {
             </div>
           )}
         </AnimatePresence>
+
+        {/* Sign Out Confirmation Dialog */}
+        <SignOutDialog
+          open={showSignOutConfirm}
+          onOpenChange={setShowSignOutConfirm}
+          onConfirm={handleLogout}
+          isLoading={isLoggingOut}
+        />
 
       </div>
     </div>

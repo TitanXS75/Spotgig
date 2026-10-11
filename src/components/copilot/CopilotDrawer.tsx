@@ -134,7 +134,7 @@ export const CopilotDrawer = () => {
           <div className="p-4 sm:p-5 border-b border-border/80 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-md">
-                <Sparkles className="w-5 h-5 animate-pulse" />
+                <Sparkles className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -293,8 +293,8 @@ export const CopilotDrawer = () => {
 
             {/* Generating Skeleton */}
             {isGenerating && (
-              <div className="flex items-center gap-2 p-3.5 rounded-2xl bg-muted/40 border border-border/60 max-w-[80%]">
-                <Sparkles className="w-4 h-4 text-primary animate-spin" />
+              <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-muted/40 border border-border/60 max-w-[80%]">
+                <Sparkles className="w-4 h-4 text-primary shrink-0" />
                 <span className="text-xs text-muted-foreground">Spotgig Copilot is thinking...</span>
               </div>
             )}

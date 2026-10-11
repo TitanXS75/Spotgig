@@ -8,32 +8,14 @@ export const CopilotFloatingButton = () => {
   const { user } = useAppStore();
   const { isOpen, openCopilot } = useCopilotStore();
 
-  // Hidden on auth / admin / landing pages where navbar is excluded
-  const hiddenPaths = ['/auth', '/forgot-password', '/adminauth'];
-  if (hiddenPaths.some((p) => location.pathname.startsWith(p)) || isOpen) {
+  // Only keep on the browse page (/home or /projects)
+  const isBrowsePage = location.pathname === '/home' || location.pathname === '/projects';
+  if (!isBrowsePage || isOpen) {
     return null;
   }
 
-  // Determine contextual badge label based on route and user role
-  let contextualLabel = 'Ask Spotgig';
-  let contextType: 'general' | 'post_project' | 'project_detail' | 'developer_profile' | 'workspace' | 'discovery' = 'general';
-
-  if (location.pathname.startsWith('/post-project')) {
-    contextualLabel = 'Help me describe my project';
-    contextType = 'post_project';
-  } else if (location.pathname.startsWith('/project/') && location.pathname.includes('/workspace')) {
-    contextualLabel = 'Help with requirements';
-    contextType = 'workspace';
-  } else if (location.pathname.startsWith('/project/')) {
-    contextualLabel = 'Explain this project';
-    contextType = 'project_detail';
-  } else if (location.pathname.startsWith('/profile')) {
-    contextualLabel = 'Improve my profile';
-    contextType = 'developer_profile';
-  } else if (location.pathname === '/projects' || location.pathname === '/home') {
-    contextualLabel = 'Help me find a project';
-    contextType = 'discovery';
-  }
+  const contextualLabel = 'Help me find a project';
+  const contextType = 'discovery';
 
   const handleClick = () => {
     openCopilot({

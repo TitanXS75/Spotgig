@@ -73,6 +73,21 @@ const ProfilePage = () => {
   const [techInput, setTechInput] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+    logout();
+    queryClient.clear();
+    toast({
+      title: 'Logged Out',
+      description: 'You have been successfully signed out.',
+    });
+    navigate('/auth', { replace: true });
+  };
+
   // Fetch target profile
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', targetUserId],
@@ -435,7 +450,7 @@ const ProfilePage = () => {
                     </button>
 
                     <button
-                      onClick={logout}
+                      onClick={handleLogout}
                       title="Log out"
                       className="p-2.5 rounded-xl border border-border bg-card hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 text-muted-foreground transition"
                     >

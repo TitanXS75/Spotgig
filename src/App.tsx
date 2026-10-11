@@ -104,6 +104,7 @@ const AppContent = () => {
       if (session?.user) {
         syncUser(session.user);
       } else {
+        setUser(null);
         setAuthLoading(false);
         setAuthInitialized(true);
       }
@@ -116,11 +117,8 @@ const AppContent = () => {
       }
       if (session?.user) {
         syncUser(session.user);
-      } else if (event === 'SIGNED_OUT') {
+      } else {
         setUser(null);
-        setAuthLoading(false);
-        setAuthInitialized(true);
-      } else if (!session) {
         setAuthLoading(false);
         setAuthInitialized(true);
       }

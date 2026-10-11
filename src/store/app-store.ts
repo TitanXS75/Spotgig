@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { supabase } from '@/lib/supabase';
 import { DEFAULT_LAT, DEFAULT_LNG } from '@/lib/distance';
 import type { ProjectRole, ProjectDifficulty, LocationPreference, CompensationType } from '@/lib/db-types';
 
@@ -94,7 +95,14 @@ export const useAppStore = create<AppState>()(
           set({ user: { ...user, ...updates } });
         }
       },
-      logout: () => set({ user: null }),
+      logout: () => {
+        try {
+          supabase.auth.signOut().catch((err) => console.error('SignOut error:', err));
+        } catch (err) {
+          console.error('SignOut error:', err);
+        }
+        set({ user: null });
+      },
       setUserLocation: (lat, lng, area) =>
         set({ userLat: lat, userLng: lng, hasLocation: true, userArea: area || null }),
       setSearchQuery: (q) => set({ searchQuery: q }),

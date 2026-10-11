@@ -87,10 +87,6 @@ const ProfilePage = () => {
     queryClient.clear();
     setIsLoggingOut(false);
     setShowSignOutConfirm(false);
-    toast({
-      title: 'Logged Out',
-      description: 'You have been successfully signed out.',
-    });
     navigate('/auth', { replace: true });
   };
 

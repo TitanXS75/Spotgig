@@ -10,6 +10,7 @@ import { useAppStore } from '@/store/app-store';
 import { getMyProjectRequests, cancelProjectRequest, type ProjectRequestWithDetails } from '@/lib/api/requests';
 import { useToast } from '@/hooks/use-toast';
 import type { RequestStatus } from '@/lib/db-types';
+import { DeleteConfirmDialog } from '@/components/common/DeleteConfirmDialog';
 
 type TabType = 'all' | 'pending' | 'accepted' | 'rejected';
 
@@ -20,6 +21,7 @@ const MyRequestsPage = () => {
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [requestToCancel, setRequestToCancel] = useState<ProjectRequestWithDetails | null>(null);
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ['my-requests', user?.id],
@@ -46,8 +48,14 @@ const MyRequestsPage = () => {
   });
 
   const handleCancel = (request: ProjectRequestWithDetails) => {
-    if (window.confirm(`Are you sure you want to withdraw your access request for "${request.projects?.title}"?`)) {
-      cancelMutation.mutate(request.id);
+    setRequestToCancel(request);
+  };
+
+  const handleConfirmCancel = () => {
+    if (requestToCancel) {
+      cancelMutation.mutate(requestToCancel.id, {
+        onSettled: () => setRequestToCancel(null),
+      });
     }
   };
 
@@ -329,6 +337,17 @@ const MyRequestsPage = () => {
           </div>
         )}
       </div>
+
+      {/* In-app Request Withdrawal Confirmation Modal */}
+      <DeleteConfirmDialog
+        open={!!requestToCancel}
+        onOpenChange={(open) => !open && setRequestToCancel(null)}
+        title="Withdraw Access Request?"
+        description={`Are you sure you want to withdraw your access request for "${requestToCancel?.projects?.title}"?`}
+        actionLabel="Withdraw"
+        onConfirm={handleConfirmCancel}
+        isLoading={cancelMutation.isPending}
+      />
     </div>
   );
 };

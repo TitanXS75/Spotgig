@@ -12,6 +12,7 @@ import { getMyProjects, updateProjectStatus, deleteProject } from '@/lib/api/pro
 import { getProjectRequestsForOwner } from '@/lib/api/requests';
 import { useToast } from '@/hooks/use-toast';
 import type { Project, ProjectStatus } from '@/lib/db-types';
+import { DeleteConfirmDialog } from '@/components/common/DeleteConfirmDialog';
 
 type Tab = 'published' | 'draft' | 'completed';
 
@@ -21,6 +22,7 @@ const MyProjectsPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<Tab>('published');
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['my-projects', user?.id],
@@ -68,8 +70,14 @@ const MyProjectsPage = () => {
   });
 
   const handleDelete = (project: Project) => {
-    if (window.confirm(`Are you sure you want to permanently delete "${project.title}"? This cannot be undone.`)) {
-      deleteMutation.mutate(project.id);
+    setProjectToDelete(project);
+  };
+
+  const handleConfirmDelete = () => {
+    if (projectToDelete) {
+      deleteMutation.mutate(projectToDelete.id, {
+        onSettled: () => setProjectToDelete(null),
+      });
     }
   };
 
@@ -303,6 +311,15 @@ const MyProjectsPage = () => {
           </div>
         )}
       </div>
+
+      {/* In-app Delete Confirmation Modal */}
+      <DeleteConfirmDialog
+        open={!!projectToDelete}
+        onOpenChange={(open) => !open && setProjectToDelete(null)}
+        itemName={projectToDelete?.title}
+        onConfirm={handleConfirmDelete}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 };

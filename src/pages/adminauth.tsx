@@ -17,6 +17,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import AnimatedDropdown from '@/components/ui/animated-dropdown';
+import { DeleteConfirmDialog } from '@/components/common/DeleteConfirmDialog';
 import {
   Trash2,
   LogOut,
@@ -124,6 +125,8 @@ export default function AdminAuth() {
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [businessNameConfirm, setBusinessNameConfirm] = useState('');
   const [deleteError, setDeleteError] = useState('');
+  const [adminProjectToDelete, setAdminProjectToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [isDeletingAdminProject, setIsDeletingAdminProject] = useState(false);
 
   // Seller filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -318,19 +321,25 @@ export default function AdminAuth() {
     }
   };
 
-  const handleDeleteProject = async (projectId: string, projectTitle: string) => {
-    if (!window.confirm(`Are you sure you want to permanently delete "${projectTitle}" from the marketplace?`)) {
-      return;
-    }
+  const handleDeleteProject = (projectId: string, projectTitle: string) => {
+    setAdminProjectToDelete({ id: projectId, title: projectTitle });
+  };
+
+  const handleConfirmDeleteProject = async () => {
+    if (!adminProjectToDelete) return;
+    setIsDeletingAdminProject(true);
     try {
-      const { error } = await supabase.from('projects').delete().eq('id', projectId);
+      const { error } = await supabase.from('projects').delete().eq('id', adminProjectToDelete.id);
       if (error) throw error;
-      setProjects((prev) => prev.filter((p) => p.id !== projectId));
-      toast.success(`Project "${projectTitle}" deleted successfully`);
+      setProjects((prev) => prev.filter((p) => p.id !== adminProjectToDelete.id));
+      toast.success(`Project "${adminProjectToDelete.title}" deleted successfully`);
+      setAdminProjectToDelete(null);
     } catch (err) {
       console.error(err);
       const message = err instanceof Error ? err.message : 'Failed to delete project';
       toast.error(message);
+    } finally {
+      setIsDeletingAdminProject(false);
     }
   };
 
@@ -1096,6 +1105,15 @@ export default function AdminAuth() {
           </Card>
         )}
       </div>
+
+      {/* In-app Project Delete Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={!!adminProjectToDelete}
+        onOpenChange={(open) => !open && setAdminProjectToDelete(null)}
+        itemName={adminProjectToDelete?.title}
+        onConfirm={handleConfirmDeleteProject}
+        isLoading={isDeletingAdminProject}
+      />
     </div>
   );
 }
